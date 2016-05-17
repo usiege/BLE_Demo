@@ -7,9 +7,10 @@
 //
 
 #import "AppDelegate.h"
-#import "DetailViewController.h"
+#import "BLEManageController.h"
+#import "FoundNewPortViewController.h"
 
-@interface AppDelegate () <UISplitViewControllerDelegate>
+@interface AppDelegate () 
 
 @end
 
@@ -18,11 +19,24 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    UISplitViewController *splitViewController = (UISplitViewController *)self.window.rootViewController;
-    UINavigationController *navigationController = [splitViewController.viewControllers lastObject];
-    navigationController.topViewController.navigationItem.leftBarButtonItem = splitViewController.displayModeButtonItem;
-    splitViewController.delegate = self;
+    self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
+    
+    FoundNewPortViewController *foundNewPortVC = [[FoundNewPortViewController alloc] init];
+    foundNewPortVC.channelType = _channelType_Output;
+    UINavigationController* foundNav = [[UINavigationController alloc] initWithRootViewController:foundNewPortVC];
+    
+    [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+    [[UINavigationBar appearance] setBarTintColor:[UIColor colorWithRed:20/255.0 green:155/255.0 blue:213/255.0 alpha:1.0]];
+    
+    self.window.rootViewController = foundNav;
+    [self setupCompontents];
+    
+    [self.window makeKeyAndVisible];
     return YES;
+}
+
+- (void)setupCompontents{
+    [BLEManageController sharedInstance];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {
@@ -49,13 +63,5 @@
 
 #pragma mark - Split view
 
-- (BOOL)splitViewController:(UISplitViewController *)splitViewController collapseSecondaryViewController:(UIViewController *)secondaryViewController ontoPrimaryViewController:(UIViewController *)primaryViewController {
-    if ([secondaryViewController isKindOfClass:[UINavigationController class]] && [[(UINavigationController *)secondaryViewController topViewController] isKindOfClass:[DetailViewController class]] && ([(DetailViewController *)[(UINavigationController *)secondaryViewController topViewController] detailItem] == nil)) {
-        // Return YES to indicate that we have handled the collapse by doing nothing; the secondary controller will be discarded.
-        return YES;
-    } else {
-        return NO;
-    }
-}
 
 @end

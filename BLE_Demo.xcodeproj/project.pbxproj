@@ -7,15 +7,28 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		46A425564A05C6E888EC5C08 /* libPods-BLE_Demo.a in Frameworks */ = {isa = PBXBuildFile; fileRef = ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */; };
 		BB06E92F1CEAAD7E000162D6 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E92E1CEAAD7E000162D6 /* main.m */; };
 		BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9311CEAAD7E000162D6 /* AppDelegate.m */; };
-		BB06E9351CEAAD7F000162D6 /* MasterViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9341CEAAD7F000162D6 /* MasterViewController.m */; };
-		BB06E9381CEAAD7F000162D6 /* DetailViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9371CEAAD7F000162D6 /* DetailViewController.m */; };
 		BB06E93B1CEAAD7F000162D6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9391CEAAD7F000162D6 /* Main.storyboard */; };
 		BB06E93D1CEAAD7F000162D6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = BB06E93C1CEAAD7F000162D6 /* Assets.xcassets */; };
 		BB06E9401CEAAD7F000162D6 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = BB06E93E1CEAAD7F000162D6 /* LaunchScreen.storyboard */; };
 		BB06E94B1CEAAD7F000162D6 /* BLE_DemoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E94A1CEAAD7F000162D6 /* BLE_DemoTests.m */; };
 		BB06E9561CEAAD7F000162D6 /* BLE_DemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9551CEAAD7F000162D6 /* BLE_DemoUITests.m */; };
+		BB06E96A1CEAB0B1000162D6 /* BLEManageController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9691CEAB0B1000162D6 /* BLEManageController.m */; };
+		BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */; };
+		BB06E9701CEAB1D9000162D6 /* DeviceInforModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */; };
+		BB06E9751CEAB312000162D6 /* ConverUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9741CEAB312000162D6 /* ConverUtil.m */; };
+		BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9771CEAB343000162D6 /* Alg3DES.m */; };
+		BB06E97C1CEAB505000162D6 /* desLib.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E97B1CEAB505000162D6 /* desLib.m */; };
+		BB06E9851CEAB7D0000162D6 /* CardactionViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9811CEAB7D0000162D6 /* CardactionViewController.m */; };
+		BB06E9861CEAB7D0000162D6 /* CardactionViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9821CEAB7D0000162D6 /* CardactionViewController.xib */; };
+		BB06E9871CEAB7D0000162D6 /* FoundNewPortViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9841CEAB7D0000162D6 /* FoundNewPortViewController.m */; };
+		BB06E9891CEAB927000162D6 /* README.md in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9881CEAB927000162D6 /* README.md */; };
+		BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E98F1CEABB0B000162D6 /* WTReParser.m */; };
+		BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9911CEABB0B000162D6 /* WTReTextField.m */; };
+		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
+		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,14 +49,12 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		14447041682CC143290F2AAF /* Pods-BLE_Demo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLE_Demo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-BLE_Demo/Pods-BLE_Demo.debug.xcconfig"; sourceTree = "<group>"; };
+		6073BA0E21CD19D5C1F79E06 /* Pods-BLE_Demo.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-BLE_Demo.release.xcconfig"; path = "Pods/Target Support Files/Pods-BLE_Demo/Pods-BLE_Demo.release.xcconfig"; sourceTree = "<group>"; };
 		BB06E92A1CEAAD7E000162D6 /* BLE_Demo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BLE_Demo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB06E92E1CEAAD7E000162D6 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		BB06E9301CEAAD7E000162D6 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		BB06E9311CEAAD7E000162D6 /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
-		BB06E9331CEAAD7E000162D6 /* MasterViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = MasterViewController.h; sourceTree = "<group>"; };
-		BB06E9341CEAAD7F000162D6 /* MasterViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = MasterViewController.m; sourceTree = "<group>"; };
-		BB06E9361CEAAD7F000162D6 /* DetailViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = DetailViewController.h; sourceTree = "<group>"; };
-		BB06E9371CEAAD7F000162D6 /* DetailViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = DetailViewController.m; sourceTree = "<group>"; };
 		BB06E93A1CEAAD7F000162D6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		BB06E93C1CEAAD7F000162D6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		BB06E93F1CEAAD7F000162D6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -54,6 +65,35 @@
 		BB06E9511CEAAD7F000162D6 /* BLE_DemoUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = BLE_DemoUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		BB06E9551CEAAD7F000162D6 /* BLE_DemoUITests.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = BLE_DemoUITests.m; sourceTree = "<group>"; };
 		BB06E9571CEAAD7F000162D6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		BB06E9661CEAADA9000162D6 /* NetRefer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetRefer.h; sourceTree = "<group>"; };
+		BB06E9681CEAB0B1000162D6 /* BLEManageController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BLEManageController.h; sourceTree = "<group>"; };
+		BB06E9691CEAB0B1000162D6 /* BLEManageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLEManageController.m; sourceTree = "<group>"; };
+		BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bluetooth40Layer.h; sourceTree = "<group>"; };
+		BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bluetooth40Layer.m; sourceTree = "<group>"; };
+		BB06E96E1CEAB1D9000162D6 /* DeviceInforModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceInforModel.h; sourceTree = "<group>"; };
+		BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceInforModel.m; sourceTree = "<group>"; };
+		BB06E9711CEAB267000162D6 /* Bluetooth40Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bluetooth40Common.h; sourceTree = "<group>"; };
+		BB06E9721CEAB298000162D6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
+		BB06E9731CEAB312000162D6 /* ConverUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConverUtil.h; sourceTree = "<group>"; };
+		BB06E9741CEAB312000162D6 /* ConverUtil.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = ConverUtil.m; sourceTree = "<group>"; };
+		BB06E9761CEAB343000162D6 /* Alg3DES.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Alg3DES.h; sourceTree = "<group>"; };
+		BB06E9771CEAB343000162D6 /* Alg3DES.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Alg3DES.m; sourceTree = "<group>"; };
+		BB06E97B1CEAB505000162D6 /* desLib.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = desLib.m; sourceTree = "<group>"; };
+		BB06E9801CEAB7D0000162D6 /* CardactionViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardactionViewController.h; sourceTree = "<group>"; };
+		BB06E9811CEAB7D0000162D6 /* CardactionViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardactionViewController.m; sourceTree = "<group>"; };
+		BB06E9821CEAB7D0000162D6 /* CardactionViewController.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = CardactionViewController.xib; sourceTree = "<group>"; };
+		BB06E9831CEAB7D0000162D6 /* FoundNewPortViewController.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FoundNewPortViewController.h; sourceTree = "<group>"; };
+		BB06E9841CEAB7D0000162D6 /* FoundNewPortViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = FoundNewPortViewController.m; sourceTree = "<group>"; };
+		BB06E9881CEAB927000162D6 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		BB06E98E1CEABB0B000162D6 /* WTReParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WTReParser.h; sourceTree = "<group>"; };
+		BB06E98F1CEABB0B000162D6 /* WTReParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WTReParser.m; sourceTree = "<group>"; };
+		BB06E9901CEABB0B000162D6 /* WTReTextField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WTReTextField.h; sourceTree = "<group>"; };
+		BB06E9911CEABB0B000162D6 /* WTReTextField.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = WTReTextField.m; sourceTree = "<group>"; };
+		BB06E9941CEABC28000162D6 /* RegExCategories.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RegExCategories.h; sourceTree = "<group>"; };
+		BB06E9951CEABC28000162D6 /* RegExCategories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegExCategories.m; sourceTree = "<group>"; };
+		BB06E9971CEACD01000162D6 /* BLERefer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLERefer.h; sourceTree = "<group>"; };
+		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
+		ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BLE_Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -61,6 +101,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46A425564A05C6E888EC5C08 /* libPods-BLE_Demo.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -81,13 +122,33 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		0D0490016D70DA7AF77E6CB2 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				14447041682CC143290F2AAF /* Pods-BLE_Demo.debug.xcconfig */,
+				6073BA0E21CD19D5C1F79E06 /* Pods-BLE_Demo.release.xcconfig */,
+			);
+			name = Pods;
+			sourceTree = "<group>";
+		};
+		449C299A1879D7E78C75A32B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		BB06E9211CEAAD7E000162D6 = {
 			isa = PBXGroup;
 			children = (
+				BB06E9881CEAB927000162D6 /* README.md */,
 				BB06E92C1CEAAD7E000162D6 /* BLE_Demo */,
 				BB06E9491CEAAD7F000162D6 /* BLE_DemoTests */,
 				BB06E9541CEAAD7F000162D6 /* BLE_DemoUITests */,
 				BB06E92B1CEAAD7E000162D6 /* Products */,
+				0D0490016D70DA7AF77E6CB2 /* Pods */,
+				449C299A1879D7E78C75A32B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -104,16 +165,20 @@
 		BB06E92C1CEAAD7E000162D6 /* BLE_Demo */ = {
 			isa = PBXGroup;
 			children = (
+				BB06E9391CEAAD7F000162D6 /* Main.storyboard */,
+				BB06E93E1CEAAD7F000162D6 /* LaunchScreen.storyboard */,
 				BB06E9301CEAAD7E000162D6 /* AppDelegate.h */,
 				BB06E9311CEAAD7E000162D6 /* AppDelegate.m */,
-				BB06E9331CEAAD7E000162D6 /* MasterViewController.h */,
-				BB06E9341CEAAD7F000162D6 /* MasterViewController.m */,
-				BB06E9361CEAAD7F000162D6 /* DetailViewController.h */,
-				BB06E9371CEAAD7F000162D6 /* DetailViewController.m */,
-				BB06E9391CEAAD7F000162D6 /* Main.storyboard */,
-				BB06E93C1CEAAD7F000162D6 /* Assets.xcassets */,
-				BB06E93E1CEAAD7F000162D6 /* LaunchScreen.storyboard */,
-				BB06E9411CEAAD7F000162D6 /* Info.plist */,
+				BB06E9831CEAB7D0000162D6 /* FoundNewPortViewController.h */,
+				BB06E9841CEAB7D0000162D6 /* FoundNewPortViewController.m */,
+				BB06E9801CEAB7D0000162D6 /* CardactionViewController.h */,
+				BB06E9811CEAB7D0000162D6 /* CardactionViewController.m */,
+				BB06E9821CEAB7D0000162D6 /* CardactionViewController.xib */,
+				BB06E9721CEAB298000162D6 /* common.h */,
+				BB06E9651CEAADA9000162D6 /* Network */,
+				BB06E9631CEAADA9000162D6 /* Bluetooth */,
+				BB06E9641CEAADA9000162D6 /* FirmLib */,
+				BB06E9671CEAADA9000162D6 /* UserLib */,
 				BB06E92D1CEAAD7E000162D6 /* Supporting Files */,
 			);
 			path = BLE_Demo;
@@ -122,6 +187,8 @@
 		BB06E92D1CEAAD7E000162D6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BB06E93C1CEAAD7F000162D6 /* Assets.xcassets */,
+				BB06E9411CEAAD7F000162D6 /* Info.plist */,
 				BB06E92E1CEAAD7E000162D6 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -145,6 +212,55 @@
 			path = BLE_DemoUITests;
 			sourceTree = "<group>";
 		};
+		BB06E9631CEAADA9000162D6 /* Bluetooth */ = {
+			isa = PBXGroup;
+			children = (
+				BB06E9981CEAE893000162D6 /* BusInitInfo.plist */,
+				BB06E9971CEACD01000162D6 /* BLERefer.h */,
+				BB06E9681CEAB0B1000162D6 /* BLEManageController.h */,
+				BB06E9691CEAB0B1000162D6 /* BLEManageController.m */,
+				BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */,
+				BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */,
+				BB06E9711CEAB267000162D6 /* Bluetooth40Common.h */,
+				BB06E96E1CEAB1D9000162D6 /* DeviceInforModel.h */,
+				BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */,
+			);
+			path = Bluetooth;
+			sourceTree = "<group>";
+		};
+		BB06E9641CEAADA9000162D6 /* FirmLib */ = {
+			isa = PBXGroup;
+			children = (
+				BB06E9761CEAB343000162D6 /* Alg3DES.h */,
+				BB06E9771CEAB343000162D6 /* Alg3DES.m */,
+				BB06E97B1CEAB505000162D6 /* desLib.m */,
+			);
+			path = FirmLib;
+			sourceTree = "<group>";
+		};
+		BB06E9651CEAADA9000162D6 /* Network */ = {
+			isa = PBXGroup;
+			children = (
+				BB06E9661CEAADA9000162D6 /* NetRefer.h */,
+			);
+			path = Network;
+			sourceTree = "<group>";
+		};
+		BB06E9671CEAADA9000162D6 /* UserLib */ = {
+			isa = PBXGroup;
+			children = (
+				BB06E9941CEABC28000162D6 /* RegExCategories.h */,
+				BB06E9951CEABC28000162D6 /* RegExCategories.m */,
+				BB06E98E1CEABB0B000162D6 /* WTReParser.h */,
+				BB06E98F1CEABB0B000162D6 /* WTReParser.m */,
+				BB06E9901CEABB0B000162D6 /* WTReTextField.h */,
+				BB06E9911CEABB0B000162D6 /* WTReTextField.m */,
+				BB06E9731CEAB312000162D6 /* ConverUtil.h */,
+				BB06E9741CEAB312000162D6 /* ConverUtil.m */,
+			);
+			path = UserLib;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -152,9 +268,12 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = BB06E95A1CEAAD7F000162D6 /* Build configuration list for PBXNativeTarget "BLE_Demo" */;
 			buildPhases = (
+				C0E0D09712179D240E178D06 /* 📦 Check Pods Manifest.lock */,
 				BB06E9261CEAAD7E000162D6 /* Sources */,
 				BB06E9271CEAAD7E000162D6 /* Frameworks */,
 				BB06E9281CEAAD7E000162D6 /* Resources */,
+				43C2B9C8CCE6261395AE71E4 /* 📦 Embed Pods Frameworks */,
+				19BA85EE1C8276EDA382DE03 /* 📦 Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -248,9 +367,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB06E9861CEAB7D0000162D6 /* CardactionViewController.xib in Resources */,
 				BB06E9401CEAAD7F000162D6 /* LaunchScreen.storyboard in Resources */,
 				BB06E93D1CEAAD7F000162D6 /* Assets.xcassets in Resources */,
 				BB06E93B1CEAAD7F000162D6 /* Main.storyboard in Resources */,
+				BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -270,15 +391,73 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
+/* Begin PBXShellScriptBuildPhase section */
+		19BA85EE1C8276EDA382DE03 /* 📦 Copy Pods Resources */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Copy Pods Resources";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BLE_Demo/Pods-BLE_Demo-resources.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		43C2B9C8CCE6261395AE71E4 /* 📦 Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Embed Pods Frameworks";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-BLE_Demo/Pods-BLE_Demo-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		C0E0D09712179D240E178D06 /* 📦 Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "📦 Check Pods Manifest.lock";
+			outputPaths = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_ROOT}/../Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [[ $? != 0 ]] ; then\n    cat << EOM\nerror: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\nEOM\n    exit 1\nfi\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
+
 /* Begin PBXSourcesBuildPhase section */
 		BB06E9261CEAAD7E000162D6 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
-				BB06E9351CEAAD7F000162D6 /* MasterViewController.m in Sources */,
+				BB06E9701CEAB1D9000162D6 /* DeviceInforModel.m in Sources */,
+				BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */,
+				BB06E9751CEAB312000162D6 /* ConverUtil.m in Sources */,
+				BB06E97C1CEAB505000162D6 /* desLib.m in Sources */,
+				BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */,
+				BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */,
+				BB06E9871CEAB7D0000162D6 /* FoundNewPortViewController.m in Sources */,
+				BB06E96A1CEAB0B1000162D6 /* BLEManageController.m in Sources */,
+				BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */,
 				BB06E92F1CEAAD7E000162D6 /* main.m in Sources */,
-				BB06E9381CEAAD7F000162D6 /* DetailViewController.m in Sources */,
+				BB06E9891CEAB927000162D6 /* README.md in Sources */,
+				BB06E9851CEAB7D0000162D6 /* CardactionViewController.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,9 +598,11 @@
 		};
 		BB06E95B1CEAAD7F000162D6 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 14447041682CC143290F2AAF /* Pods-BLE_Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -430,9 +611,11 @@
 		};
 		BB06E95C1CEAAD7F000162D6 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6073BA0E21CD19D5C1F79E06 /* Pods-BLE_Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -504,6 +687,7 @@
 				BB06E95C1CEAAD7F000162D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		BB06E95D1CEAAD7F000162D6 /* Build configuration list for PBXNativeTarget "BLE_DemoTests" */ = {
 			isa = XCConfigurationList;
@@ -512,6 +696,7 @@
 				BB06E95F1CEAAD7F000162D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		BB06E9601CEAAD7F000162D6 /* Build configuration list for PBXNativeTarget "BLE_DemoUITests" */ = {
 			isa = XCConfigurationList;
@@ -520,6 +705,7 @@
 				BB06E9621CEAAD7F000162D6 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
