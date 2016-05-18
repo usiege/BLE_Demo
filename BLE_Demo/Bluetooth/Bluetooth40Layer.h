@@ -75,7 +75,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 };
 
-@class DeviceInforModel;
+@class PeripheralDevice;
 //代理声明
 @protocol Bluetooth40LayerDelegate;
 
@@ -83,9 +83,6 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 /*
  *  类名 Bluetooth40Layer
  *  描述 封装与蓝牙4.0进行的各种操作，如搜索，连接，发现服务，数据交互等，使用单例模式，资源共享
- *
- *
- *
  */
 
 @interface Bluetooth40Layer : NSObject <CBCentralManagerDelegate,CBPeripheralDelegate>
@@ -120,7 +117,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      返回值:     无
  *      参数:  @seconds   搜索时长多少，如果此值为0，代表一直搜索
  */
--(void)startScan:(NSInteger)seconds withServices:(NSString *)service;
+-(void)startScan:(NSTimeInterval)seconds withServices:(NSString *)service;
 
 /*
  *      函数名称:   stopScan
@@ -138,7 +135,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      参数:      建立数据通道的设备
  *      参见:
  */
--(void)createDataChannelWithDevice:(DeviceInforModel *)device;
+-(void)createDataChannelWithDevice:(PeripheralDevice *)device;
 
 
 
@@ -149,7 +146,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      参数:      向设备发送数据
  *      参见:
  */
--(BOOL)sendData:(NSData *)data toDevice:(DeviceInforModel *)device;
+-(BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device;
 
 
 /*
@@ -159,11 +156,9 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      参数:      建立了数据通道的设备类
  *      参见:
  */
+-(void)disconnectWithDevice:(PeripheralDevice *)device;
 
-
--(void)disconnectWithDevice:(DeviceInforModel *)device;
-
--(void)startConnectWithDevice:(DeviceInforModel *)device;
+-(void)startConnectWithDevice:(PeripheralDevice *)device;
 
 @end
 
@@ -176,6 +171,14 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 
 @protocol Bluetooth40LayerDelegate <NSObject>
+
+@optional
+
+/*
+ * 发现新的外围设备
+ */
+- (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
+
 
 @optional
 
@@ -194,21 +197,21 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  参见: startScan:withServices:
  *
  */
--(void)didFoundDevice:(DeviceInforModel *)device;
+-(void)didFoundDevice:(PeripheralDevice *)device;
 
 /*
  *  描述: 创建数据通道时，代理反馈结果接口
  *
  *  参见: createDataChannelWithDevice
  */
--(void)didCreateDataChannelWithDevice:(DeviceInforModel *)device withResult:(BT40LayerResultTypeDef)result;
+-(void)didCreateDataChannelWithDevice:(PeripheralDevice *)device withResult:(BT40LayerResultTypeDef)result;
 
 /*
  *  描述: 数据通道接收到数据时的处理接口
  *
  *
  */
--(void)didReceivedData:(NSData *)data fromChannelWithDevice:(DeviceInforModel *)device;
+-(void)didReceivedData:(NSData *)data fromChannelWithDevice:(PeripheralDevice *)device;
 
 -(void)didReceivedData:(NSData *)data fromChannelWithPeripheral:(CBPeripheral *)peripheral;
 
@@ -218,7 +221,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  有可能是被动断开，有可能是主动断开
  *
  */
--(void)didDisconnectWithDevice:(DeviceInforModel *)device;
+-(void)didDisconnectWithDevice:(PeripheralDevice *)device;
 
 
 @required

@@ -9,11 +9,14 @@
 #import <UIKit/UIKit.h>
 #import "WTReTextField.h"
 
+@class PeripheralDevice;
 @interface CardactionViewController : UIViewController
 {
     UIAlertView *alert;
     NSTimer *updata;
 }
+
+@property (nonatomic,strong)    PeripheralDevice* device;
 
 @property(nonatomic,retain)    IBOutlet UILabel *cardmoney;
 @property(nonatomic,retain)    IBOutlet UILabel *cardnumber;
@@ -21,7 +24,6 @@
 @property(nonatomic,retain)    IBOutlet UILabel *chaxuntime;
 
 @property(nonatomic,retain)    IBOutlet WTReTextField *chongzhilab;
-
 
 @property(nonatomic,retain)    IBOutlet UIButton *Sendchongzhiaction;
 @property(nonatomic,retain)    IBOutlet UIButton *Sendchaxunaction;

@@ -23,7 +23,7 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
     MESSAGE_SOCKET = 5
 };
 
-@class DeviceInforModel;
+@class PeripheralDevice;
 
 @interface BLEManageController : NSObject
 {
@@ -168,9 +168,9 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
 
 @property (assign,nonatomic)    int countOfLogs;
 
-@property (strong,nonatomic)    DeviceInforModel    *inputDevice;
+@property (strong,nonatomic)    PeripheralDevice    *inputDevice;
 
-@property (strong,nonatomic)    DeviceInforModel    *outputDevice;
+@property (strong,nonatomic)    PeripheralDevice    *outputDevice;
 
 @property (assign,nonatomic)    int j;
 
@@ -195,9 +195,9 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
 
 - (void)stopScan;
 
-- (void)createDataChannelWithDevice:(DeviceInforModel *)device withType:(ChannelType)_cType;
+- (void)createDataChannelWithDevice:(PeripheralDevice *)device withType:(ChannelType)_cType;
 
--(void)sendData:(NSData *)data toDevice:(DeviceInforModel *)device;
+-(void)sendData:(NSData *)data toDevice:(PeripheralDevice *)device;
 -(void)sendcardrequest:(NSString*)value;
 -(void)sendsysterequest:(NSString*)value;
 -(void)sendfollow:(int)type;

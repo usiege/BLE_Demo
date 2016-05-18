@@ -11,7 +11,7 @@
 
 #define LOCAL_BLUETOOTH_HOST_IP             @"192.168.0.141"
 #define LOCAL_BLUETOOTH_HOST_PORT           @"6000"
-#define RELEASE_BLUETOOCH_HOST_IP           @""
-#define RELEASE_BLUETOOCH_HOST_PORT         @""
+#define RELEASE_BLUETOOCH_HOST_IP           @"115.236.0.2"
+#define RELEASE_BLUETOOCH_HOST_PORT         @"6543"
 
 #endif /* NetRefer_h */

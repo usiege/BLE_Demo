@@ -22,7 +22,6 @@
     self.window = [[UIWindow alloc] initWithFrame:[[UIScreen mainScreen] bounds]];
     
     FoundNewPortViewController *foundNewPortVC = [[FoundNewPortViewController alloc] init];
-    foundNewPortVC.channelType = _channelType_Output;
     UINavigationController* foundNav = [[UINavigationController alloc] initWithRootViewController:foundNewPortVC];
     
     [[UINavigationBar appearance] setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];

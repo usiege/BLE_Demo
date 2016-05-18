@@ -7,17 +7,24 @@
 //
 
 #import "CardactionViewController.h"
-#import "FoundNewPortViewController.h"
-#import "RegExCategories.h"
 #import "BLEManageController.h"
 
-//extern BLEManageController *Public_BleController;
+#import "RegExCategories.h"
+#import "PeripheralDevice.h"
+#import "XFBluetoochManager.h"
 
 
 @interface CardactionViewController ()
 {
-    BLEManageController *Public_BleController;
+    BOOL addInputDeviceObs;
+    BOOL addOutputDeviceObs;
+    
+//    BLEManageController *_bleController;
+    XFBluetoochManager* _sharedBTManager;
 }
+
+@property (nonatomic,assign) ChannelType channelType;
+
 @end
 
 @implementation CardactionViewController
@@ -26,98 +33,82 @@
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
+    self.title = self.device.name;
     
-    Public_BleController = [BLEManageController sharedInstance];
+    _sharedBTManager = [XFBluetoochManager shareInstance];
+    addInputDeviceObs = false;
+    addOutputDeviceObs = false;
     
     self.chongzhilab.pattern=@"^((0|[1-9]{1}\\d{0,5}))(?:\\.)\\d{2}$";
     
     NSDate *  senddate=[NSDate date];
-    
     NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
-    
     [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
-    
     NSString *  locationString=[dateformatter stringFromDate:senddate];
+    NSLog(@"locationString:%@",locationString);
     
-//    NSLog(@"locationString:%@",locationString);
+//    self.cardmoney.text = _bleController.databuff;
+//    self.chaxuntime.text = locationString;
+//    
+//    if (_bleController.cardchoiseabc == 1) {
+//        self.cardname.text = @"燃气卡";
+//    }else if (_bleController.cardchoiseabc == 2){
+//        self.cardname.text = @"深圳通";
+//    }else if(_bleController.cardchoiseabc == 3){
+//        self.cardname.text = @"银行卡";
+//    }
     
-    self.cardmoney.text = Public_BleController.databuff;
-    self.chaxuntime.text = locationString;
-    
-    if (Public_BleController.cardchoiseabc == 1) {
-        self.cardname.text = @"燃气卡";
-    }else if (Public_BleController.cardchoiseabc == 2){
-        self.cardname.text = @"深圳通";
-    }else if(Public_BleController.cardchoiseabc == 3){
-        self.cardname.text = @"银行卡";
-    }
-    
-    
+    //连接卡
+    [_sharedBTManager startConnectPeriphralDevice:self.device];
 }
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.
 }
 
+- (void)viewDidUnload{
+    [super viewDidUnload];
+    if(addInputDeviceObs)
+    {
+        //        [_bleController removeObserver:self forKeyPath:@"inputDevice"];
+        addInputDeviceObs = false;
+    }
+    if(addOutputDeviceObs)
+    {
+        //        [_bleController removeObserver:self forKeyPath:@"outputDevice"];
+        addOutputDeviceObs = false;
+    }
+}
+
 
 
 /////查询
--(IBAction)Bluechaxun:(id)sender
-{
+-(IBAction)Bluechaxun:(id)sender{
     
-    if(Public_BleController.outputDevice.state == BT40DeviceState_DataReady){
-        
-//        if (Public_BleController.cardchoiseabc == 3) {
-//            Public_BleController.actionsort =10;
-//            Public_BleController.requesetcount=1;
-//            [Public_BleController actionbankchaxun];
-//        }else{
-//            Public_BleController.actionsort = 5;
-//            Public_BleController.requesetcount = 1;
-//            [Public_BleController actiontaizhouchaxun];
-//        }
-//
-//        alert= [[UIAlertView alloc]initWithTitle:@"正在通讯，请稍后...." message:nil delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
-//        [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector: @selector(performDismisschaxun)  userInfo:nil repeats:NO];
-//        [alert show];
-        Public_BleController.actionsort=12;
-        Public_BleController.requesetcount=1;
-        [Public_BleController actionreadandwrite];
-        
-    }else{
-        
-    }
+    
+    
+//    if(_bleController.outputDevice.state == BT40DeviceState_DataReady){
+//        _bleController.actionsort=12;
+//        _bleController.requesetcount=1;
+//        [_bleController actionreadandwrite];
+//        
+//    }else{
+//        
+//    }
 }
 
 
 /////充值
 -(IBAction)Bluechongzhi:(id)sender
 {
-    if(Public_BleController.outputDevice.state == BT40DeviceState_DataReady){
-        
-//        if(([self.chongzhilab.text  isEqual:@"0.00"])|| self.chongzhilab.text.length>9||([self.chongzhilab.text  isEqual:@""])){
-//            alert= [[UIAlertView alloc]initWithTitle:@"请输入正确的金额" message:nil delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-//            [alert show];
-//        }else{
-//            if (Public_BleController.cardchoiseabc == 3) {
-//                Public_BleController.actionsort =11;
-//                Public_BleController.requesetcount=1;
-//                [Public_BleController actionmybankchongzhi:self.chongzhilab.text];
-//            }else{
-//                Public_BleController.actionsort = 6;
-//                Public_BleController.requesetcount =1;
-//                [Public_BleController actionMytaizhouchongzhi:self.chongzhilab.text];
-//            }
-//
-//            alert= [[UIAlertView alloc]initWithTitle:@"正在通讯，请稍后...." message:nil delegate:self cancelButtonTitle:nil otherButtonTitles:nil];
-//            [NSTimer scheduledTimerWithTimeInterval:2.0f target:self selector: @selector(performDismisschaxun)  userInfo:nil repeats:NO];
-//            [alert show];
-//        }
-    }else{
-        
-        
-    }
+//    if(_bleController.outputDevice.state == BT40DeviceState_DataReady){
+//    
+//    }else{
+//        
+//        
+//    }
 
 }
 
@@ -128,21 +119,13 @@
     alert= [[UIAlertView alloc]initWithTitle:@"成功！" message:nil delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
     [alert show];
 
-    
     NSDate *  senddate=[NSDate date];
-    
     NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
-    
     [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
-    
     NSString *  locationString=[dateformatter stringFromDate:senddate];
-    
-    
-    //    NSLog(@"locationString:%@",locationString);
-    self.cardmoney.text = Public_BleController.databuff;
-    self.chaxuntime.text = locationString;
 
-    //    [alert release];
+//    self.cardmoney.text = _bleController.databuff;
+    self.chaxuntime.text = locationString;
 }
 
 

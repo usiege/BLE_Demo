@@ -17,7 +17,7 @@
 		BB06E9561CEAAD7F000162D6 /* BLE_DemoUITests.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9551CEAAD7F000162D6 /* BLE_DemoUITests.m */; };
 		BB06E96A1CEAB0B1000162D6 /* BLEManageController.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9691CEAB0B1000162D6 /* BLEManageController.m */; };
 		BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */; };
-		BB06E9701CEAB1D9000162D6 /* DeviceInforModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */; };
+		BB06E9701CEAB1D9000162D6 /* PeripheralDevice.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E96F1CEAB1D9000162D6 /* PeripheralDevice.m */; };
 		BB06E9751CEAB312000162D6 /* ConverUtil.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9741CEAB312000162D6 /* ConverUtil.m */; };
 		BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9771CEAB343000162D6 /* Alg3DES.m */; };
 		BB06E97C1CEAB505000162D6 /* desLib.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E97B1CEAB505000162D6 /* desLib.m */; };
@@ -29,6 +29,7 @@
 		BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9911CEABB0B000162D6 /* WTReTextField.m */; };
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
+		BB06E9AD1CEC0DF2000162D6 /* XFBluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* XFBluetoochManager.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -70,8 +71,8 @@
 		BB06E9691CEAB0B1000162D6 /* BLEManageController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BLEManageController.m; sourceTree = "<group>"; };
 		BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bluetooth40Layer.h; sourceTree = "<group>"; };
 		BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Bluetooth40Layer.m; sourceTree = "<group>"; };
-		BB06E96E1CEAB1D9000162D6 /* DeviceInforModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DeviceInforModel.h; sourceTree = "<group>"; };
-		BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DeviceInforModel.m; sourceTree = "<group>"; };
+		BB06E96E1CEAB1D9000162D6 /* PeripheralDevice.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PeripheralDevice.h; sourceTree = "<group>"; };
+		BB06E96F1CEAB1D9000162D6 /* PeripheralDevice.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PeripheralDevice.m; sourceTree = "<group>"; };
 		BB06E9711CEAB267000162D6 /* Bluetooth40Common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Bluetooth40Common.h; sourceTree = "<group>"; };
 		BB06E9721CEAB298000162D6 /* common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = common.h; sourceTree = "<group>"; };
 		BB06E9731CEAB312000162D6 /* ConverUtil.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConverUtil.h; sourceTree = "<group>"; };
@@ -93,6 +94,8 @@
 		BB06E9951CEABC28000162D6 /* RegExCategories.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = RegExCategories.m; sourceTree = "<group>"; };
 		BB06E9971CEACD01000162D6 /* BLERefer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = BLERefer.h; sourceTree = "<group>"; };
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
+		BB06E9AB1CEC0DF2000162D6 /* XFBluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XFBluetoochManager.h; sourceTree = "<group>"; };
+		BB06E9AC1CEC0DF2000162D6 /* XFBluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XFBluetoochManager.m; sourceTree = "<group>"; };
 		ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BLE_Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -217,13 +220,15 @@
 			children = (
 				BB06E9981CEAE893000162D6 /* BusInitInfo.plist */,
 				BB06E9971CEACD01000162D6 /* BLERefer.h */,
+				BB06E9AB1CEC0DF2000162D6 /* XFBluetoochManager.h */,
+				BB06E9AC1CEC0DF2000162D6 /* XFBluetoochManager.m */,
 				BB06E9681CEAB0B1000162D6 /* BLEManageController.h */,
 				BB06E9691CEAB0B1000162D6 /* BLEManageController.m */,
 				BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */,
 				BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */,
 				BB06E9711CEAB267000162D6 /* Bluetooth40Common.h */,
-				BB06E96E1CEAB1D9000162D6 /* DeviceInforModel.h */,
-				BB06E96F1CEAB1D9000162D6 /* DeviceInforModel.m */,
+				BB06E96E1CEAB1D9000162D6 /* PeripheralDevice.h */,
+				BB06E96F1CEAB1D9000162D6 /* PeripheralDevice.m */,
 			);
 			path = Bluetooth;
 			sourceTree = "<group>";
@@ -446,7 +451,8 @@
 			files = (
 				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
-				BB06E9701CEAB1D9000162D6 /* DeviceInforModel.m in Sources */,
+				BB06E9701CEAB1D9000162D6 /* PeripheralDevice.m in Sources */,
+				BB06E9AD1CEC0DF2000162D6 /* XFBluetoochManager.m in Sources */,
 				BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */,
 				BB06E9751CEAB312000162D6 /* ConverUtil.m in Sources */,
 				BB06E97C1CEAB505000162D6 /* desLib.m in Sources */,

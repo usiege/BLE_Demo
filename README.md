@@ -12,4 +12,9 @@ UserLib/ConverUtil
 二、Demo界面
 AppDelegate->FoundNewPortViewController->CardactionViewController
 
+5月18日
+一、蓝牙模块编写
+XFBluetoochManager用于发现蓝牙设备，对已发现的蓝牙设备缓存,连接蓝牙，断开蓝牙等操作；
+1.发现设备；
+2.蓝牙读卡；
 

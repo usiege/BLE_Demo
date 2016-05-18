@@ -8,14 +8,9 @@
 
 #import <UIKit/UIKit.h>
 #import "common.h"
-#import "BLEManageController.h"
-#import "DeviceInforModel.h"
+
 @interface FoundNewPortViewController : UIViewController <UITableViewDataSource,UITableViewDelegate>
 
-@property (strong,nonatomic)   UITableView *foundDevicesTableView;
-
-@property (assign,nonatomic)   ChannelType channelType;
-
--(void)connectDevice:(DeviceInforModel*)device;
+@property (assign,nonatomic)    NSInteger   devicesCount;
 
 @end

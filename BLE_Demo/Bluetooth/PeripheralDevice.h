@@ -29,15 +29,16 @@ typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
     
 };
 
-@interface DeviceInforModel : NSObject<NSCopying,NSCoding>
+@interface PeripheralDevice : NSObject<NSCopying,NSCoding>
 
-
-@property (nonatomic, strong) NSString * name;
-@property (nonatomic, strong) NSString * identifier;
 @property (nonatomic, strong) CBPeripheral * peripheral;
-@property (nonatomic, strong) NSNumber * rssi;
 @property (nonatomic, strong) NSData * manufactureData;
-@property (nonatomic, strong) NSString *advertisementDataLocal;
+
+@property (nonatomic, copy)     NSString * name;
+@property (nonatomic, copy)     NSString * identifier;
+@property (nonatomic, copy)     NSString* UUID;
+@property (nonatomic,strong)    NSNumber * rssi;
+@property (nonatomic,strong)    NSDictionary* advertisementData;
 
 @property (assign,nonatomic)  BT40DeviceStateTypeDef    state;
 
@@ -47,7 +48,7 @@ typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
 
 @property (assign,nonatomic)  int countOfNotiCharac;//计数设置的通知属笥
 
-+(BOOL)checkDeviceA:(DeviceInforModel *)deviceA sameAsDeviceB:(DeviceInforModel *)deviceB;
++(BOOL)checkDeviceA:(PeripheralDevice *)deviceA sameAsDeviceB:(PeripheralDevice *)deviceB;
 
 
 @end

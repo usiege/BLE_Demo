@@ -9,17 +9,11 @@
 #import "BLEManageController.h"
 
 #import "Bluetooth40Layer.h"
-#import "DeviceInforModel.h"
+#import "PeripheralDevice.h"
 #import "common.h"
 #import "ConverUtil.h"
 #import "Alg3DES.h"
 
-
-static NSInteger CARD_4442 = 8;
-static NSString* CARD_READ_4442 = @"010100";
-static NSString* CARD_WRITE_4442 = @"010200";
-static NSString* CARD_CHECKPASS_4442 = @"01030000";
-static NSString* CARD_CHANGEPASS_4442 = @"01050000";
 
 @interface BLEManageController () <Bluetooth40LayerDelegate>
 
@@ -121,7 +115,6 @@ static BLEManageController *_instance = nil;
         NSString *path = [[NSBundle mainBundle] pathForResource:@"BusInitInfo" ofType:@"plist"];
         NSDictionary *data = [[NSDictionary alloc] initWithContentsOfFile:path];
         NSAssert(nil!=data, @"Read plist file failed!");
-           
            
         [self initInstance];
         [self initRequestWithDic:data[@"request"]];
@@ -285,7 +278,7 @@ static BLEManageController *_instance = nil;
     [_btLayer stopScan];
 }
 //连接蓝牙
-- (void)createDataChannelWithDevice:(DeviceInforModel *)device withType:(ChannelType)_cType{
+- (void)createDataChannelWithDevice:(PeripheralDevice *)device withType:(ChannelType)_cType{
     self.channelType = _cType;
     if (self.channelType == _channelType_Input) {
         if (self.inputDevice != nil) {
@@ -302,7 +295,7 @@ static BLEManageController *_instance = nil;
  
 }
 
-- (void)sendData:(NSData *)data toDevice:(DeviceInforModel *)device{
+- (void)sendData:(NSData *)data toDevice:(PeripheralDevice *)device{
     
     if (data != nil) {
         
@@ -323,7 +316,7 @@ static BLEManageController *_instance = nil;
     if (LOG) printf("didBluetoothStateChange to : %ld\n",btStatus);
 }
 
-- (void)didFoundDevice:(DeviceInforModel *)device{
+- (void)didFoundDevice:(PeripheralDevice *)device{
     dispatch_async(dispatch_get_main_queue(), ^{
         if (LOG) printf("didFoundDevice : %s\n",[device.name.description UTF8String]);//[device.name.description UTF8String]);
          if (self.channelType == _channelType_Output)
@@ -355,7 +348,7 @@ static BLEManageController *_instance = nil;
     
 }
 
-- (void)didCreateDataChannelWithDevice:(DeviceInforModel *)device withResult:(BT40LayerResultTypeDef)result{
+- (void)didCreateDataChannelWithDevice:(PeripheralDevice *)device withResult:(BT40LayerResultTypeDef)result{
     
     if (LOG) printf("create data channel result : %@\n",result);
     if (self.channelType == _channelType_Input)
@@ -376,7 +369,7 @@ static BLEManageController *_instance = nil;
     
 }
 
-- (void)didDisconnectWithDevice:(DeviceInforModel *)device{
+- (void)didDisconnectWithDevice:(PeripheralDevice *)device{
     if (LOG) printf("didDisconnect With Device : %s\n",[device.name.description UTF8String]);
     if(outputIs ){
       self.outputDevice = nil;
@@ -395,7 +388,7 @@ static BLEManageController *_instance = nil;
 
 
 
-- (void)didReceivedData:(NSData *)data fromChannelWithDevice:(DeviceInforModel *)device{
+- (void)didReceivedData:(NSData *)data fromChannelWithDevice:(PeripheralDevice *)device{
    [self dataProcessing:data];
    
 }

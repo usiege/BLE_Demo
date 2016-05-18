@@ -6,23 +6,14 @@
 //  Copyright (c) 2014 BDE. All rights reserved.
 //
 
-#import "DeviceInforModel.h"
-
-
+#import "PeripheralDevice.h"
 
 #define  kDeviceInforModelNameString            @"keyDeviceInforModelNameString"
 #define  kDeviceInforModelIdentifierString      @"keyDeviceInforModelIdentifierString"
 
 
 
-@implementation DeviceInforModel
-
-@synthesize     name;
-@synthesize     identifier;
-@synthesize     peripheral;
-@synthesize     rssi;
-@synthesize     manufactureData;
-@synthesize     advertisementDataLocal;
+@implementation PeripheralDevice
 
 -(id)init{
     self = [super init];
@@ -60,7 +51,6 @@
     [aCoder encodeObject:self.identifier forKey:kDeviceInforModelIdentifierString];
 }
 
-
 #pragma mark -Utility
 -(void)initAllVariable{
     
@@ -77,7 +67,7 @@
 }
 
 
-+(BOOL)checkDeviceA:(DeviceInforModel *)deviceA sameAsDeviceB:(DeviceInforModel *)deviceB{
++(BOOL)checkDeviceA:(PeripheralDevice *)deviceA sameAsDeviceB:(PeripheralDevice *)deviceB{
     if (deviceA != nil && deviceB != nil) {
         if ([deviceA.identifier isEqualToString:deviceB.identifier]) {
             return YES;

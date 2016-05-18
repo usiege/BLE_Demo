@@ -10,35 +10,29 @@
 
 #import "common.h"
 #import "ConverUtil.h"
-#import "BLEManageController.h"
 
-#import "DeviceInforModel.h"
 #import "Bluetooth40Common.h"
+#import "PeripheralDevice.h"
+#import "XFBluetoochManager.h"
 
+#define LOCAL_DEVICE_NAMES @"LocalDeviceID"
+#define BLUETOOCHMANAGER [XFBluetoochManager shareInstance]
 
 //函数处理结果返回值
 typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
-
     UtilityFuncHandleResult_Success,
-    
-    
     UtilityFuncHandleResult_Existed,
     UtilityFuncHandleResult_Added,
-    
     UtilityFuncHandleResult_Err,
-    
     UtilityFuncHandleResultEnd
-    
 };
-
-
 
 
 @implementation Bluetooth40Layer
 {
     //搜索变量定义
-    NSTimer             *scanTimer;
-    NSMutableArray      *foundedArray;//用于存储搜索到的设备
+    NSTimer                 *scanTimer;
+    NSMutableArray*         _localDeviceNames;
 }
 
 @synthesize _CM;
@@ -49,15 +43,12 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     //用在类方法中，返回一个单例
     static dispatch_once_t once_token;
     
-    
     dispatch_once(&once_token, ^{
         if (_sharedInstance == nil) {
             _sharedInstance = [[Bluetooth40Layer alloc] init];
         }
     });
-
     return _sharedInstance;
-    
 }
 
 //初始化
@@ -65,22 +56,16 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     
     self =  [super init];
     if (self) {
-        dispatch_queue_t centralQ = dispatch_queue_create("com.bde.BDEWristBand.CentralQ", DISPATCH_QUEUE_SERIAL);
+        dispatch_queue_t centralQ = dispatch_queue_create("com.bde.BDEWristBand.CentralQ", DISPATCH_QUEUE_CONCURRENT);
         _CM = [[CBCentralManager alloc] initWithDelegate:self queue:centralQ];
-        _CM.delegate = self;
-        [self initAllVariables];
+        
+        _localDeviceNames = [[NSMutableArray alloc] init];
+        scanTimer = nil;
+        self.state = BT40LayerState_Idle;
     }
     count = 0;
     pagecou = 0;
     return self;
-}
-
--(void)initAllVariables{
-    
-    scanTimer = nil;
-    foundedArray = [[NSMutableArray alloc] init];
-    self.state = BT40LayerState_Idle;
-    
 }
 
 -(NSArray *)fetchConnectedDevices{
@@ -93,27 +78,18 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     return resultArray;
 }
 //搜索蓝牙
--(void)startScan:(NSInteger)seconds withServices:(NSString *)service{
+-(void)startScan:(NSTimeInterval)seconds withServices:(NSString *)service{
     
     if (self.state == BT40LayerState_Searching) {
         [self stopScan];
     }
     
-    if (foundedArray != nil) {
-        [foundedArray removeAllObjects];
-    }
-    
     if (_CM) {
         
-        NSArray *services = nil;
-        if (service != nil) {
-            services = [NSArray arrayWithObjects:[CBUUID UUIDWithString:service], nil];
-        }
+        NSArray *services = @[[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]];
+        NSDictionary *scanOption = @{CBCentralManagerScanOptionAllowDuplicatesKey:@(YES)};//服务暂时不用
         
-        //服务暂时不用
-        NSDictionary *scanOption = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES],CBCentralManagerScanOptionAllowDuplicatesKey, nil];
-//        [_CM scanForPeripheralsWithServices:services options:scanOption];
-        [_CM scanForPeripheralsWithServices:@[[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]] options:scanOption];
+        [_CM scanForPeripheralsWithServices:services options:scanOption];
         printf("start scan peripheral .... \n");
         
         scanTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(scanTimeoutHandler:) userInfo:nil repeats:NO];
@@ -123,17 +99,15 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     
     
 }
--(void)createDataChannelWithDevice:(DeviceInforModel *)device{
-    
+-(void)createDataChannelWithDevice:(PeripheralDevice *)device{
+    [self startConnectWithDevice:device];
     if (self.state == BT40LayerState_Searching) {
         [self stopScan];
     }
-    
-    [self startConnectWithDevice:device];
 }
-//遍历特征，发送数据
 
--(BOOL)sendData:(NSData *)data toDevice:(DeviceInforModel *)device{
+//遍历特征，发送数据
+-(BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device{
     
     //if (device.state == BT40DeviceState_DataReady) {
   if(device == nil)
@@ -144,11 +118,6 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
             CBCharacteristic *txCharac = [self getTXCharacteristicOfDevice:device];
             if(txCharac)
             {
-//              if (txCharac.properties & CBCharacteristicPropertyWriteWithoutResponse) {
-//                  [device.peripheral writeValue:data forCharacteristic:txCharac type:CBCharacteristicWriteWithoutResponse];
-//              }else{
-//                  [device.peripheral writeValue:data forCharacteristic:txCharac type:CBCharacteristicWriteWithResponse];
-//              }
                 [device.peripheral writeValue:data forCharacteristic:txCharac type:CBCharacteristicWriteWithResponse];
             }
             return YES;
@@ -159,7 +128,6 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 }
 
 ///发送完成
-
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     NSLog(@"发送结束");
     
@@ -180,35 +148,41 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 }
 
 //开始链接
-
--(void)startConnectWithDevice:(DeviceInforModel *)device{
+-(void)startConnectWithDevice:(PeripheralDevice *)device{
   
-        if (_CM && device.peripheral && device.peripheral.state == CBPeripheralStateDisconnected) {
-//            printf("===> connect device : %s\n",device.advertisementDataLocal);
-            // printf("%s",);
-            [_CM connectPeripheral:device.peripheral options:nil];
-            device.state = BT40DeviceState_Connecting;
-            device.connectTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_CONNECT_PROCEDURE_ target:self selector:@selector(connectTimeoutHandler:) userInfo:device repeats:NO];
-        }
-   
+    if (_CM && device.peripheral &&
+        device.peripheral.state == CBPeripheralStateDisconnected) {
+        
+        [_CM connectPeripheral:device.peripheral options:nil];
+        
+        
+        device.state = BT40DeviceState_Connecting;
+        device.connectTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_CONNECT_PROCEDURE_
+                                                               target:self
+                                                             selector:@selector(connectTimeoutHandler:)
+                                                             userInfo:device
+                                                              repeats:NO];
+    }
 }
 
 //断开蓝牙
--(void)disconnectWithDevice:(DeviceInforModel *)device{
+-(void)disconnectWithDevice:(PeripheralDevice *)device{
     if (device != nil && device.state != BT40DeviceState_Idle) {
-        if (device.peripheral != nil && device.peripheral.state != CBPeripheralStateDisconnected) {
+        if (device.peripheral != nil &&
+            device.peripheral.state != CBPeripheralStateDisconnected) {
             [_CM cancelPeripheralConnection:device.peripheral];
-            printf("\n-- disconnect with device : %s\n",device.advertisementDataLocal);
+            NSLog(@"\n-- disconnect with device :%@\n",device.advertisementData);
         }
     }
 }
+
 
 #pragma mark-TimeroutHandler
 
 - (void)configureTimeoutHandler:(NSTimer *)_timer{
 
     printf("configure Timeout Handler\n");
-    DeviceInforModel *device = _timer.userInfo;
+    PeripheralDevice *device = _timer.userInfo;
     if (device != nil && device.state == BT40DeviceState_Configuring) {
         device.state = BT40DeviceState_Disconnecting;
         [self disconnectWithDevice:device];
@@ -226,7 +200,7 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 
 - (void)connectTimeoutHandler:(NSTimer *)_timer{
     printf("connect Timeout Handler\n");
-    DeviceInforModel *device = _timer.userInfo;
+    PeripheralDevice *device = _timer.userInfo;
     if (device != nil && device.state == BT40DeviceState_Connecting) {
         device.state = BT40DeviceState_Disconnecting;
         [self disconnectWithDevice:device];
@@ -235,7 +209,7 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 
 - (void)discoverTimeoutHandler:(NSTimer *)_timer{
     printf("discover Timeout Handler \n");
-    DeviceInforModel *device = _timer.userInfo;
+    PeripheralDevice *device = _timer.userInfo;
     if (device != nil && device.state == BT40DeviceState_Discovering) {
         device.state = BT40DeviceState_Disconnecting;
         [self disconnectWithDevice:device];
@@ -253,7 +227,7 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 
 #pragma mark    Utility Function
 
--(CBCharacteristic *)getTXCharacteristicOfDevice:(DeviceInforModel *)device{
+-(CBCharacteristic *)getTXCharacteristicOfDevice:(PeripheralDevice *)device{
 
     for (CBService *service in device.peripheral.services)
     {
@@ -274,10 +248,9 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     return nil;
 }
 
-- (void)dataChannelReadyForDevice:(DeviceInforModel *)device{
+- (void)dataChannelReadyForDevice:(PeripheralDevice *)device{
 
-    printf("\n ==== dataChannelReadyForDevice : %s ==== \n",[device.advertisementDataLocal UTF8String]);
-    
+    NSLog(@"==== dataChannelReadyForDevice : %@ ====",device.advertisementData);
     if (device != nil) {
         
         if ([self.delegate respondsToSelector:@selector(didCreateDataChannelWithDevice:withResult:)]) {
@@ -299,42 +272,6 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 - (void)enableNotifyPropertyOfCharacteristic:(CBCharacteristic *)characteristic peripheral:(CBPeripheral *)peripheral on:(BOOL)bOn{
     
     [peripheral setNotifyValue:bOn forCharacteristic:characteristic];
-    
-}
-
--(UtilityFuncHandleResultDef)addDeviceIntoFoundArray:(DeviceInforModel *)device{
-    if (foundedArray == nil) {
-        return  UtilityFuncHandleResult_Err;
-    }
-    
-    if (foundedArray.count == 0) {
-        [foundedArray addObject:device];
-        return UtilityFuncHandleResult_Added;
-    }
-    
-    for (DeviceInforModel *dev in foundedArray) {
-        if ([dev.identifier isEqualToString:device.identifier]) {
-            return UtilityFuncHandleResult_Existed;
-        }
-    }
-
-    [foundedArray addObject:device];
-    
-    return UtilityFuncHandleResult_Added;
-}
-
-
--(DeviceInforModel *)getDeviceInforByPeripheral:(CBPeripheral *)peripheral{
-   
-    if (foundedArray != nil) {
-        for (DeviceInforModel *dev in foundedArray) {
-            if ([dev.identifier isEqualToString:[peripheral.identifier UUIDString]]) {
-                return dev;
-            }
-        }
-    }
-
-    return nil;
     
 }
 
@@ -393,97 +330,67 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 -(void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI{
     
     printf("didDiscoverPeripheral\n");
-
-    NSLog(@"advertisement data is :%@",advertisementData);
+//    NSLog(@"advertisement data is :%@",advertisementData);
     
+    NSString* identifer = [peripheral.identifier UUIDString];
+    peripheral.delegate = self;
     
-    DeviceInforModel *device = [[DeviceInforModel alloc] init];
-    device.name = peripheral.name;
-
-    NSObject *value = [advertisementData objectForKey:CBAdvertisementDataLocalNameKey];
-    device.advertisementDataLocal = [value description];
-    
-    NSLog(@"系统广播名%@\n",device.advertisementDataLocal);
-
-    device.identifier = [peripheral.identifier UUIDString];
-    device.peripheral = peripheral;
-
-    if (device != nil && device.advertisementDataLocal!=nil) {
-        UtilityFuncHandleResultDef result = [self addDeviceIntoFoundArray:device];
-        switch (result)
-        {
-            case UtilityFuncHandleResult_Added:
-            {
-                //如添加成功，则是新设备
-                if ([self.delegate respondsToSelector:@selector(didFoundDevice:)]) {
-                    [self.delegate didFoundDevice:device];
-                }
-            }
-                break;
-            case UtilityFuncHandleResult_Existed:
-            {
-                // do nothing;
-            }
-                break;
-            case UtilityFuncHandleResult_Err:
-            {
-                // do nothing;
-            }
-                break;
-            case UtilityFuncHandleResult_Success:
-            {
-                // do nothing;
-            }
-                break;
-            default:
-                break;
-        }//END SWITCH
-    }//END IF
+    //根据设备的UUID进行检索
+    if (![_localDeviceNames containsObject:identifer]) {
+        
+        [_localDeviceNames addObject:identifer];
+        NSLog(@"device identifier is :%@",identifer);
+        
+        PeripheralDevice *device = [[PeripheralDevice alloc] init];
+        device.identifier = [peripheral.identifier UUIDString];
+        device.rssi = RSSI;
+        device.name = peripheral.name;
+        device.advertisementData = advertisementData;
+        device.peripheral = peripheral;
+        [BLUETOOCHMANAGER addNewDevice:device];
+        
+    }else{
+        return;
+    }
 }
-
 
 -(void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral{
     printf("didConnectPeripheral , name = %s\n",[peripheral.name UTF8String]);
-    DeviceInforModel *device = [self getDeviceInforByPeripheral:peripheral];
-    //if (device != nil) {
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
     
     [self cancelTimer:device.connectTimer];
     
     dispatch_async(dispatch_get_main_queue(), ^{
-        // if (device.state == BT40DeviceState_Connecting) {
-        [peripheral discoverServices:nil];
-        printf(" -- service discovering .... \n");
-        peripheral.delegate = self;
-        device.state = BT40DeviceState_Discovering;
-        device.discoverTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_DISCOVER_PROCEDURE_ target:self selector:@selector(discoverTimeoutHandler:) userInfo:device repeats:NO];
+        if (device.state == BT40DeviceState_Connecting){
+            [peripheral discoverServices:nil];
+            printf(" -- service discovering .... \n");
+            peripheral.delegate = self;
+            device.state = BT40DeviceState_Discovering;
+            device.discoverTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_DISCOVER_PROCEDURE_ target:self selector:@selector(discoverTimeoutHandler:) userInfo:device repeats:NO];
+        }
     });
 }
 
-
-
-//连接失败回调
--(void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
-    NSLog(@"didFailToConnectPeripheral");
-}
 
 //断开回调处理
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
     NSLog(@"didDisconnectPeripheral%@\n",peripheral.name);
     
-    DeviceInforModel *device = [self getDeviceInforByPeripheral:peripheral];
-    // if (device != nil) {
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
+    if (!device) return;
+    
     device.state = BT40DeviceState_Idle;
     [self cancelTimer:device.connectTimer];
     [self cancelTimer:device.discoverTimer];
     [self cancelTimer:device.configureTimer];
     if ([self.delegate respondsToSelector:@selector(didDisconnectWithDevice:)]) {
-//        [self.delegate didDisconnectWithDevice:device];
-        
+        [self.delegate didDisconnectWithDevice:device];
     }
-    
-    // }
-    
-    
+}
+
+//连接失败回调
+-(void)centralManager:(CBCentralManager *)central didFailToConnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
+    NSLog(@"didFailToConnectPeripheral error:%@",error);
 }
 
 //周边蓝牙协议
@@ -493,8 +400,8 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverServices:(NSError *)error{
     printf("\n ==== didDiscoverServices ==== \n");
     
-    DeviceInforModel *device = [self getDeviceInforByPeripheral:peripheral];
-    // if (device != nil) {
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
+    if(!device) return;
     
     [self cancelTimer:device.discoverTimer];
     
@@ -503,12 +410,9 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
         if ([self.delegate respondsToSelector:@selector(didCreateDataChannelWithDevice:withResult:)]) {
             [self.delegate didCreateDataChannelWithDevice:device withResult:BT40LayerResult_DiscoverFailed];
         }
-        
         [self disconnectWithDevice:device];
         
     }else{
-        
-        
         device.countOfNotiCharac = 0;
         
         for (CBService *service in peripheral.services) {
@@ -517,17 +421,13 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
         }
         
     }
-    // }
-    
-    
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didDiscoverCharacteristicsForService:(CBService *)service error:(NSError *)error{
     printf("didDiscoverCharacteristicsForService(%s)\n",[[service.UUID UUIDString] UTF8String]);
     
-    DeviceInforModel *device  =  [self getDeviceInforByPeripheral:peripheral];
-    
-    // if (device != nil) {
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
+    if(!device) return;
     
     if (error != nil) {//出错处理
         printf("error is : %s\n",[error.description UTF8String]);
@@ -537,9 +437,7 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
         
         [self disconnectWithDevice:device];
         
-    }else
-        
-      {
+    }else{
         
         for (CBCharacteristic *characteristic in service.characteristics) {
             printf(" -> charac : %s,property(0x%02x) ",[[characteristic.UUID UUIDString] UTF8String],characteristic.properties);
@@ -570,15 +468,12 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
         }
         
     }
-    //  }
-    
-    
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     printf("didUpdateNotificationStateForCharacteristic (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
-    DeviceInforModel *device = [self getDeviceInforByPeripheral:peripheral];
-    // if (device != nil) {
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
+    if(!device) return;
     
     if (error != nil) {
         printf("error is : %s\n",[error.description UTF8String]);
@@ -601,19 +496,15 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
             [self dataChannelReadyForDevice:device];
         }
     }
-    
-    // }
 }
 
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
-   // printf("didUpdateValueForCharacteristic , value = %s\n",[[characteristic.value description] UTF8String]);
     
-    DeviceInforModel *device = [self getDeviceInforByPeripheral:peripheral];
+    PeripheralDevice *device = [BLUETOOCHMANAGER getDeviceByPeripheral:peripheral];
     
     if (error != nil) {
         printf("接收失败");
     }else{
-        
         if ([self.delegate respondsToSelector:@selector(didReceivedData:fromChannelWithDevice:)])
         {
             NSLog(@"Rev:%@  Length:%lu",[ConverUtil data2HexString:characteristic.value],(unsigned long)characteristic.value.length);
@@ -622,8 +513,6 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
             //            }
             
             [self.delegate didReceivedData:characteristic.value fromChannelWithDevice:device];
-            
-            
         }
     }
 }
