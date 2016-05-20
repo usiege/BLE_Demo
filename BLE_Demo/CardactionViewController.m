@@ -24,6 +24,7 @@
 }
 
 @property (nonatomic,assign) ChannelType channelType;
+@property (strong) UIActivityIndicatorView* aiView;
 
 @end
 
@@ -33,7 +34,7 @@
     
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    self.title = self.device.name;
+    [self createUI];
     
     _sharedBTManager = [XFBluetoochManager shareInstance];
     addInputDeviceObs = false;
@@ -62,6 +63,14 @@
     [_sharedBTManager startConnectPeriphralDevice:self.device];
 }
 
+-(void)createUI{
+    self.title = self.device.name;
+    
+    self.aiView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    UIBarButtonItem* aiItem = [[UIBarButtonItem alloc] initWithCustomView:_aiView];
+    self.navigationItem.rightBarButtonItem = aiItem;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
@@ -86,9 +95,6 @@
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
-    
-    
-    
 //    if(_bleController.outputDevice.state == BT40DeviceState_DataReady){
 //        _bleController.actionsort=12;
 //        _bleController.requesetcount=1;

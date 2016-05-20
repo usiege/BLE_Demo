@@ -49,23 +49,11 @@ typedef NS_ENUM(NSInteger, BT40LayerResultTypeDef) {
     BT40LayerResult_DiscoverFailed,
     BT40LayerResult_ConfigureFailed,
     
-    
     BT40LayerResultTypeEnd
 };
 
-
-/*
- *  状态机制枚举定义
- *  当前蓝牙逻辑层状态被分为以下:
- *  Idle            蓝牙未使用
- *  Searching       蓝牙在搜索
- *  Connecting      蓝牙在与外设建立连接
- *  Discovering     蓝牙发现设备Service及Characteristic
- *  Configuring     蓝牙配置相关Service及Characteristic
- *  DataReady       蓝牙数据通路可使用
- *  Disconnecting   正在断开与外设的连接
- *  Reconnecting    正在试图与外设进行重连
- */
+//*  Idle            蓝牙未使用
+//*  Searching       蓝牙在搜索
 typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
     
     BT40LayerState_Idle,            //
@@ -87,7 +75,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 @interface Bluetooth40Layer : NSObject 
 {
-    int count;
+    int count;      
     int pagecou;
 }
 
@@ -198,29 +186,20 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  */
 -(void)didBluetoothStateChange:(BT40LayerStatusTypeDef)btStatus;
 
-/*
- *  描述: 发现设备代理接口
- *
- *  参见: startScan:withServices:
- *
- */
--(void)didFoundDevice:(PeripheralDevice *)device;
+///*
+// *  描述: 发现设备代理接口
+// *
+// *  参见: startScan:withServices:
+// *
+// */
+//-(void)didFoundDevice:(PeripheralDevice *)device;
 
-/*
- *  描述: 创建数据通道时，代理反馈结果接口
+/**
+ *  当中心连接到外围设备
  *
- *  参见: createDataChannelWithDevice
+ *  @param device 已连接的外围设备
  */
--(void)didCreateDataChannelWithDevice:(PeripheralDevice *)device withResult:(BT40LayerResultTypeDef)result;
-
-/*
- *  描述: 数据通道接收到数据时的处理接口
- *
- *
- */
--(void)didReceivedData:(NSData *)data fromChannelWithDevice:(PeripheralDevice *)device;
-
--(void)didReceivedData:(NSData *)data fromChannelWithPeripheral:(CBPeripheral *)peripheral;
+- (void)didConnectedPeripheralDevice:(PeripheralDevice *)device;
 
 /*
  *  描述: 当与设备的连接断开时的处理接口
@@ -228,7 +207,25 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  有可能是被动断开，有可能是主动断开
  *
  */
--(void)didDisconnectWithDevice:(PeripheralDevice *)device;
+-(void)didDisconnectedPeripheralDevice:(PeripheralDevice *)device;
+
+
+/*
+ *  描述: 创建数据通道时，代理反馈结果状态接口
+ *
+ *  参见: createDataChannelWithDevice
+ */
+-(void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerResultTypeDef)state;
+
+/*
+ *  描述: 数据通道接收到数据时的处理接口
+ */
+-(void)didReceivedData:(NSData *)data fromChannelWithDevice:(PeripheralDevice *)device;
+
+-(void)didReceivedData:(NSData *)data fromChannelWithPeripheral:(CBPeripheral *)peripheral;
+
+
+
 
 
 @required

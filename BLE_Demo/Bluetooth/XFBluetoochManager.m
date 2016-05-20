@@ -10,6 +10,8 @@
 #import "PeripheralDevice.h"
 #import "Bluetooth40Layer.h"
 
+#import "BLEManageController.h"
+
 static XFBluetoochManager* _bluetoochManager = nil;
 
 @interface XFBluetoochManager () <Bluetooth40LayerDelegate>
@@ -34,6 +36,7 @@ static XFBluetoochManager* _bluetoochManager = nil;
         _seekedDevices = [NSMutableArray array];
         _sharedBluetoothLayer = [Bluetooth40Layer sharedInstance];
         _sharedBluetoothLayer.delegate = self;
+        
     }
     
     return self;
@@ -55,6 +58,10 @@ static XFBluetoochManager* _bluetoochManager = nil;
 
 - (void)stopConectPeriphralDevice:(PeripheralDevice *)pDevice{
     [_sharedBluetoothLayer disconnectWithDevice:pDevice];
+}
+
+- (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID{
+    return nil;
 }
 
 -(PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral{
@@ -112,7 +119,13 @@ static XFBluetoochManager* _bluetoochManager = nil;
 
 #pragma mark -BLELayerDelegate
 
-
+- (void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerResultTypeDef)state{
+    
+    BLEManageController* Public_BleController = [BLEManageController sharedInstance];
+    Public_BleController.actionsort=12;
+    Public_BleController.requesetcount=1;
+    [Public_BleController actionreadandwrite];
+}
 
 
 @end

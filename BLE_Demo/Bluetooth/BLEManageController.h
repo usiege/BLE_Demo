@@ -32,8 +32,8 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
     NSTimer *checkpackge;           //////接受数据包［20字节］超时
     NSTimer *checkfollow;           //////等待正确小数据包接入超时
 
-    int outtimecount;                      //////超时记述
-    int lastcountfill;                  ////// 上一个包序号
+    int outtimecount;                //////超时记述
+    int lastcountfill;               ////// 上一个包序号
     int maxnow;                     //////总包数
     
     bool check15page;               //////收到1015标志
@@ -107,53 +107,15 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
 }
 
 
-//@property(assign,nonatomic) unsigned char *sequenceBuf;
-//@property(assign,nonatomic) unsigned char *cardChallenge;
-//@property(assign,nonatomic) unsigned char *sesKey;      ////kong4  16
-//@property(assign,nonatomic) unsigned char *macKey;    ///kong3      16
-//@property(assign,nonatomic) unsigned char *resultBuf;  ///kong1  8
-////    unsigned char *cardChallenge[6];  ///截取15-20  6
-//@property(assign,nonatomic) unsigned char *MAC;   ///kong2  8
-//@property(assign,nonatomic) unsigned char *hostChallenge;
-
-@property(assign,nonatomic)   int requesetcount;              //////执行第几个指令
-@property(assign,nonatomic)   int actionsort;                 //////执行指令类型
-
 @property(strong,nonatomic)   NSMutableArray *dataRevArray;;
 @property(strong,nonatomic)   NSMutableArray *dataArr;
-@property(assign,nonatomic)   int serial;
-@property(assign,nonatomic)   int pagecount;
-@property(assign,nonatomic)   int cardyuer;
-
-@property(assign,nonatomic)     BOOL isendsend;
-@property(nonatomic,retain)     NSString *datastring;
-@property(nonatomic,retain)     NSString *databuff;
-@property(nonatomic,retain)     NSString *requsetnow;
-@property(nonatomic,retain)     NSString *requset1;
-@property(nonatomic,retain)     NSString *requset2;
-@property(nonatomic,retain)     NSString *requset3;
-@property(nonatomic,retain)     NSString *requset4;
-@property(nonatomic,retain)     NSString *requset5;
-
-
-@property(nonatomic,retain)     NSString *requsetcreat;         ///注册创建
-@property(nonatomic,retain)     NSString *requsetcharg;         ///充值
-@property(nonatomic,retain)     NSString *requsetconsume;       ///消费
-@property(nonatomic,retain)     NSString *requsetcancel;        ///注销
-@property(nonatomic,retain)     NSString *requsetquery;          ///查询
-@property(nonatomic,retain)     NSString *requsetgetall;         ///获取所有应用
-@property(nonatomic,retain)     NSString *requsetgetname;         ///获取所有应用
 
 @property(assign,nonatomic)     int cardchoiseabc;
 
 
-@property(nonatomic,retain)     NSString *requsetdatesend;         ///获取所有应用
 
-@property(nonatomic,retain)     NSString *requsetxiazaixuanzhe;
-@property(nonatomic,retain)     NSString *requsetxiazaisuijishu;
-@property(nonatomic,retain)     NSString *requsetxiazaihuoqu;
-@property(nonatomic,retain)     NSString *requsetxiazaimiyao;
-@property(nonatomic,retain)     NSString *requsetxiazaihuoqu2;
+
+
 
 @property(assign,nonatomic)     BOOL requsetgetallis;
 @property(assign,nonatomic)     BOOL isgongjiaoxiazai;
@@ -172,21 +134,6 @@ typedef NS_ENUM(int,MESSAGE_TYPE)
 
 @property (strong,nonatomic)    PeripheralDevice    *outputDevice;
 
-@property (assign,nonatomic)    int j;
-
-@property (strong,nonatomic)     NSString*        Battery_voltage;
-
-@property (strong,nonatomic)     NSString*        Driving_Speed;
-
-@property (strong,nonatomic)     NSString*        Engine_Speed;
-
-@property (strong,nonatomic)     NSString*        Driving_Course;
-
-@property (strong,nonatomic)     NSString*        Fuel_Consumption;
-
-@property (strong,nonatomic)     NSString*        Total_Fuel_Consumption;
-
-@property (strong,nonatomic)     NSString*        Remaining_Oil;
 
 
 + (instancetype)sharedInstance;

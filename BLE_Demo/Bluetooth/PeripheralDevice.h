@@ -11,15 +11,22 @@
 #import <CoreBluetooth/CoreBluetooth.h>
 
 
-/**
- *  设备状态枚举定义
- *
+/*
+ *  状态机制枚举定义
+ *  当前蓝牙逻辑层状态被分为以下:
+ *  Idle            蓝牙未使用
+ *  Connecting      蓝牙在与外设建立连接
+ *  Discovering     蓝牙发现设备Service及Characteristic
+ *  Configuring     蓝牙配置相关Service及Characteristic
+ *  DataReady       蓝牙数据通路可使用
+ *  Disconnecting   正在断开与外设的连接
+ *  Reconnecting    正在试图与外设进行重连
  */
 typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
     
-    BT40DeviceState_Idle,            //
-    BT40DeviceState_Connecting,      //
-    BT40DeviceState_Discovering,     //
+    BT40DeviceState_Idle,            //已断开
+    BT40DeviceState_Connecting,      //已连接...
+    BT40DeviceState_Discovering,     //已发现服务...
     BT40DeviceState_Configuring,     //
     BT40DeviceState_DataReady,       //
     BT40DeviceState_Disconnecting,   //
@@ -31,8 +38,8 @@ typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
 
 @interface PeripheralDevice : NSObject<NSCopying,NSCoding>
 
-@property (nonatomic, strong) CBPeripheral * peripheral;
-@property (nonatomic, strong) NSData * manufactureData;
+@property (nonatomic, strong)   CBPeripheral * peripheral;
+@property (nonatomic, strong)   NSData * manufactureData;
 
 @property (nonatomic, copy)     NSString * name;
 @property (nonatomic, copy)     NSString * identifier;

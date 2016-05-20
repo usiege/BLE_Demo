@@ -17,6 +17,49 @@
 
 @interface BLEManageController () <Bluetooth40LayerDelegate>
 
+@property (assign,nonatomic)    int j;
+@property (strong,nonatomic)     NSString*        Battery_voltage;
+@property (strong,nonatomic)     NSString*        Driving_Speed;
+@property (strong,nonatomic)     NSString*        Engine_Speed;
+@property (strong,nonatomic)     NSString*        Driving_Course;
+@property (strong,nonatomic)     NSString*        Fuel_Consumption;
+@property (strong,nonatomic)     NSString*        Total_Fuel_Consumption;
+@property (strong,nonatomic)     NSString*        Remaining_Oil;
+
+@property(assign,nonatomic)   int  serial;
+@property(assign,nonatomic)   int  pagecount;
+@property(assign,nonatomic)   BOOL isendsend;
+
+@property(assign,nonatomic)   int cardyuer;
+
+@property(nonatomic,retain)     NSString *datastring;
+@property(nonatomic,retain)     NSString *databuff;
+
+@property(assign,nonatomic)     int requesetcount;              //////执行第几个指令
+@property(nonatomic,retain)     NSString *requsetnow;
+@property(nonatomic,retain)     NSString *requset1;
+@property(nonatomic,retain)     NSString *requset2;
+@property(nonatomic,retain)     NSString *requset3;
+@property(nonatomic,retain)     NSString *requset4;
+@property(nonatomic,retain)     NSString *requset5;
+
+@property(assign,nonatomic)     int actionsort;                 //////执行指令类型
+
+@property(nonatomic,retain)     NSString *requsetcreat;         ///注册创建
+@property(nonatomic,retain)     NSString *requsetcharg;         ///充值
+@property(nonatomic,retain)     NSString *requsetconsume;       ///消费
+@property(nonatomic,retain)     NSString *requsetcancel;        ///注销
+@property(nonatomic,retain)     NSString *requsetquery;          ///查询
+@property(nonatomic,retain)     NSString *requsetgetall;         ///获取所有应用
+@property(nonatomic,retain)     NSString *requsetgetname;         ///获取所有应用
+@property(nonatomic,retain)     NSString *requsetdatesend;         ///获取所有应用
+
+@property(nonatomic,retain)     NSString *requsetxiazaixuanzhe;
+@property(nonatomic,retain)     NSString *requsetxiazaisuijishu;
+@property(nonatomic,retain)     NSString *requsetxiazaihuoqu;
+@property(nonatomic,retain)     NSString *requsetxiazaimiyao;
+@property(nonatomic,retain)     NSString *requsetxiazaihuoqu2;
+
 @end
 
 
@@ -28,56 +71,23 @@
     
 }
 
-@synthesize j;
+@synthesize j,Battery_voltage,Driving_Speed,Engine_Speed,Driving_Course,Fuel_Consumption,Total_Fuel_Consumption,Remaining_Oil;
 
-@synthesize Battery_voltage;
+@synthesize serial,pagecount,isendsend;
 
-@synthesize Driving_Speed;
+@synthesize databuff,datastring;
 
-@synthesize Engine_Speed;
+@synthesize requset1,requset2,requset3,requset4,requset5,requsetnow,requesetcount;
 
-@synthesize Driving_Course;
-
-@synthesize Fuel_Consumption;
-
-@synthesize Total_Fuel_Consumption;
-
-@synthesize Remaining_Oil;
-
-@synthesize serial;
-@synthesize pagecount;
-@synthesize isendsend;
-
-@synthesize databuff;
-@synthesize datastring;
-
-@synthesize requset1;
-@synthesize requset2;
-@synthesize requset3;
-@synthesize requset4;
-@synthesize requset5;
-@synthesize requsetnow;
-@synthesize requesetcount;
 @synthesize actionsort;
 
-@synthesize requsetcreat;
-@synthesize requsetcancel;
-@synthesize requsetcharg;
-@synthesize requsetconsume;
-@synthesize requsetgetall;
-@synthesize requsetquery;
-@synthesize requsetgetname;
+@synthesize requsetcreat,requsetcancel,requsetcharg,requsetconsume,requsetgetall,requsetquery,requsetgetname,requsetdatesend;
 
-@synthesize requsetdatesend;
-
-@synthesize requsetxiazaixuanzhe;
-@synthesize requsetxiazaisuijishu;
-@synthesize requsetxiazaihuoqu;
-@synthesize requsetxiazaimiyao;
+@synthesize requsetxiazaixuanzhe,requsetxiazaisuijishu,requsetxiazaihuoqu,requsetxiazaihuoqu2,requsetxiazaimiyao;
 
 @synthesize cardchoiseabc;
 
-@synthesize requsetxiazaihuoqu2;
+
 
 @synthesize requsetgetallis;
 @synthesize isgongjiaoxiazai;
@@ -323,9 +333,7 @@ static BLEManageController *_instance = nil;
            {
             // if ([device.peripheral.name rangeOfString:@"SIVISION"].location != NSNotFound)
                 {
-                    
                   [self.foundDevicesArray addObject:device];
-                
                 }
            }
         
