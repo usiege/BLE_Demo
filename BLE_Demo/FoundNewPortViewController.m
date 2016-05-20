@@ -115,8 +115,10 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
     
     if (rightButton.selected) {
         [self.aInView startAnimating];
+        [_bleManager startSearchPeriphralsUntil:[NSDate distantFuture]];
     }else{
         [self.aInView stopAnimating];
+        [_bleManager stopSearchPeriphrals];
     }
 }
 

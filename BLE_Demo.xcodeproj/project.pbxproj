@@ -30,6 +30,7 @@
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 		BB06E9AD1CEC0DF2000162D6 /* XFBluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* XFBluetoochManager.m */; };
+		BB65ED051CEDA612005E4803 /* BleCardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BB65ED041CEDA612005E4803 /* BleCardHandler.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -96,6 +97,8 @@
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
 		BB06E9AB1CEC0DF2000162D6 /* XFBluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XFBluetoochManager.h; sourceTree = "<group>"; };
 		BB06E9AC1CEC0DF2000162D6 /* XFBluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XFBluetoochManager.m; sourceTree = "<group>"; };
+		BB65ED031CEDA612005E4803 /* BleCardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardHandler.h; sourceTree = "<group>"; };
+		BB65ED041CEDA612005E4803 /* BleCardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardHandler.m; sourceTree = "<group>"; };
 		ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BLE_Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -226,6 +229,8 @@
 				BB06E9691CEAB0B1000162D6 /* BLEManageController.m */,
 				BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */,
 				BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */,
+				BB65ED031CEDA612005E4803 /* BleCardHandler.h */,
+				BB65ED041CEDA612005E4803 /* BleCardHandler.m */,
 				BB06E9711CEAB267000162D6 /* Bluetooth40Common.h */,
 				BB06E96E1CEAB1D9000162D6 /* PeripheralDevice.h */,
 				BB06E96F1CEAB1D9000162D6 /* PeripheralDevice.m */,
@@ -336,6 +341,7 @@
 				TargetAttributes = {
 					BB06E9291CEAAD7E000162D6 = {
 						CreatedOnToolsVersion = 7.3.1;
+						DevelopmentTeam = KP4EV5KXB5;
 					};
 					BB06E9451CEAAD7F000162D6 = {
 						CreatedOnToolsVersion = 7.3.1;
@@ -455,6 +461,7 @@
 				BB06E9AD1CEC0DF2000162D6 /* XFBluetoochManager.m in Sources */,
 				BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */,
 				BB06E9751CEAB312000162D6 /* ConverUtil.m in Sources */,
+				BB65ED051CEDA612005E4803 /* BleCardHandler.m in Sources */,
 				BB06E97C1CEAB505000162D6 /* desLib.m in Sources */,
 				BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */,
 				BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */,
@@ -607,11 +614,14 @@
 			baseConfigurationReference = 14447041682CC143290F2AAF /* Pods-BLE_Demo.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Debug;
 		};
@@ -620,11 +630,14 @@
 			baseConfigurationReference = 6073BA0E21CD19D5C1F79E06 /* Pods-BLE_Demo.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "iPhone Developer";
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "";
 			};
 			name = Release;
 		};

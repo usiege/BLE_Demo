@@ -10,8 +10,6 @@
 #ifndef BLEDataGateway_common_h
 #define BLEDataGateway_common_h
 
-#include "BLEManageController.h"
-
 #define LOG         1
 #define CARD        1
 

@@ -85,7 +85,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  描述 封装与蓝牙4.0进行的各种操作，如搜索，连接，发现服务，数据交互等，使用单例模式，资源共享
  */
 
-@interface Bluetooth40Layer : NSObject <CBCentralManagerDelegate,CBPeripheralDelegate>
+@interface Bluetooth40Layer : NSObject 
 {
     int count;
     int pagecou;
@@ -94,11 +94,14 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 @property (nonatomic,assign)        id<Bluetooth40LayerDelegate>    delegate;
 @property (nonatomic,assign)        BT40LayerStateTypeDef state;
 
-@property(strong,nonatomic)          CBCentralManager* _CM;
+@property (strong,nonatomic)        CBCentralManager* _CM;
 
 
 //单例模式静态接口
 +(instancetype)sharedInstance;
+
++ (PeripheralDevice *)currentDisposedDevice;
+//@property (nonatomic,strong)        PeripheralDevice* currentDisposedDevice;
 
 //实例接口
 
@@ -108,7 +111,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      返回值:     查看DeviceInforModel.h
  *      参数无
  */
--(NSArray *)fetchConnectedDevices;
+//-(NSArray *)fetchConnectedDevices;
 
 
 /*      
@@ -178,6 +181,10 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  * 发现新的外围设备
  */
 - (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
+
+/*
+ * 
+ */
 
 
 @optional

@@ -370,18 +370,18 @@ static BLEManageController *_instance = nil;
 }
 
 - (void)didDisconnectWithDevice:(PeripheralDevice *)device{
+    NSLog(@"BLEManagerController 中的方法调用：");
     if (LOG) printf("didDisconnect With Device : %s\n",[device.name.description UTF8String]);
+    
     if(outputIs ){
-      self.outputDevice = nil;
+        self.outputDevice = nil;
     }else{
-    [self createDataChannelWithDevice:self.outputDevice withType:_channelType_Output];
+        [self createDataChannelWithDevice:self.outputDevice withType:_channelType_Output];
     }
-     if(inputIs)
-    {
-     self.inputDevice = nil;
-     
+     if(inputIs){
+         self.inputDevice = nil;
     }else{
-      [self createDataChannelWithDevice:self.inputDevice withType:_channelType_Input];
+        [self createDataChannelWithDevice:self.inputDevice withType:_channelType_Input];
     }
     
 }

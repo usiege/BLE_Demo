@@ -36,7 +36,6 @@ typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
 
 @property (nonatomic, copy)     NSString * name;
 @property (nonatomic, copy)     NSString * identifier;
-@property (nonatomic, copy)     NSString* UUID;
 @property (nonatomic,strong)    NSNumber * rssi;
 @property (nonatomic,strong)    NSDictionary* advertisementData;
 

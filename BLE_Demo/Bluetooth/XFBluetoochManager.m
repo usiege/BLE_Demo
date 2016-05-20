@@ -10,15 +10,9 @@
 #import "PeripheralDevice.h"
 #import "Bluetooth40Layer.h"
 
-static NSInteger CARD_4442 = 8;
-static NSString* CARD_READ_4442 = @"010100";
-static NSString* CARD_WRITE_4442 = @"010200";
-static NSString* CARD_CHECKPASS_4442 = @"01030000";
-static NSString* CARD_CHANGEPASS_4442 = @"01050000";
-
 static XFBluetoochManager* _bluetoochManager = nil;
 
-@interface XFBluetoochManager ()
+@interface XFBluetoochManager () <Bluetooth40LayerDelegate>
 {
     Bluetooth40Layer* _sharedBluetoothLayer;
 }
@@ -39,6 +33,7 @@ static XFBluetoochManager* _bluetoochManager = nil;
     if (self = [super init]) {
         _seekedDevices = [NSMutableArray array];
         _sharedBluetoothLayer = [Bluetooth40Layer sharedInstance];
+        _sharedBluetoothLayer.delegate = self;
     }
     
     return self;
@@ -84,10 +79,10 @@ static XFBluetoochManager* _bluetoochManager = nil;
 }
 
 - (BOOL)containsDevice:(PeripheralDevice *)device{
-    NSString* UUID = device.UUID;
+    NSString* UUID = device.identifier;
     BOOL thereis = NO;
-    for (PeripheralDevice* device in _seekedDevices) {
-        if ([UUID isEqualToString:device.UUID]) {
+    for (PeripheralDevice* owned in _seekedDevices) {
+        if ([UUID isEqualToString:owned.identifier]) {
             thereis = YES;
         }
     }
@@ -114,6 +109,10 @@ static XFBluetoochManager* _bluetoochManager = nil;
 - (void)remoeAllDevices{
     [_seekedDevices removeAllObjects];
 }
+
+#pragma mark -BLELayerDelegate
+
+
 
 
 @end
