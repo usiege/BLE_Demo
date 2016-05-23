@@ -7,7 +7,7 @@
 //
 
 #import "AppDelegate.h"
-#import "BLEManageController.h"
+
 #import "FoundNewPortViewController.h"
 
 @interface AppDelegate () 
@@ -35,7 +35,7 @@
 }
 
 - (void)setupCompontents{
-    [BLEManageController sharedInstance];
+//    [BLEManageController sharedInstance];
 }
 
 - (void)applicationWillResignActive:(UIApplication *)application {

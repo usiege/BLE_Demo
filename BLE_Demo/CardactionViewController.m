@@ -7,11 +7,10 @@
 //
 
 #import "CardactionViewController.h"
-#import "BLEManageController.h"
 
 #import "RegExCategories.h"
 #import "PeripheralDevice.h"
-#import "XFBluetoochManager.h"
+#import "BluetoochManager.h"
 
 
 @interface CardactionViewController ()
@@ -19,11 +18,9 @@
     BOOL addInputDeviceObs;
     BOOL addOutputDeviceObs;
     
-//    BLEManageController *_bleController;
-    XFBluetoochManager* _sharedBTManager;
+    BluetoochManager* _sharedBTManager;
 }
 
-@property (nonatomic,assign) ChannelType channelType;
 @property (strong) UIActivityIndicatorView* aiView;
 
 @end
@@ -36,7 +33,7 @@
     // Do any additional setup after loading the view from its nib.
     [self createUI];
     
-    _sharedBTManager = [XFBluetoochManager shareInstance];
+    _sharedBTManager = [BluetoochManager shareInstance];
     addInputDeviceObs = false;
     addOutputDeviceObs = false;
     
@@ -48,16 +45,6 @@
     NSString *  locationString=[dateformatter stringFromDate:senddate];
     NSLog(@"locationString:%@",locationString);
     
-//    self.cardmoney.text = _bleController.databuff;
-//    self.chaxuntime.text = locationString;
-//    
-//    if (_bleController.cardchoiseabc == 1) {
-//        self.cardname.text = @"燃气卡";
-//    }else if (_bleController.cardchoiseabc == 2){
-//        self.cardname.text = @"深圳通";
-//    }else if(_bleController.cardchoiseabc == 3){
-//        self.cardname.text = @"银行卡";
-//    }
     
     //连接卡
     [_sharedBTManager startConnectPeriphralDevice:self.device];
@@ -95,14 +82,9 @@
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
-//    if(_bleController.outputDevice.state == BT40DeviceState_DataReady){
-//        _bleController.actionsort=12;
-//        _bleController.requesetcount=1;
-//        [_bleController actionreadandwrite];
-//        
-//    }else{
-//        
-//    }
+    
+    [_sharedBTManager startConnectPeriphralDevice:self.device];
+    
 }
 
 

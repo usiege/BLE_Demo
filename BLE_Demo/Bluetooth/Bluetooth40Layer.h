@@ -75,31 +75,31 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 @interface Bluetooth40Layer : NSObject 
 {
-    int count;      
+    int count;
     int pagecou;
 }
 
 @property (nonatomic,assign)        id<Bluetooth40LayerDelegate>    delegate;
 @property (nonatomic,assign)        BT40LayerStateTypeDef state;
 
-@property (strong,nonatomic)        CBCentralManager* _CM;
+//
+
 
 
 //单例模式静态接口
 +(instancetype)sharedInstance;
 
+//返回当前正在处理的设备
 + (PeripheralDevice *)currentDisposedDevice;
-//@property (nonatomic,strong)        PeripheralDevice* currentDisposedDevice;
 
-//实例接口
-
-
-/*      函数名称:   fetchConnectedDevices
- *      功能描述:   获取已经与系统连接的外设，但是如果要进行数据交互，需要通过createDataChannelWithDevice与其建立数据通道
- *      返回值:     查看DeviceInforModel.h
- *      参数无
- */
-//-(NSArray *)fetchConnectedDevices;
+///**
+// *  @brief <#Description#>
+// *
+// *  @param device <#device description#>
+// *
+// *  @return <#return value description#>
+// */
+//-(CBCharacteristic *)getCharacteristicOfDevice:(PeripheralDevice *)device;
 
 
 /*      
@@ -120,25 +120,24 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 -(void)stopScan;
 
 /*
- *      函数名称:   createDataChannelWithDevice
- *      功能描述:   与设备建立数据通道
+ *      函数名称:   startConnectWithDevice
+ *      功能描述:   与设备建立数据连接
  *      返回值:     无
  *      参数:      建立数据通道的设备
  *      参见:
  */
--(void)createDataChannelWithDevice:(PeripheralDevice *)device;
+-(void)startConnectWithDevice:(PeripheralDevice *)device;
 
 
 
 /*
- *      函数名称:   sendData:toDevice:
- *      功能描述:   发送数据
+ *      函数名称:    sendData:toDevice:
+ *      功能描述:    发送数据
  *      返回值:     是否发送成功
- *      参数:      向设备发送数据
+ *      参数:       向设备发送数据
  *      参见:
  */
 -(BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device;
-
 
 /*
  *      函数名称:   disconnecDataChannelWithDevice
@@ -149,12 +148,9 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  */
 -(void)disconnectWithDevice:(PeripheralDevice *)device;
 
--(void)startConnectWithDevice:(PeripheralDevice *)device;
+
 
 @end
-
-
-
 
 /*
  *      协议声明
@@ -166,18 +162,12 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 @optional
 
 /*
- * 发现新的外围设备
+ * 发现新的外围设备时
  */
 - (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
 
-/*
- * 
- */
-
 
 @optional
-
--(void)automoticConnect;
 
 /*
  *  描述: 当蓝牙状态改变时，接口返回状态值
@@ -220,16 +210,17 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 /*
  *  描述: 数据通道接收到数据时的处理接口
  */
--(void)didReceivedData:(NSData *)data fromChannelWithDevice:(PeripheralDevice *)device;
-
--(void)didReceivedData:(NSData *)data fromChannelWithPeripheral:(CBPeripheral *)peripheral;
+-(void)didReceivedData:(NSData *)data fromPeripheralDevice:(PeripheralDevice *)device;
 
 
-
-
+/**
+ *  @brief <#Description#>
+ *
+ *  @param type <#type description#>
+ */
+- (void)sendFollowWithType:(int)type;
 
 @required
-
 
 
 @end

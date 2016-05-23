@@ -12,7 +12,6 @@
 #define  kDeviceInforModelIdentifierString      @"keyDeviceInforModelIdentifierString"
 
 
-
 @implementation PeripheralDevice
 
 -(id)init{
@@ -62,8 +61,6 @@
     self.connectTimer = nil;
     self.discoverTimer = nil;
     self.configureTimer = nil;
-    
-    self.countOfNotiCharac = 0;
 }
 
 

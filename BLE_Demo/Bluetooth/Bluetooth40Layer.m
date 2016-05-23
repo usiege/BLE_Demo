@@ -13,12 +13,14 @@
 
 #import "Bluetooth40Common.h"
 #import "PeripheralDevice.h"
-#import "XFBluetoochManager.h"
+#import "BluetoochManager.h"
+
+//#import "BleCardHandler.h"
 
 #define BLUETOOCH_QUEUE_IDENTIFER   "com.bde.BDEWristBand.CentralQ"
 
 #define LOCAL_DEVICE_NAMES          @"LocalDeviceID"
-#define BLUETOOCHMANAGER            [XFBluetoochManager shareInstance]
+#define BLUETOOCHMANAGER            [BluetoochManager shareInstance]
 
 //函数处理结果返回值
 typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
@@ -29,15 +31,19 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     UtilityFuncHandleResultEnd
 };
 
-@interface Bluetooth40Layer () <CBCentralManagerDelegate,CBPeripheralDelegate>
+
+
+@interface Bluetooth40Layer ()
+<CBCentralManagerDelegate,CBPeripheralDelegate>
 {
     //搜索变量定义
     NSTimer                 *scanTimer;
     NSMutableArray*         _localDeviceNames;
-    
-    //当前正在处理的设备
-    PeripheralDevice*       _currentDisposedDevice;
 }
+
+@property (strong,nonatomic) CBCentralManager* centralManager;
+//@property (nonatomic,strong) NSMutableArray* cardHandlers;
+
 @end
 
 @implementation Bluetooth40Layer
@@ -45,9 +51,11 @@ typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
     
 }
 
-@synthesize _CM;
 
 static Bluetooth40Layer * _sharedInstance = nil;
+
+PeripheralDevice* _currentDisposedDevice;
+
 +(instancetype)sharedInstance{
     
     //用在类方法中，返回一个单例
@@ -67,9 +75,10 @@ static Bluetooth40Layer * _sharedInstance = nil;
     self =  [super init];
     if (self) {
         dispatch_queue_t centralQ = dispatch_queue_create(BLUETOOCH_QUEUE_IDENTIFER, DISPATCH_QUEUE_CONCURRENT);
-        _CM = [[CBCentralManager alloc] initWithDelegate:self queue:centralQ];
+        _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:centralQ];
         
         _localDeviceNames = [[NSMutableArray alloc] init];
+        
         scanTimer = nil;
         self.state = BT40LayerState_Idle;
     }
@@ -78,6 +87,11 @@ static Bluetooth40Layer * _sharedInstance = nil;
     return self;
 }
 
++ (PeripheralDevice *)currentDisposedDevice{
+    return _currentDisposedDevice;
+}
+
+
 //搜索蓝牙
 -(void)startScan:(NSTimeInterval)seconds withServices:(NSString *)service{
     
@@ -85,58 +99,33 @@ static Bluetooth40Layer * _sharedInstance = nil;
         [self stopScan];
     }
     
-    if (_CM) {
+    if (_centralManager) {
         
         NSArray *services = @[[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]
                               ];
         NSDictionary *scanOption = @{CBCentralManagerScanOptionAllowDuplicatesKey:@(NO)};//服务暂时不用
         
-        [_CM scanForPeripheralsWithServices:services options:scanOption];
+        [_centralManager scanForPeripheralsWithServices:services options:scanOption];
         printf("start scan peripheral .... \n");
         
         scanTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(scanTimeoutHandler:) userInfo:nil repeats:NO];
         self.state = BT40LayerState_Searching;
     }
-    
-    
-}
--(void)createDataChannelWithDevice:(PeripheralDevice *)device{
-    
-    if (self.state == BT40LayerState_Searching) {
-        [self stopScan];
-    }
-    [self startConnectWithDevice:device];
 }
 
-//遍历特征，发送数据
--(BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device{
-    
-    //if (device.state == BT40DeviceState_DataReady) {
-  if(device == nil)
-    return false;
-  
-        if (device.peripheral != nil && device.peripheral.state == CBPeripheralStateConnected) {
-            printf("\nwrite data : %s \n\n",[data.description UTF8String]);
-            CBCharacteristic *txCharac = [self getTXCharacteristicOfDevice:device];
-            if(txCharac)
-            {
-                [device.peripheral writeValue:data forCharacteristic:txCharac type:CBCharacteristicWriteWithResponse];
-            }
-            return YES;
-        }
-    //}
-    return NO;
-    
-}
 
 //开始链接
 -(void)startConnectWithDevice:(PeripheralDevice *)device{
   
-    if (_CM && device.peripheral &&
+    if (self.state == BT40LayerState_Searching) {
+        [self stopScan];
+    }
+    
+    if (_centralManager && device.peripheral &&
         device.peripheral.state == CBPeripheralStateDisconnected) {
         
-        //连接外围
-        [_CM connectPeripheral:device.peripheral options:nil];
+        //连接外围设备
+        [_centralManager connectPeripheral:device.peripheral options:nil];
         device.state = BT40DeviceState_Connecting;
         
         device.connectTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_CONNECT_PROCEDURE_
@@ -152,32 +141,62 @@ static Bluetooth40Layer * _sharedInstance = nil;
     if (device != nil && device.state != BT40DeviceState_Idle) {
         if (device.peripheral != nil &&
             device.peripheral.state != CBPeripheralStateDisconnected) {
-            [_CM cancelPeripheralConnection:device.peripheral];
+            [_centralManager cancelPeripheralConnection:device.peripheral];
             NSLog(@"\n-- disconnect with device :%@\n",device.identifier);
         }
     }
 }
 
+//遍历特征，发送数据
+- (BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device{
+    if(device == nil) return NO;
+    
+    if (device.peripheral != nil && device.peripheral.state == CBPeripheralStateConnected) {
+        printf("\n write data : %s \n\n",[data.description UTF8String]);
+        CBCharacteristic *txCharac = [self getCharacteristicOfDevice:device];
+        if(txCharac){
+            [device.peripheral writeValue:data forCharacteristic:txCharac type:CBCharacteristicWriteWithResponse];
+        }
+        return YES;
+    }
+    return NO;
+}
+
+#pragma mark  Util Function
+
+-(CBCharacteristic *)getCharacteristicOfDevice:(PeripheralDevice *)device{
+    for (CBService *service in device.peripheral.services){
+        if ([service.UUID isEqual:[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]]){
+            for (CBCharacteristic *characteristic in service.characteristics){
+                NSLog(@"characteristic %@", [characteristic.UUID UUIDString]);
+                if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:WRITE_CHARACTERISTIC_UUID_STRING]]){
+                    NSLog(@"find it");
+                    return characteristic;
+                }
+            }
+        }
+    }
+    return nil;
+}
 
 #pragma mark-TimeroutHandler
 
-- (void)configureTimeoutHandler:(NSTimer *)_timer{
-
-    printf("服务配置已超时！\n");
-    PeripheralDevice *device = _timer.userInfo;
-    if (device != nil && device.state == BT40DeviceState_Configuring) {
-        device.state = BT40DeviceState_Disconnecting;
-        [self disconnectWithDevice:device];
-    }
-
-}
-
 -(void)scanTimeoutHandler:(NSTimer *)_timer{
-    
+    printf("扫描已超时! \n");
     if (self.state == BT40LayerState_Searching) {
         [self stopScan];
     }
     [self cancelTimer:_timer];
+}
+
+-(void)stopScan{
+    printf("停止扫描！ \n");
+    if (scanTimer != nil) {
+        [_centralManager stopScan];
+        [scanTimer invalidate];
+        scanTimer = nil;
+        self.state = BT40LayerState_Idle;
+    }
 }
 
 - (void)connectTimeoutHandler:(NSTimer *)_timer{
@@ -199,39 +218,16 @@ static Bluetooth40Layer * _sharedInstance = nil;
     }
     [self cancelTimer:_timer];
 }
-
--(void)stopScan{
-    if (scanTimer != nil) {
-        [_CM stopScan];
-        [scanTimer invalidate];
-        scanTimer = nil;
-        self.state = BT40LayerState_Idle;
+- (void)configureTimeoutHandler:(NSTimer *)_timer{
+    
+    printf("服务配置已超时！\n");
+    PeripheralDevice *device = _timer.userInfo;
+    if (device != nil && device.state == BT40DeviceState_Configuring) {
+        device.state = BT40DeviceState_Disconnecting;
+        [self disconnectWithDevice:device];
     }
+    [self cancelTimer:_timer];
 }
-
-#pragma mark    Utility Function
-
--(CBCharacteristic *)getTXCharacteristicOfDevice:(PeripheralDevice *)device{
-
-    for (CBService *service in device.peripheral.services)
-    {
-         if ([service.UUID isEqual:[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]])
-        {
-
-            for (CBCharacteristic *characteristic in service.characteristics)
-            {
-                NSLog(@"characteristic %@", [characteristic.UUID UUIDString]);
-                if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:WRITE_CHARACTERISTIC_UUID_STRING]])
-                {
-                  NSLog(@"find it");
-                  return characteristic;
-                }
-            }
-        }
-    }
-    return nil;
-}
-
 
 //超时取消操作
 - (void)cancelTimer:(NSTimer *)_timer{
@@ -241,51 +237,36 @@ static Bluetooth40Layer * _sharedInstance = nil;
     }
 }
 
+
 //蓝牙中心协议
 #pragma mark    CBCentralManager Delegate
 -(void)centralManagerDidUpdateState:(CBCentralManager *)central{
     //状态改变
-    BT40LayerStatusTypeDef status = BT40LayerStatusEnd;
-    
+    BT40LayerStatusTypeDef status = BT40LayerStatusEnd;    
     switch (central.state) {
         case CBCentralManagerStatePoweredOff:
-        {
             status = BT40LayerStatus_PoweredOff;
-        }
             break;
         case CBCentralManagerStatePoweredOn:
-        {
             status = BT40LayerStatus_PoweredOn;
-        }
             break;
         case CBCentralManagerStateResetting:
-        {
             status = BT40LayerStatus_Resetting;
-        }
             break;
         case CBCentralManagerStateUnauthorized:
-        {
             status = BT40LayerStatus_Unauthorized;
-        }
             break;
         case CBCentralManagerStateUnknown:
-        {
             status = BT40LayerStatus_Unknown;
-        }
             break;
         case CBCentralManagerStateUnsupported:
-        {
             status = BT40LayerStatus_Unsupported;
-        }
             break;
         default:
-        {
             status = BT40LayerStatusEnd;
-        }
             break;
     }
-    
-    
+
     if ([self.delegate respondsToSelector:@selector(didBluetoothStateChange:)]) {
         [self.delegate didBluetoothStateChange:status];
     }
@@ -320,6 +301,7 @@ static Bluetooth40Layer * _sharedInstance = nil;
     }
 }
 
+
 -(void)centralManager:(CBCentralManager *)central didConnectPeripheral:(CBPeripheral *)peripheral{
     printf("已连接上设备：");
     printf("name = %s\n",[peripheral.name UTF8String]);
@@ -331,12 +313,12 @@ static Bluetooth40Layer * _sharedInstance = nil;
     peripheral.delegate = self;
     _currentDisposedDevice = device;//连接之后发现服务，服务特性扫描均在当前设备中
     
+    
     if ([self.delegate respondsToSelector:@selector(didConnectedPeripheralDevice:)])
         [self.delegate didConnectedPeripheralDevice:device];
     
-    
-    NSArray<CBUUID*>* uuids =@[[CBUUID UUIDWithString:WRITE_CHARACTERISTIC_UUID_STRING],
-                               [CBUUID UUIDWithString:READ_CHARACTERISTIC_UUID_STRING]];
+//    NSArray<CBUUID*>* uuids =@[[CBUUID UUIDWithString:WRITE_CHARACTERISTIC_UUID_STRING],
+//                               [CBUUID UUIDWithString:READ_CHARACTERISTIC_UUID_STRING]];
     //发现服务
     dispatch_sync(dispatch_get_main_queue(), ^{
         
@@ -359,7 +341,10 @@ static Bluetooth40Layer * _sharedInstance = nil;
     device.state = BT40DeviceState_Idle;
     if ([self.delegate respondsToSelector:@selector(didDisconnectedPeripheralDevice:)])
         [self.delegate didDisconnectedPeripheralDevice:device];
+    
+    
 
+    //取消操作
     [self cancelTimer:device.connectTimer];
     [self cancelTimer:device.discoverTimer];
     [self cancelTimer:device.configureTimer];
@@ -387,8 +372,7 @@ static Bluetooth40Layer * _sharedInstance = nil;
     
     printf("发现周边设备的服务:\n");
     printf("==== didDiscoverServices ==== \n");
-    
-    device.countOfNotiCharac = 0;
+
     
     for (CBService *service in peripheral.services) {
         printf("-- service : %s\n",[[service.UUID UUIDString] UTF8String]);
@@ -417,7 +401,6 @@ static Bluetooth40Layer * _sharedInstance = nil;
     
     printf("开始读取服务数据...\n");
     for (CBCharacteristic *characteristic in service.characteristics) {
-        NSLog(@"properties is %lu",characteristic.properties);
         if (characteristic.properties & CBCharacteristicPropertyNotify) {
 //            [peripheral readValueForCharacteristic:characteristic];
             [peripheral setNotifyValue:YES forCharacteristic:characteristic];
@@ -430,7 +413,7 @@ static Bluetooth40Layer * _sharedInstance = nil;
 
 //中心读取外设实时数据
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
-    printf("didUpdateNotificationStateForCharacteristic (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
+    printf("didUpdateNotificationStateForCharacteristic: (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
     PeripheralDevice *device = _currentDisposedDevice;
     if(!device) return;
     
@@ -443,17 +426,19 @@ static Bluetooth40Layer * _sharedInstance = nil;
         return;
     }
     
-    printf(" update notification success !!");
-    NSLog(@"接收到的数据：%@",characteristic.value);
+    NSLog(@"中心读取外设实时数据");
     
-    if (device.countOfNotiCharac == 0 && device.state == BT40DeviceState_Configuring) {
+    if (device.state == BT40DeviceState_Configuring) {
         
         [self cancelTimer:device.configureTimer];
         device.state = BT40DeviceState_DataReady;
+        
+        //回调
         if ([self.delegate respondsToSelector:@selector(isConnectingPeripheralDevice:withState:)])
             [self.delegate isConnectingPeripheralDevice:device withState:BT40LayerResult_Success];
+        
+        return;
     }
-    
 }
 
 //获取外设发来的数据，不论是read和notify,获取数据都是从这个方法中读取。
@@ -466,6 +451,11 @@ static Bluetooth40Layer * _sharedInstance = nil;
     
     NSLog(@"characteristic data is:%@ ",characteristic.value);
     NSLog(@"characteristic data length is %ld",characteristic.value.length);
+
+
+    if ([self.delegate respondsToSelector:@selector(didReceivedData:fromPeripheralDevice:)]){
+        [self.delegate didReceivedData:characteristic.value fromPeripheralDevice:_currentDisposedDevice];
+    }
     
 }
 
@@ -473,16 +463,22 @@ static Bluetooth40Layer * _sharedInstance = nil;
 //用于检测中心向外设写数据是否成功
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     NSLog(@"发送结束");
-
-    if(error){
+    
+    if(error!=nil){
         NSLog(@"发送失败");
         if(count<3){
+//        [self.delegate sendFollowWithType:0];
         }
         count++;
     }else{
         NSLog(@"发送成功");
+//        [self.delegate sendFollowWithType:1];
         count=0;
     }
-    
 }
+
+
+
+
+
 @end

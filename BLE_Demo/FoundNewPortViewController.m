@@ -10,22 +10,21 @@
 #import <QuartzCore/CALayer.h>
 #import "CardactionViewController.h"
 
-#import "BLEManageController.h"
-#import "XFBluetoochManager.h"
+#import "BluetoochManager.h"
 #import "PeripheralDevice.h"
 
 static NSString* RIGHT_BUTTON_STATE_NORMAL = @"正常";
 static NSString* RIGHT_BUTTON_STATE_SCAN = @"扫描";
 static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 
-@interface FoundNewPortViewController () <XFBluetoochManagerDelegate>
+@interface FoundNewPortViewController () <BluetoochManagerDelegate>
 {
     
     
     NSString* rButtonState;
     
 //    BLEManageController *_bleController;
-    XFBluetoochManager*  _bleManager;
+    BluetoochManager*  _bleManager;
 }
 @property (strong,nonatomic) UITableView *foundDevicesTableView;
 @property (strong,nonatomic) UIActivityIndicatorView* aInView;
@@ -53,7 +52,7 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 
 
     [self createUI];
-    _bleManager = [XFBluetoochManager shareInstance];
+    _bleManager = [BluetoochManager shareInstance];
     _bleManager.delegate = self;
     
 //    [[NSNotificationCenter defaultCenter] addObserver:self forKeyPath:@"devicesCount" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
@@ -82,21 +81,7 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
             [self.foundDevicesTableView reloadData];
         }
     }
-    
-    if ([object isKindOfClass:[BLEManageController class]]) {
-        if ([keyPath isEqualToString:@"inputDevice"]){
-            NSLog(@"there is a inputDevice");
-        }
-        else if ([keyPath isEqualToString:@"outputDevice"]){
-            NSLog(@"there is a outputDevice");
-        }
-        else{
-            [self.foundDevicesTableView reloadData];
-        
-            [self.aInView stopAnimating];
-            self.rightButton.selected = NO;
-        }
-    }
+
 }
 
 

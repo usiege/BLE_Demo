@@ -44,17 +44,7 @@ enum{
 #define  RX_CHARACTERISTIC_UUID_VALUE        @"00005303-0000-0041-4c50-574953450000"
 
 
-//#define     BUSINESS_SERVICE_UUID_STRING     @"0783b03e-8535-b5a0-7140-a304d2495cb7"    //        //@"18F0"
-//#define     TX_CHARACTERISTIC_UUID_STRING    @"0783b03e-8535-b5a0-7140-a304d2495cb8"      //        //@"2AF1"
-//#define     RX_CHARACTERISTIC_UUID_STRING    @"0783b03e-8535-b5a0-7140-a304d2495cba"        //        //@"2AF0"
 
-//#define     BUSINESS_SERVICE_UUID_STRING             @"FFB0"
-//#define     TX_CHARACTERISTIC_UUID_STRING   @"FFB2"
-//#define     RX_CHARACTERISTIC_UUID_STRING   @"FFB2"
-//
-//#define     BUSINESS_SERVICE_UUID_VALUE          0xFFB0
-//#define     TX_CHARACTERISTIC_UUID_VALUE    0xFFB2
-//#define     RX_CHARACTERISTIC_UUID_VALUE    0xFFB2
 
 
 #endif

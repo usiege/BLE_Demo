@@ -52,7 +52,6 @@ typedef NS_ENUM(NSInteger, BT40DeviceStateTypeDef) {
 @property (nonatomic, strong) NSTimer *discoverTimer;
 @property (nonatomic, strong) NSTimer *configureTimer;
 
-@property (assign,nonatomic)  int countOfNotiCharac;//计数设置的通知属笥
 
 +(BOOL)checkDeviceA:(PeripheralDevice *)deviceA sameAsDeviceB:(PeripheralDevice *)deviceB;
 

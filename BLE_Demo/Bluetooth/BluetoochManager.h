@@ -10,21 +10,22 @@
 
 @class CBPeripheral;
 @class PeripheralDevice;
-@protocol XFBluetoochManagerDelegate;
+@protocol BluetoochManagerDelegate;
 
 /*
  *蓝牙连接管理器
  1.缓存已发现的设备;
  2.搜索蓝牙设备；
  3.蓝牙连接、断开；
- 4.读取卡信息；
+ 4.获取搜索到的蓝牙设备；
+ 5.删除蓝牙设备；
 */
 
-@interface XFBluetoochManager : NSObject
+@interface BluetoochManager : NSObject
 
 + (instancetype)shareInstance;
 
-@property (nonatomic,weak)      id<XFBluetoochManagerDelegate> delegate;
+@property (nonatomic,weak)      id<BluetoochManagerDelegate> delegate;
 @property (nonatomic,strong)    NSMutableArray* seekedDevices;
 
 - (PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral;
@@ -54,7 +55,7 @@
 
 @end
 
-@protocol XFBluetoochManagerDelegate <NSObject>
+@protocol BluetoochManagerDelegate <NSObject>
 
 //发现新的外围设备时
 - (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
