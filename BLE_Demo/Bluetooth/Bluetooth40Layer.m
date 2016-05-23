@@ -427,7 +427,6 @@ PeripheralDevice* _currentDisposedDevice;
     }
     
     NSLog(@"中心读取外设实时数据");
-    
     if (device.state == BT40DeviceState_Configuring) {
         
         [self cancelTimer:device.configureTimer];
@@ -464,15 +463,16 @@ PeripheralDevice* _currentDisposedDevice;
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     NSLog(@"发送结束");
     
+    
     if(error!=nil){
         NSLog(@"发送失败");
         if(count<3){
-//        [self.delegate sendFollowWithType:0];
+        [self.delegate sendFollowWithType:0];
         }
         count++;
     }else{
         NSLog(@"发送成功");
-//        [self.delegate sendFollowWithType:1];
+        [self.delegate sendFollowWithType:1];
         count=0;
     }
 }

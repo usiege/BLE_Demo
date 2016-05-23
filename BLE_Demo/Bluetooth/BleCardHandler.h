@@ -38,7 +38,7 @@
 /**
  *  @brief 开始处理蓝牙卡请求
  */
-- (void)actionreadandwrite;
+- (void)cardRequestWithCommand:(NSString *)command;
 
 /**
  *  @brief 处理卡数据

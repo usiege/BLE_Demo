@@ -20,13 +20,11 @@
     NSTimer *checkfollow;           //////等待正确小数据包接入超时
     
     bool check15page;               //////收到1015标志
-//    int  maxnow;                    //////总包数
+    int  maxnow;                    //////总包数
     int  lastcountfill;             ////// 上一个包序号
     int  outtimecount;              //////超时记述
     BOOL lostpackge;                ////// 丢包标志
     
-    
-//    NSData* recivedata;
 }
 
 @property (assign,nonatomic) int      requesetcount;//////执行第几个指令
@@ -50,18 +48,16 @@
 
 - (instancetype)initWithPeripheralDevice:(PeripheralDevice *)device{
     if (self = [super init]) {
+        
+        _requesetcount = 1;
+        _actionsort = 12;
+        
         _device = device;
         _dataArr = [NSMutableArray array];
         _dataRevArray = [NSMutableArray array];
     }
     return self;
 }
-
-- (void)actionreadandwrite{
-    
-    [self cardRequestWithCommand:@"01010000FF"];
-}
-
 
 - (void)cardRequestWithCommand:(NSString *)command{
     
@@ -165,10 +161,12 @@
     NSData *mydata = [data objectAtIndex:dserial];
     NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
     
-    if([self.delegate respondsToSelector:@selector(bleCardHandler:sendData:)]){
-        [self.delegate bleCardHandler:self sendData:mydata];
-    }
+    BOOL sendResult = NO;
+    Bluetooth40Layer* _sharedBleLayer = [Bluetooth40Layer sharedInstance];
+    sendResult = 
+    [_sharedBleLayer sendData:mydata toDevice:[Bluetooth40Layer currentDisposedDevice]];
 }
+
 
 -(void)sendfollow:(int)type
 {
@@ -192,9 +190,7 @@
 //////数据接收处理
 -(void)dataProcessing:(NSData*)data{
     
-//    _receiveData=data;
-    int maxnow = 0; //总包数
-    
+    _receiveData=data;
     if (data.length>=2 && ([[ConverUtil data2HexString:data] hasPrefix:@"1015"])) {
         NSLog(@"接收到1015报文\n");
         check15page = YES;
@@ -203,10 +199,10 @@
             [check15Timer invalidate];
             check15Timer = nil;
         }
-        
+        maxnow = 0 ;
         lastcountfill = 0;
-        outtimecount=0;
         
+        outtimecount=0;
         [_dataRevArray removeAllObjects];
         
         // 开启接受数据等待定时器
@@ -219,6 +215,7 @@
         });
         return;
     }else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
+        
         
         NSLog(@"接收到正确结尾报文\n");
         
@@ -244,7 +241,7 @@
         });
     }
     
-    NSLog(@"datawidth =%@",[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)]);
+    NSLog(@"datawith =%@",[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)]);
     
     if(check15page){
         /////收到recive关闭定时
@@ -271,6 +268,7 @@
         if(lostpackge && current!=(lastcountfill+1)){
             return;
         }else{
+            
             ///////正确包接入，取消时钟
             if(checkfollow!=nil){
                 [checkfollow invalidate];
@@ -285,8 +283,8 @@
             [self ErrorRecovery:0];
             //            lostpackge = YES;
             return;
-            
         }
+        
         //////记录第一个数据，
         if ([_dataRevArray count] == 0 && current==0){
             maxnow = max;
@@ -315,37 +313,23 @@
             lastcountfill = current;
         }
         
-        //datastring buf
-        NSString* datastring = _datastring;
-        NSString* databuff = @"0";
-        
         if(current == maxnow-1){
             [_dataRevArray addObject:data];
             for (int i=0; i<[_dataRevArray count]; i++) {
                 if (i == 0) {
-                    datastring =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
+                    _datastring =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
                 }else{
-                    datastring = [datastring stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
+                    _datastring = [_datastring stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
                 }
             }
             
-            NSLog(@"接收到的有效数据:%@\n",datastring);
-            NSLog(@"_dataArr is %@",_dataArr);
-        
-            if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:)]){
-                NSData* dataWanted= [datastring dataUsingEncoding:NSUTF8StringEncoding];
-                _receiveData = dataWanted;
-                [self.delegate bleCardHandler:self didReceiveData:dataWanted];
-            }
-        
+            NSLog(@"接收到的有效数据:%@\n",_datastring);
+            
             [_dataRevArray removeAllObjects];
             
-            //卡指令类型判断
-            if (_actionsort == 12) {
-                NSLog(@"这里是燃气卡的指令判断，当前指令：actionsort = %d",_actionsort);
-                [self cardRequestWithCommand:_requsetnow];
-            }else{
-                
+            if(_actionsort == 12){
+                NSLog(@"燃气卡数据请求...");
+//                return;
             }
             
             check15page = NO;
@@ -357,6 +341,7 @@
                 [check15Timer invalidate];
                 check15Timer=nil;
             }
+            
             return;
         }
         

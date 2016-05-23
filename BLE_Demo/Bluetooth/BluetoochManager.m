@@ -15,7 +15,8 @@
 static BluetoochManager* _bluetoochManager = nil;
 
 @interface BluetoochManager ()
-<Bluetooth40LayerDelegate,BleCardHandlerDelegate>
+<Bluetooth40LayerDelegate,BleCardHandlerDelegate
+>
 {
     Bluetooth40Layer* _sharedBleLayer;
 }
@@ -126,10 +127,13 @@ static BluetoochManager* _bluetoochManager = nil;
 - (void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerResultTypeDef)state{
 
     if(state == BT40LayerResult_Success){
-        //获取卡处理器处理卡数据
+        //燃气卡读写
         BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:device];
         if(!cardHandler) return;
-        [cardHandler actionreadandwrite];
+        NSString* command = @"01010000FF";
+        NSLog(@"正在连接外围设备，连接命令:%@",command);
+        [cardHandler cardRequestWithCommand:command];
+        
     }else{
         
     }
@@ -138,48 +142,55 @@ static BluetoochManager* _bluetoochManager = nil;
 
 //已经连接上了外围设备，正在进行卡处理
 - (void)didConnectedPeripheralDevice:(PeripheralDevice *)device{
+    printf("新建蓝牙卡处理器！");
     //新建卡处理器用于蓝牙卡处理
     BleCardHandler* cardHandler = [[BleCardHandler alloc] initWithPeripheralDevice:device];
     cardHandler.delegate = self;
     [_cardHandlers addObject:cardHandler];
-}
-
-//卡正在读取数据，这个是读取卡的过程
-- (void)didReceivedData:(NSData *)data fromPeripheralDevice:(PeripheralDevice *)device{
-    //卡处理器处理数据
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
-    if(!cardHandler) return;
-    [cardHandler dataProcessing:data];
+    
 }
 
 //已经断开与外围设备的连接
 - (void)didDisconnectedPeripheralDevice:(PeripheralDevice *)device{
+    printf("删除蓝牙卡处理器！");
     //删除卡处理器
     BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:device];
     if(!cardHandler) return;
     [_cardHandlers removeObject:cardHandler];
 }
 
-////
-//- (void)sendFollowWithType:(int)type{
-//    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
-//    if(!cardHandler) return;
-//    [cardHandler sendfollow:type];
-//}
+
+//卡正在读取数据，这个是读取卡的过程
+- (void)didReceivedData:(NSData *)data fromPeripheralDevice:(PeripheralDevice *)device{
+    //卡处理器处理数据
+    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
+    if(!cardHandler) return;
+    
+    NSLog(@"卡正在读写数据，这个过程可能会被调用多次...");
+    
+    [cardHandler dataProcessing:data];
+}
+
+- (void)sendFollowWithType:(int)type{
+    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
+    if(!cardHandler) return;
+    [cardHandler sendfollow:type];
+}
 
 
 #pragma mark -BleCardHandlerDelegate
-//卡处理器发送数据
-- (void)bleCardHandler:(BleCardHandler *)cardHandler sendData:(NSData *)data{
-    NSLog(@"%@发送的数据：%@",cardHandler,data);
-    [_sharedBleLayer sendData:data toDevice:[Bluetooth40Layer currentDisposedDevice]];
-}
 
-//卡处理器接收数据
-- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data{
-    NSLog(@"%@接收的数据长度：%ld",cardHander,data.length);
-    
-}
+////卡处理器发送数据
+//- (void)bleCardHandler:(BleCardHandler *)cardHandler sendData:(NSData *)data{
+//    NSLog(@"%@发送的数据：%@",cardHandler,data);
+//    [_sharedBleLayer sendData:data toDevice:[Bluetooth40Layer currentDisposedDevice]];
+//}
+//
+////卡处理器接收数据
+//- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data{
+//    NSLog(@"%@接收的数据长度：%ld",cardHander,data.length);
+//    
+//}
 
 
 
