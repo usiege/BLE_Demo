@@ -26,11 +26,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/BleCardHandler.m"
-            timestampString = "485701147.564138"
+            timestampString = "485749779.864195"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "165"
-            endingLineNumber = "165"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
             landmarkName = "-sendsmalldata:dserial:"
             landmarkType = "5">
          </BreakpointContent>
@@ -42,11 +42,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/BleCardHandler.m"
-            timestampString = "485701147.564138"
+            timestampString = "485749779.864195"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "105"
-            endingLineNumber = "105"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
             landmarkName = "-sendData:Length:"
             landmarkType = "5">
          </BreakpointContent>
@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/BleCardHandler.m"
-            timestampString = "485701147.564138"
+            timestampString = "485749779.864195"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "63"
-            endingLineNumber = "63"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
             landmarkName = "-cardRequestWithCommand:"
             landmarkType = "5">
          </BreakpointContent>
@@ -70,16 +70,16 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "BLE_Demo/Bluetooth/BleCardHandler.m"
-            timestampString = "485704133.228877"
+            filePath = "BLE_Demo/Network/XFSocketManager.m"
+            timestampString = "485752060.788815"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "332"
-            endingLineNumber = "332"
-            landmarkName = "-dataProcessing:"
+            startingLineNumber = "112"
+            endingLineNumber = "112"
+            landmarkName = "-stream:handleEvent:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

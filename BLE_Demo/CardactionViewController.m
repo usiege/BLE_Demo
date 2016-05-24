@@ -11,14 +11,16 @@
 #import "RegExCategories.h"
 #import "PeripheralDevice.h"
 #import "BluetoochManager.h"
+#import "XFSocketManager.h"
 
 
-@interface CardactionViewController ()
+@interface CardactionViewController ()<BluetoochDelegate,XFSocketDelegate>
 {
     BOOL addInputDeviceObs;
     BOOL addOutputDeviceObs;
     
-    BluetoochManager* _sharedBTManager;
+    BluetoochManager*   _sharedBTManager;
+    XFSocketManager*    _sharedSocketManager;
 }
 
 @property (strong) UIActivityIndicatorView* aiView;
@@ -34,6 +36,11 @@
     [self createUI];
     
     _sharedBTManager = [BluetoochManager shareInstance];
+    _sharedBTManager.delegate = self;
+    
+    _sharedSocketManager = [XFSocketManager sharedManager];
+    _sharedSocketManager.delegate = self;
+    
     addInputDeviceObs = false;
     addOutputDeviceObs = false;
     
@@ -44,7 +51,6 @@
     [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
     NSString *  locationString=[dateformatter stringFromDate:senddate];
     NSLog(@"locationString:%@",locationString);
-    
     
     //连接卡
     [_sharedBTManager startConnectPeriphralDevice:self.device];
@@ -82,22 +88,23 @@
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
-    
     [_sharedBTManager startConnectPeriphralDevice:self.device];
-    
+
 }
 
+
+//接收到蓝牙卡版本数据
+- (void)didReceiveDisposedData:(NSData *)data fromDevice:(PeripheralDevice *)device{
+    NSLog(@"发送数据到服务器，开始解析");
+    [[XFSocketManager sharedManager] connectHostWithIP:LOCAL_BLUETOOTH_HOST_IP port:LOCAL_BLUETOOTH_HOST_PORT data:data completed:^(NSData *responseData) {
+        NSLog(@"服务器返回的数据：%@",responseData);
+    }];
+}
 
 /////充值
 -(IBAction)Bluechongzhi:(id)sender
 {
-//    if(_bleController.outputDevice.state == BT40DeviceState_DataReady){
-//    
-//    }else{
-//        
-//        
-//    }
-
+    
 }
 
 

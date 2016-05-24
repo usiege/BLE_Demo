@@ -10,7 +10,7 @@
 
 @class CBPeripheral;
 @class PeripheralDevice;
-@protocol BluetoochManagerDelegate;
+@protocol BluetoochDelegate;
 
 /*
  *蓝牙连接管理器
@@ -25,8 +25,9 @@
 
 + (instancetype)shareInstance;
 
-@property (nonatomic,weak)      id<BluetoochManagerDelegate> delegate;
+@property (nonatomic,weak)      id<BluetoochDelegate> delegate;
 @property (nonatomic,strong)    NSMutableArray* seekedDevices;
+@property (nonatomic,strong) NSMutableData*         resultData;
 
 - (PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral;
 - (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID;
@@ -55,10 +56,13 @@
 
 @end
 
-@protocol BluetoochManagerDelegate <NSObject>
+@protocol BluetoochDelegate <NSObject>
 
 //发现新的外围设备时
 - (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
+
+//接收到处理后的数据
+- (void)didReceiveDisposedData:(NSData *)data fromDevice:(PeripheralDevice *)device;
 
 @end
 

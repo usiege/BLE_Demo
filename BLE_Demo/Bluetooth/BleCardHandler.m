@@ -12,6 +12,8 @@
 #import "ConverUtil.h"
 #import "Bluetooth40Layer.h"
 
+#define SINGAL_RECEIVEDATA_SUCCESS @"9000"
+
 @interface BleCardHandler ()
 {
     NSTimer *check15Timer;          //////1015 超时计时
@@ -41,6 +43,8 @@
 @property(nonatomic,copy)      NSString*        datastring;
 @property(nonatomic,strong)    NSData*          receiveData;
 
+@property (nonatomic,assign) CardOperationState currentState;
+
 @end
 
 
@@ -55,11 +59,14 @@
         _device = device;
         _dataArr = [NSMutableArray array];
         _dataRevArray = [NSMutableArray array];
+        
+//        _finalDataDic = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
 - (void)cardRequestWithCommand:(NSString *)command{
+    NSLog(@"正在连接外围设备，连接命令:%@",command);
     
     _requsetnow = command;
     NSUInteger length=0;
@@ -324,12 +331,14 @@
             }
             
             NSLog(@"接收到的有效数据:%@\n",_datastring);
-            
             [_dataRevArray removeAllObjects];
             
             if(_actionsort == 12){
                 NSLog(@"燃气卡数据请求...");
-//                return;
+                if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)]){
+                    [self receiveDataSuccess];
+                    [self.delegate bleCardHandler:self didReceiveData:_receiveData state:_currentState];
+                }
             }
             
             check15page = NO;
@@ -352,6 +361,21 @@
         });
     }
 }
+
+//接收到结果数据
+- (void)receiveDataSuccess{
+    NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+    if ([outstring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]) {
+        [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
+        _datastring = outstring;
+        _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+        _currentState = CardOperationState_ReadCorrect;
+    }else{
+        _currentState = CardOperationState_ReadWrong;
+    }
+}
+                        
+                        
 
 -(void)ErrorRecovery:(int)ErrorSerial{
     Byte temp[20]={0};

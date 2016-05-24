@@ -9,8 +9,8 @@
 #ifndef NetRefer_h
 #define NetRefer_h
 
-#define LOCAL_BLUETOOTH_HOST_IP             @"192.168.0.141"
-#define LOCAL_BLUETOOTH_HOST_PORT           @"6000"
+#define LOCAL_BLUETOOTH_HOST_IP             @"10.811.55.3"
+#define LOCAL_BLUETOOTH_HOST_PORT           @"8040"
 #define RELEASE_BLUETOOCH_HOST_IP           @"115.236.0.2"
 #define RELEASE_BLUETOOCH_HOST_PORT         @"6543"
 

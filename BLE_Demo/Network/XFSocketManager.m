@@ -14,13 +14,14 @@ typedef void(^ScoketCallback)(NSData* data);
 
 @interface XFSocketManager () <NSStreamDelegate>
 {
-    AsyncSocket* _serverSock;
+//    AsyncSocket* _serverSock;
     
     NSInputStream* _inputStream;
     NSOutputStream* _outputStream;
 }
 
 @property (nonatomic,copy) ScoketCallback sCallback;
+@property (nonatomic,strong) NSData* receiveData;
 
 @end
 
@@ -40,24 +41,25 @@ typedef void(^ScoketCallback)(NSData* data);
 {
     if (self = [super init])
     {
-        _serverSock = [[AsyncSocket alloc] initWithDelegate:self];
+//        _serverSock = [[AsyncSocket alloc] initWithDelegate:self];
     }
     return self;
 }
 
 - (void)dealloc
 {
-    _serverSock = nil;
+//    _serverSock = nil;
     _inputStream = nil;
     _outputStream = nil;
 }
 
-- (void)connectHostWithIP:(NSString *)host port:(NSString *)port completed:(void (^)(NSData* data))callback{
-    [self connectToHostUseStreamWithIP:host port:port.intValue];
+- (void)connectHostWithIP:(NSString *)host port:(NSString *)port data:(NSData *)data completed:(void (^)(NSData* data))callback{
+    [self connectToHostUseStreamWithIP:host port:port.intValue data:data];
+    self.receiveData = data;
     self.sCallback = callback;
 }
 
-- (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port{
+- (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
     // 1.建立连接
     // 定义C语言输入输出流
     CFReadStreamRef readStream;
@@ -81,6 +83,7 @@ typedef void(^ScoketCallback)(NSData* data);
     [_inputStream open];
     [_outputStream open];
     
+    //发送数据
     [[NSRunLoop currentRunLoop] run];
 }
 
@@ -89,7 +92,7 @@ typedef void(^ScoketCallback)(NSData* data);
 }
 
 
-- (void)receiceData{
+- (void)readDataFromSocket{
      //建立一个缓冲区 可以放1024个字节
      uint8_t buf[1024];
      // 返回实际装的字节数
@@ -118,14 +121,15 @@ typedef void(^ScoketCallback)(NSData* data);
                 NSLog(@"输入输出流打开完成");
                 break;
         case NSStreamEventHasBytesAvailable:
-              NSLog(@"有字节可读");
-                [self receiceData];
+                NSLog(@"有字节可读");
+                [self readDataFromSocket];
                 break;
         case NSStreamEventHasSpaceAvailable:
                 NSLog(@"可以发送字节");
+            [self sendData:self.receiveData];
                 break;
         case NSStreamEventErrorOccurred:
-                NSLog(@" 连接出现错误");
+                NSLog(@"连接出现错误");
                 break;
         case NSStreamEventEndEncountered:
                 NSLog(@"连接结束");

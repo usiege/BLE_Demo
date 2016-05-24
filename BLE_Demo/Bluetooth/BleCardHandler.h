@@ -15,6 +15,12 @@
 @class PeripheralDevice;
 @protocol BleCardHandlerDelegate;
 
+typedef NS_ENUM(NSUInteger,CardOperationState) {
+    CardOperationState_idle,
+    CardOperationState_ReadCorrect = 1,
+    CardOperationState_ReadWrong = 2,
+    
+};
 
 @interface BleCardHandler : NSObject
 
@@ -29,6 +35,11 @@
 
 
 @property (nonatomic,weak) id<BleCardHandlerDelegate> delegate;
+
+/**
+ *  @brief 读取的最终完整结果数据
+ */
+//@property (nonatomic,strong) NSData* finalData;
 
 /**
  *  @brief 蓝牙卡对应设备信息
@@ -59,16 +70,13 @@
 @protocol BleCardHandlerDelegate <NSObject>
 
 /**
- *  @brief 在蓝牙卡处理数据过程中发送数据
- */
-- (void)bleCardHandler:(BleCardHandler *)cardHandler sendData:(NSData *)data;
-
-/**
- *  @brief 卡片请求后的数据
+ *  @brief 接收到处理类处理过的数据
  *
- *  @param data 
+ *  @param cardHander 卡片处理对象
+ *  @param data       返回的数据
+ *  @param state      此时处理的状态
  */
-- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data;
+- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data state:(CardOperationState)state;
 
 @end
 

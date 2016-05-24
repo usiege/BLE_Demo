@@ -17,7 +17,7 @@ static NSString* RIGHT_BUTTON_STATE_NORMAL = @"正常";
 static NSString* RIGHT_BUTTON_STATE_SCAN = @"扫描";
 static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 
-@interface FoundNewPortViewController () <BluetoochManagerDelegate>
+@interface FoundNewPortViewController () <BluetoochDelegate>
 {
     
     
