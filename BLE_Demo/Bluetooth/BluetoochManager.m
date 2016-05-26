@@ -20,7 +20,7 @@ static BluetoochManager* _bluetoochManager = nil;
 #define CARD_READ4442_COMMAND_FOR_SECONDTIME     @"0101008080"
 
 #define CARD_CHECKPASS4442_COMMAND               @"0103000003"
-#define CARD_WRITE4442_COMMAND_FOR_ONCE          @"01020020E0"//写卡开始位置是20，长度是224
+#define CARD_WRITE4442_COMMAND_FOR_ONCE          @"01020020e0"//写卡开始位置是20，长度是224
 #define CARD_CHANGPASS4442_COMMAND               @"0105000003"
 
 static const NSUInteger STANTARD_CARDDATA_LENGTH = 512; //卡片最长可读写长度
@@ -93,9 +93,9 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 - (void)writeData:(NSString *)dataString toPeriphralDevice:(PeripheralDevice *)pDevice{
     if(!pDevice) return;
     pDevice.operationType = GasCardOperation_WRITE;
-    NSData* dataIwant = [pDevice valueForKey:DEVICE_PARSED_DATA_KEY];
-    
     if(_sharedBleLayer.state == BT40LayerState_Connected) return;
+    
+    NSData* dataIwant = [pDevice valueForKey:DEVICE_PARSED_DATA_KEY];
     if(dataIwant)
         [self startConnectPeriphralDevice:pDevice];
 }
@@ -151,9 +151,9 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 - (void)addNewDevice:(PeripheralDevice *)dm{
     if (![_seekedDevices containsObject:dm]) {
         [_seekedDevices addObject:dm];
-        if ([self.delegate respondsToSelector:@selector(didFoundNewPerigheralDevice:)]) {
+        if ([self.delegate respondsToSelector:@selector(bluetoochManager:didFoundNewPerigheralDevice:)]) {
             dispatch_sync(dispatch_get_main_queue(), ^{
-                [self.delegate didFoundNewPerigheralDevice:dm];
+                [self.delegate bluetoochManager:self didFoundNewPerigheralDevice:dm];
             });
         }
     }
@@ -223,8 +223,14 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         }else if(device.operationType == GasCardOperation_WRITE){
             //校验请求
             NSMutableString* commandIwant = [NSMutableString stringWithFormat:CARD_CHECKPASS4442_COMMAND];
+            if(!device.checkKey) return;
             [commandIwant appendString:device.checkKey];
-            [cardHandler cardRequestWithCommand:commandIwant];
+            
+            NSLog(@"checkKey ------------------->|%@|",[device checkKey]);
+            NSLog(@"checkKeyNEW ------------------->|%@|",[device checkKeyNew]);
+            
+            if([device.checkKey isEqualToString:@"147178"])
+                [cardHandler cardRequestWithCommand:commandIwant];
             NSLog(@"正在进行校验，校验命令：%@",commandIwant);
         }
 
@@ -296,8 +302,8 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             //设备数据写入
             [currentDisposedDevice setValue:_readResultData forKey:DEVICE_CARD_READED_DATA_KEY];
             
-            if ([self.delegate respondsToSelector:@selector(didReceiveDisposedData:fromDevice:)]) {
-                [self.delegate didReceiveDisposedData:_readResultData fromDevice:currentDisposedDevice];
+            if ([self.delegate respondsToSelector:@selector(bluetoochManager:didReadSuccessWithDisposeData:fromDevice:)]) {
+                [self.delegate bluetoochManager:self didReadSuccessWithDisposeData:_readResultData fromDevice:currentDisposedDevice];
             }
             return;
         }
@@ -309,16 +315,27 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             _beenWritedCard = NO;
             NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_WRITE4442_COMMAND_FOR_ONCE];
             NSData* dataIwant = _writeData;
-            if(dataIwant.length > 512) return;
+//            if(dataIwant.length > 512) return;
             dataIwant = [dataIwant subdataWithRange:NSMakeRange(64, 512-64)];
-            NSString* stringIwant = [ConverUtil data2HexString:dataIwant];
+            
+            //二进制转16进制
+            NSString* stringIwant = [ConverUtil stringFromHexString:[ConverUtil convertDataToHexStr:dataIwant]];
             //加卡片数据(64-512)位
             [commandIwant appendString:stringIwant];
+            
             [cardHandler cardRequestWithCommand:commandIwant];
             _beenWritedCard = YES;
             NSLog(@"正在写入卡片数据，命令：%@",commandIwant);
         }else{
-            NSLog(@"写入卡片不成功！");
+            if(!_beenWritedCard){
+                NSLog(@"写入卡片不成功！");
+                [self stopConectPeriphralDevice:currentDisposedDevice];
+                if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteFailedToDevice:)]) {
+                    [self.delegate bluetoochManager:self didWriteFailedToDevice:currentDisposedDevice];
+                }
+            }else{
+                
+            }
         }
     }
 }
@@ -330,6 +347,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
     if (error) {
         NSLog(@"写入设备失败:%@",error);
+        [self stopConectPeriphralDevice:[Bluetooth40Layer currentDisposedDevice]];
+        if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteFailedToDevice:)]) {
+            [self.delegate bluetoochManager:self didWriteFailedToDevice:[Bluetooth40Layer currentDisposedDevice]];
+        }
     }else{
         //如果当前为写卡操作，且写入卡数据成功，则进行密码更新
         if (device.operationType == GasCardOperation_WRITE
@@ -345,7 +366,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                 _beenWritedCard = NO;
                 NSLog(@"正在进行密码更新，命令：%@",commandIwant);
             }else{
-                NSLog(@"卡片不必更新密码");
+                NSLog(@"卡片不必更新密码,写卡成功");
+                if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteSuccesToDevice:)]) {
+                    [self.delegate bluetoochManager:self didWriteSuccesToDevice:[Bluetooth40Layer currentDisposedDevice]];
+                }
             }
         }else{
             NSLog(@"%s",__FUNCTION__);

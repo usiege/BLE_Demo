@@ -67,7 +67,7 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
     [_bleManager stopSearchPeriphrals];
 }
 
-- (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device{
+- (void)bluetoochManager:(BluetoochManager *)manager didFoundNewPerigheralDevice:(PeripheralDevice *)device{
     self.devicesCount = _bleManager.seekedDevices.count;
     [self.foundDevicesTableView reloadData];
 }

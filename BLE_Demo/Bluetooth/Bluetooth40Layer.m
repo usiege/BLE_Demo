@@ -23,8 +23,8 @@
 #define LOCAL_DEVICE_NAMES          @"LocalDeviceID"
 #define BLUETOOCHMANAGER            [BluetoochManager shareInstance]
 
-extern NSString* DEVICE_PARSED_DATA_KEY;
-extern NSString* DEVICE_CARD_READED_DATA_KEY;
+//extern NSString* DEVICE_PARSED_DATA_KEY;
+//extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 //函数处理结果返回值
 typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
@@ -83,6 +83,7 @@ PeripheralDevice* _currentDisposedDevice;
         
         scanTimer = nil;
         self.state = BT40LayerState_Idle;
+
     }
     count = 0;
     pagecou = 0;
@@ -90,6 +91,7 @@ PeripheralDevice* _currentDisposedDevice;
 }
 
 + (PeripheralDevice *)currentDisposedDevice{
+    
     return _currentDisposedDevice;
 }
 
@@ -121,7 +123,7 @@ PeripheralDevice* _currentDisposedDevice;
 -(void)startConnectWithDevice:(PeripheralDevice *)device{
     
     if (_centralManager && device.peripheral &&
-        device.peripheral.state != CBPeripheralStateConnected) {
+        device.peripheral.state == CBPeripheralStateConnected) {
         
         //连接外围设备
         [_centralManager connectPeripheral:device.peripheral options:nil];
@@ -134,6 +136,7 @@ PeripheralDevice* _currentDisposedDevice;
     }else{
         //连接设备
         NSLog(@"设备已连接");
+        return;
     }
 }
 
@@ -175,7 +178,6 @@ PeripheralDevice* _currentDisposedDevice;
         ){
         
         //要发送的数据，写入设备中
-        [device setValue:data forKey:DEVICE_PARSED_DATA_KEY];
         [device.peripheral discoverServices:nil];
         
         //发现超时处理

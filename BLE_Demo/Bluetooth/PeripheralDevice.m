@@ -65,14 +65,16 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
 
 - (NSString *)checkKey{
     if(!_parsedData) return nil;
-    if(_parsedData.length > 129+16) nil;
-    return [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(129, 16)] encoding:NSUTF8StringEncoding];
+    if(_parsedData.length < 129+16) return nil;
+    NSString* strIwant = [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(129, 16)] encoding:NSUTF8StringEncoding];
+    return [strIwant stringByReplacingOccurrencesOfString:@" " withString:@""];
 }
 
 - (NSString *)checkKeyNew{
     if(!_parsedData) return nil;
-    if(_parsedData.length > 145+16) nil;
-    return [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(145, 16)] encoding:NSUTF8StringEncoding];
+    if(_parsedData.length < 145+16) return nil;
+    NSString* strIwant = [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(145, 16)] encoding:NSUTF8StringEncoding];
+    return [strIwant stringByReplacingOccurrencesOfString:@" " withString:@""];
 }
 
 

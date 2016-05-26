@@ -49,8 +49,6 @@
  */
 - (void)stopSearchPeriphrals;
 
-
-- (void)stopConectPeriphralDevice:(PeripheralDevice *)pDevice;
 /**
  *  @brief 从外围设备中读数据
  *
@@ -76,16 +74,32 @@
  *
  *  @param device 外围设备
  */
-- (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
+- (void)bluetoochManager:(BluetoochManager *)manager didFoundNewPerigheralDevice:(PeripheralDevice *)device;
 
 
 /**
- *  @brief 接收到外围设备数据
+ *  @brief 读取外围设备数据成功
  *
  *  @param data   接收到的数据
  *  @param device 外围设备
  */
-- (void)didReceiveDisposedData:(NSData *)data fromDevice:(PeripheralDevice *)device;
+- (void)bluetoochManager:(BluetoochManager *)manager didReadSuccessWithDisposeData:(NSData *)data fromDevice:(PeripheralDevice *)device;
+
+/**
+ *  @brief 写入数据成功
+ *
+ *  @param manager
+ *  @param device  外围设备
+ */
+- (void)bluetoochManager:(BluetoochManager *)manager didWriteSuccesToDevice:(PeripheralDevice *)device;
+
+/**
+ *  @brief 写入数据失败
+ *
+ *  @param manager
+ *  @param device  外围设备
+ */
+- (void)bluetoochManager:(BluetoochManager *)manager didWriteFailedToDevice:(PeripheralDevice *)device;
 
 @end
 

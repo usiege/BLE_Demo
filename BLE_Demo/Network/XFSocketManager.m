@@ -19,8 +19,9 @@ typedef void(^ScoketCallback)(NSData* data,CardDataType dataType);
 
 #define SINGNAL_READDATA_PRE    @"LYGASGS150100010001" //发送读卡数据
 #define SINGNAL_WRITEDATA_PRE   @"LYGASGS210100010001" //发送写卡数据
+//LYGAS00002016
 
-#define SOCKET_OVERTIME_SECOND      5
+#define SOCKET_OVERTIME_SECOND      3
 
 extern NSString* DEVICE_PARSED_DATA_KEY;
 extern NSString* DEVICE_CARD_READED_DATA_KEY;
@@ -114,6 +115,18 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     
     //发送数据
     [[NSRunLoop currentRunLoop] run];
+}
+
+- (void)stopConnect{
+
+    // 从运行循环移除
+    [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
+    // 关闭输入输出流
+    [_inputStream close];
+    [_outputStream close];
+    
+    NSLog(@"Socket 连接已断开！");
 }
 
 - (void)sendDataToSocket{

@@ -21,6 +21,7 @@
 @property (nonatomic,copy)      NSString*       port;
 
 - (void)connectWithData:(NSData *)data userInfo:(NSDictionary *)userInfo completed:(void (^)(NSData* responseData,CardDataType dataType))callback;
+- (void)stopConnect;
 
 @end
 

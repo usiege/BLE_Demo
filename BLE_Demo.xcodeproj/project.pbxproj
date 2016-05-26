@@ -29,6 +29,7 @@
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 		BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */; };
+		BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */; };
 		BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */; };
 		BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardModel.m */; };
 		BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB2B33B21CF28F0600823C23 /* XFSocketManager.m */; };
@@ -97,6 +98,8 @@
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
 		BB06E9AB1CEC0DF2000162D6 /* BluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BluetoochManager.h; sourceTree = "<group>"; };
 		BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BluetoochManager.m; sourceTree = "<group>"; };
+		BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBProgressHUD.h; sourceTree = "<group>"; };
+		BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBProgressHUD.m; sourceTree = "<group>"; };
 		BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardInfo.h; sourceTree = "<group>"; };
 		BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardInfo.m; sourceTree = "<group>"; };
 		BB1D82881CF443D900FA1DE7 /* BleCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardModel.h; sourceTree = "<group>"; };
@@ -187,6 +190,7 @@
 				BB06E9811CEAB7D0000162D6 /* CardactionViewController.m */,
 				BB06E9821CEAB7D0000162D6 /* CardactionViewController.xib */,
 				BB06E9721CEAB298000162D6 /* common.h */,
+				BB19C7A01CF6E87A00907E1F /* ControlLib */,
 				BB06E9651CEAADA9000162D6 /* Network */,
 				BB06E9631CEAADA9000162D6 /* Bluetooth */,
 				BB06E9641CEAADA9000162D6 /* FirmLib */,
@@ -279,6 +283,15 @@
 				BB06E9741CEAB312000162D6 /* ConverUtil.m */,
 			);
 			path = UserLib;
+			sourceTree = "<group>";
+		};
+		BB19C7A01CF6E87A00907E1F /* ControlLib */ = {
+			isa = PBXGroup;
+			children = (
+				BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */,
+				BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */,
+			);
+			path = ControlLib;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -479,6 +492,7 @@
 				BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */,
 				BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */,
 				BB06E9871CEAB7D0000162D6 /* FoundNewPortViewController.m in Sources */,
+				BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */,
 				BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */,
 				BB06E92F1CEAAD7E000162D6 /* main.m in Sources */,
 				BB06E9891CEAB927000162D6 /* README.md in Sources */,
