@@ -33,9 +33,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 <Bluetooth40LayerDelegate
 >
 {
-    Bluetooth40Layer* _sharedBleLayer;
+    Bluetooth40Layer*   _sharedBleLayer;
     
-    BOOL _beenWritedCard;
+    BOOL                _beenWritedCard;        //写卡是否已完成
+//    CardOperationType   _lastOperation;         //上次执行的操作
 }
 
 @property (nonatomic,strong)    NSMutableData*      readResultData;     //读卡后的结果
@@ -81,29 +82,102 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     [_sharedBleLayer stopScan];
 }
 
+- (void)stopConnectPerpheral{
+    [_sharedBleLayer stopConnect];
+}
+
 
 //读写
 - (void)readDataFromPeriphralDevice:(PeripheralDevice *)pDevice{
     if(!pDevice) return;
     pDevice.operationType = GasCardOperation_READ;
-    if(_sharedBleLayer.state == BT40LayerState_Connected) return;
-    [self startConnectPeriphralDevice:pDevice];
+    
+    //正在存取卡片数据
+    if(_sharedBleLayer.state == BT40LayerState_IsAccessing){
+        return;
+    }
+    
+    //是否连接卡片
+    if(pDevice.stateType == PeripheralState_Connected){
+        //开始读卡
+        [_sharedBleLayer readDataFromPeriphralDevice:pDevice];
+        //
+        [_readResultData resetBytesInRange:NSMakeRange(0, _readResultData.length)];
+        [_readResultData setLength:0];
+        return;
+    }else if(pDevice.stateType == PeripheralState_Disconnected){
+        [_sharedBleLayer startConnectWithDevice:pDevice completed:^(BT40LayerStateTypeDef state) {
+            if (state == BT40LayerState_Connecting) {
+                //开始读卡
+                [_sharedBleLayer readDataFromPeriphralDevice:pDevice];
+                //
+                [_readResultData resetBytesInRange:NSMakeRange(0, _readResultData.length)];
+                [_readResultData setLength:0];
+            }
+//            [self delegateActionWithData:nil device:pDevice result:NO operationType:GasCardOperation_READ];
+        }];
+    }
 }
 
 - (void)writeData:(NSString *)dataString toPeriphralDevice:(PeripheralDevice *)pDevice{
     if(!pDevice) return;
     pDevice.operationType = GasCardOperation_WRITE;
-    if(_sharedBleLayer.state == BT40LayerState_Connected) return;
-    
+    if(_sharedBleLayer.state == BT40LayerState_IsAccessing){
+        return;
+    }
     NSData* dataIwant = [pDevice valueForKey:DEVICE_PARSED_DATA_KEY];
-    if(dataIwant)
-        [self startConnectPeriphralDevice:pDevice];
+    if(!dataIwant) return;
+    
+    if(pDevice.stateType == PeripheralState_Connected){
+        //开始写卡
+        NSData* dataIwant = [pDevice valueForKey:DEVICE_PARSED_DATA_KEY];
+        _writeData = dataIwant;
+        if(_writeData){
+            [_sharedBleLayer writeData:dataIwant toDevice:pDevice];
+        }else{
+            NSLog(@"卡片信息还未读取！");
+        }
+    }else if (pDevice.stateType == PeripheralState_Disconnected){
+        [_sharedBleLayer startConnectWithDevice:pDevice completed:^(BT40LayerStateTypeDef state) {
+            if (state == BT40LayerState_Connecting) {
+                //开始写卡
+                NSData* dataIwant = [pDevice valueForKey:DEVICE_PARSED_DATA_KEY];
+                _writeData = dataIwant;
+                if(_writeData){
+                    [_sharedBleLayer writeData:dataIwant toDevice:pDevice];
+                }else{
+                    NSLog(@"卡片信息还未读取！");
+                }
+            }else{
+//                [self delegateActionWithData:nil device:pDevice result:NO operationType:GasCardOperation_WRITE];
+            }
+        }];
+    }
 }
 
 
+- (void)delegateActionWithData:(NSData *)data device:(PeripheralDevice *)device result:(BOOL)isSuccess operationType:(PeripheralOperationType)type{
+    NSLog(@"读写数据回调");
+    
+    _sharedBleLayer.state = BT40LayerState_Idle;
+    device.stateType = PeripheralState_Disconnected;
+    
+    if(type == GasCardOperation_READ){
+        if ([self.delegate respondsToSelector:@selector(bluetoochManager:didEndReadWithResponseData:fromDevice:result:)]) {
+            [self.delegate bluetoochManager:self didEndReadWithResponseData:data fromDevice:device result:isSuccess];
+        }
+    }else if (type == GasCardOperation_WRITE){
+        if ([self.delegate respondsToSelector:@selector(bluetoochManager:didEndWriteWithResponseData:fromDevice:result:)]) {
+            [self.delegate bluetoochManager:self didEndWriteWithResponseData:data fromDevice:device result:isSuccess];
+        }
+    }
+}
+
 //连接
 - (void)startConnectPeriphralDevice:(PeripheralDevice *)pDevice{
-    [_sharedBleLayer startConnectWithDevice:pDevice];
+    [_sharedBleLayer startConnectWithDevice:pDevice completed:^(BT40LayerStateTypeDef state) {
+        
+    }];
 }
 
 - (void)stopConectPeriphralDevice:(PeripheralDevice *)pDevice{
@@ -113,7 +187,13 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 #pragma mark
 - (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID{
-    return nil;
+    PeripheralDevice* iWant = nil;
+    for (PeripheralDevice* device in _seekedDevices) {
+        if (device.identifier == deviceID) {
+            iWant = device;
+        }
+    }
+    return iWant;
 }
 
 -(PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral{
@@ -183,30 +263,8 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 #pragma mark -BLELayerDelegate
 
-//已经连接上了外围设备
-- (void)didConnectedPeripheralDevice:(PeripheralDevice *)device{
-    
-    if (device.operationType == GasCardOperation_READ) {
-        //开始读卡
-        [_sharedBleLayer readDataFromPeriphralDevice:device];
-        //
-        [_readResultData resetBytesInRange:NSMakeRange(0, _readResultData.length)];
-        [_readResultData setLength:0];
-    }else if (device.operationType == GasCardOperation_WRITE){
-        //开始写卡
-        NSData* dataIwant = [device valueForKey:DEVICE_PARSED_DATA_KEY];
-        _writeData = dataIwant;
-        if(_writeData){
-            [_sharedBleLayer writeData:dataIwant toDevice:device];
-        }else{
-            NSLog(@"卡片信息还未读取！");
-        }
-    }
-}
-
 //与外围设备连接中...
-- (void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state{
-    //
+- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state{
     
     if(state == BT40LayerState_IsAccessing){
         //燃气卡读写
@@ -239,53 +297,48 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     }
 }
 
-//已经断开与外围设备的连接
-- (void)didDisconnectedPeripheralDevice:(PeripheralDevice *)device{
-    printf("删除蓝牙卡处理对象！");
-    //删除卡处理器
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:device];
-    if(!cardHandler) return;
-    [_cardHandlers removeObject:cardHandler];
-}
-
-
-//卡正在读取数据，这个是读取卡的过程
-- (void)didReceivedData:(NSData *)data fromPeripheralDevice:(PeripheralDevice *)device{
+- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error{
     
-    if(!device) return;
-    //卡处理器处理数据
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:device];
-    if(!cardHandler) return;
-    
-    NSLog(@"卡正在读写数据，这个过程可能会被调用多次...");
-#warning 这里有可能出现问题
-    [cardHandler dataProcessing:data];
-}
-
-- (void)sendFollowWithType:(int)type{
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
-    if(!cardHandler) return;
-#warning 这里有可能出现问题
-    [cardHandler sendfollow:type];
-    
-    
+    if (error) {
+        NSLog(@"写入设备失败:%@",error);
+        [self stopConectPeriphralDevice:device];
+        [self delegateActionWithData:nil device:device result:NO operationType:GasCardOperation_WRITE];
+    }else{
+        BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:device];
+        //如果当前为写卡操作，且写入卡数据成功，则进行密码更新
+        if (device.operationType == GasCardOperation_WRITE
+            && cardHandler.currentState == CardOperationState_ReadCorrect
+            && _beenWritedCard == YES) {
+            //密码判断
+            NSString* keyold = device.checkKey;
+            NSString* keyNew = device.checkKeyNew;
+            if (![keyold isEqualToString:keyNew]) {
+                NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_CHANGPASS4442_COMMAND];
+                [commandIwant appendString:keyNew];
+                [cardHandler cardRequestWithCommand:commandIwant];
+                _beenWritedCard = NO;
+                NSLog(@"正在进行密码更新，命令：%@",commandIwant);
+            }else{
+                NSLog(@"卡片不必更新密码,写卡成功");
+                [self delegateActionWithData:nil device:device result:YES operationType:GasCardOperation_WRITE];
+            }
+        }else{
+            NSLog(@"%s",__FUNCTION__);
+        }
+    }
 }
 
 
 #pragma mark -BleCardHandlerDelegate
-
 //卡处理器接收数据
 - (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data state:(CardOperationState)state{
 
     NSLog(@"卡处理器接收到数据！");
     
-    PeripheralDevice* currentDisposedDevice = [Bluetooth40Layer currentDisposedDevice];
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:
-                                   currentDisposedDevice];
-    if(!cardHandler) return;
-    
+    PeripheralDevice* deviceIwant = [Bluetooth40Layer currentDisposedDevice];
+    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:deviceIwant];
     //读写卡数据
-    if(currentDisposedDevice.operationType == GasCardOperation_READ){
+    if(deviceIwant.operationType == GasCardOperation_READ){
         [_readResultData appendData:data];
         NSLog(@"%@接收的数据长度：%ld",cardHander,(unsigned long)_readResultData.length);
         
@@ -300,15 +353,12 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             NSLog(@"最终的结果数据是：%@",[[NSString alloc] initWithData:_readResultData encoding:NSUTF8StringEncoding]);
             
             //设备数据写入
-            [currentDisposedDevice setValue:_readResultData forKey:DEVICE_CARD_READED_DATA_KEY];
-            
-            if ([self.delegate respondsToSelector:@selector(bluetoochManager:didReadSuccessWithDisposeData:fromDevice:)]) {
-                [self.delegate bluetoochManager:self didReadSuccessWithDisposeData:_readResultData fromDevice:currentDisposedDevice];
-            }
+            [deviceIwant setValue:_readResultData forKey:DEVICE_CARD_READED_DATA_KEY];
+            [self delegateActionWithData:_readResultData device:deviceIwant result:YES operationType:GasCardOperation_READ];
             return;
         }
     }
-    else if (currentDisposedDevice.operationType == GasCardOperation_WRITE){
+    else if (deviceIwant.operationType == GasCardOperation_WRITE){
         
         //校验结果如果完成，开始写入卡片数据
         if (state == CardOperationState_ReadCorrect) {
@@ -329,50 +379,11 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         }else{
             if(!_beenWritedCard){
                 NSLog(@"写入卡片不成功！");
-                [self stopConectPeriphralDevice:currentDisposedDevice];
-                if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteFailedToDevice:)]) {
-                    [self.delegate bluetoochManager:self didWriteFailedToDevice:currentDisposedDevice];
-                }
+                [self stopConectPeriphralDevice:deviceIwant];
+                [self delegateActionWithData:nil device:deviceIwant result:NO operationType:GasCardOperation_WRITE];
             }else{
-                
+                [self delegateActionWithData:data device:deviceIwant result:YES operationType:GasCardOperation_WRITE];
             }
-        }
-    }
-}
-
-- (void)didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error{
-    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:
-                                   device];
-    if(!cardHandler) return;
-
-    if (error) {
-        NSLog(@"写入设备失败:%@",error);
-        [self stopConectPeriphralDevice:[Bluetooth40Layer currentDisposedDevice]];
-        if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteFailedToDevice:)]) {
-            [self.delegate bluetoochManager:self didWriteFailedToDevice:[Bluetooth40Layer currentDisposedDevice]];
-        }
-    }else{
-        //如果当前为写卡操作，且写入卡数据成功，则进行密码更新
-        if (device.operationType == GasCardOperation_WRITE
-            && cardHandler.currentState == CardOperationState_ReadCorrect
-            && _beenWritedCard == YES) {
-            //密码判断
-            NSString* keyold = device.checkKey;
-            NSString* keyNew = device.checkKeyNew;
-            if (![keyold isEqualToString:keyNew]) {
-                NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_CHANGPASS4442_COMMAND];
-                [commandIwant appendString:keyNew];
-                [cardHandler cardRequestWithCommand:commandIwant];
-                _beenWritedCard = NO;
-                NSLog(@"正在进行密码更新，命令：%@",commandIwant);
-            }else{
-                NSLog(@"卡片不必更新密码,写卡成功");
-                if ([self.delegate respondsToSelector:@selector(bluetoochManager:didWriteSuccesToDevice:)]) {
-                    [self.delegate bluetoochManager:self didWriteSuccesToDevice:[Bluetooth40Layer currentDisposedDevice]];
-                }
-            }
-        }else{
-            NSLog(@"%s",__FUNCTION__);
         }
     }
 }

@@ -10,6 +10,7 @@
 
 @class CBPeripheral;
 @class PeripheralDevice;
+@class BleCardHandler;
 
 @protocol BluetoochDelegate;
 @protocol BleCardHandlerDelegate;
@@ -32,12 +33,13 @@
 @property (nonatomic,strong)    NSMutableArray* cardHandlers;
 
 
-- (PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral;
-- (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID;
 - (void)addNewDevice:(PeripheralDevice *)dm;
 - (void)removeDevice:(PeripheralDevice *)dm;
 - (void)remoeAllDevices;
 
+- (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID;
+- (PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral;
+- (BleCardHandler *)cardHandlerForPeripheralDevice:(PeripheralDevice *)device;
 /*
  * 开始搜索周边外围设备
  * date 搜索结束时刻
@@ -64,7 +66,6 @@
  */
 - (void)writeData:(NSString *)dataString toPeriphralDevice:(PeripheralDevice *)pDevice;
 
-
 @end
 
 @protocol BluetoochDelegate <NSObject>
@@ -78,28 +79,25 @@
 
 
 /**
- *  @brief 读取外围设备数据成功
+ *  @brief <#Description#>
  *
- *  @param data   接收到的数据
- *  @param device 外围设备
+ *  @param manager   <#manager description#>
+ *  @param data      <#data description#>
+ *  @param device    <#device description#>
+ *  @param isSuccess <#isSuccess description#>
  */
-- (void)bluetoochManager:(BluetoochManager *)manager didReadSuccessWithDisposeData:(NSData *)data fromDevice:(PeripheralDevice *)device;
+- (void)bluetoochManager:(BluetoochManager *)manager didEndReadWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess;
+
 
 /**
- *  @brief 写入数据成功
+ *  @brief <#Description#>
  *
- *  @param manager
- *  @param device  外围设备
+ *  @param manager   <#manager description#>
+ *  @param data      <#data description#>
+ *  @param device    <#device description#>
+ *  @param isSuccess <#isSuccess description#>
  */
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteSuccesToDevice:(PeripheralDevice *)device;
-
-/**
- *  @brief 写入数据失败
- *
- *  @param manager
- *  @param device  外围设备
- */
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteFailedToDevice:(PeripheralDevice *)device;
+- (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess;
 
 @end
 

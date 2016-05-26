@@ -78,14 +78,20 @@
     NSLog(@"locationString:%@",locationString);
 }
 
+- (void)viewDidDisappear:(BOOL)animated{
+    [_sharedBTManager stopSearchPeriphrals];
+}
 
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
     
     self.device.operationType = GasCardOperation_READ;
-    [_sharedBTManager readDataFromPeriphralDevice:self.device];
     [self.mProgress show:YES];
+    NSBlockOperation* operation = [NSBlockOperation blockOperationWithBlock:^{
+        [_sharedBTManager readDataFromPeriphralDevice:self.device];
+    }];
+    [[NSOperationQueue mainQueue] addOperation:operation];
 }
 
 /////充值
@@ -93,51 +99,57 @@
     
     self.device.operationType = GasCardOperation_WRITE;
     [self.mProgress show:YES];
-    [_sharedBTManager writeData:@"" toPeriphralDevice:self.device];
-    
+    NSBlockOperation* operation = [NSBlockOperation blockOperationWithBlock:^{
+        [_sharedBTManager writeData:@"" toPeriphralDevice:self.device];
+    }];
+    [[NSOperationQueue mainQueue] addOperation:operation];
 }
 
 
+
+
 //接收到蓝牙卡版本数据
-- (void)bluetoochManager:(BluetoochManager *)manager didReadSuccessWithDisposeData:(NSData *)data fromDevice:(PeripheralDevice *)device{
+- (void)bluetoochManager:(BluetoochManager *)manager didEndReadWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
+    
     [self.mProgress hide:YES];
-    NSLog(@"发送数据到服务器，开始解析");
+    
+    if (!isSuccess) {
+        return;
+    }
+    
+    
+    
     [XFSocketManager sharedManager].dataType = GasCardDataType_WRITE;
     [XFSocketManager sharedManager].host = RELEASE_BLUETOOCH_HOST_IP;
     [XFSocketManager sharedManager].port = RELEASE_BLUETOOCH_HOST_PORT;
     
-    //
-    [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
-        
-        self.Sendchongzhiaction.enabled = YES;
-        //        NSLog(@"服务器返回的数据：%@",responseData);
-        
-        if (responseData) {
-            
-            BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:type];
-            
-            NSLog(@"%@",infoIwish);
-            
-            self.cardname.text = infoIwish.username;
-            self.cardnumber.text = infoIwish.userID;
-            self.chaxuntime.text = [NSDate date].description;
-            
-        }
-        [self.mProgress hide:YES];
-        [[XFSocketManager sharedManager] stopConnect];
-    }];
+    //NSLog(@"发送数据到服务器，开始解析");
+//    [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
+//        
+//        self.Sendchongzhiaction.enabled = YES;
+//        //        NSLog(@"服务器返回的数据：%@",responseData);
+//        
+//        if (responseData) {
+//            
+//            BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:type];
+//            
+//            NSLog(@"%@",infoIwish);
+//            
+//            self.cardname.text = infoIwish.username;
+//            self.cardnumber.text = infoIwish.userID;
+//            self.chaxuntime.text = [NSDate date].description;
+//            
+//        }
+//        [self.mProgress hide:YES];
+//        [[XFSocketManager sharedManager] stopConnect];
+//    }];
+}
 
+- (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
     
 }
 
 
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteSuccesToDevice:(PeripheralDevice *)device{
-    [self.mProgress hide:YES];
-}
-
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteFailedToDevice:(PeripheralDevice *)device{
-    [self.mProgress hide:YES];
-}
 
 /*
 #pragma mark - Navigation

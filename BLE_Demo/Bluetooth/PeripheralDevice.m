@@ -39,6 +39,7 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
         self.parsedData = nil;
         self.name = nil;
         self.identifier = nil;
+        self.stateType = PeripheralState_Disconnected;
         
         [self initAllVariable];
     }
@@ -110,8 +111,6 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
     self.manufactureData = nil;
     self.operationType = CardOperation_Idle;
     
-    self.connectTimer = nil;
-    self.discoverTimer = nil;
 }
 
 

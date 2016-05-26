@@ -39,7 +39,7 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
 /**
  *  @brief 卡片发送是否结束
  */
-@property (assign,nonatomic)  BOOL     sendEnded;
+@property (assign,nonatomic)  BOOL  sendEnded;
 /**
  *  @brief 卡片操作状态
  */

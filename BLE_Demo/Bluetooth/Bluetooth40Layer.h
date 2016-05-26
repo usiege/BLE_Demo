@@ -36,19 +36,11 @@ typedef NS_ENUM(NSInteger, BT40LayerStatusTypeDef) {
  */
 typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
     
-    BT40LayerState_Idle,            //
-    BT40LayerState_Searching,       // 正在查找
+    BT40LayerState_Idle,            //无状态
+    BT40LayerState_Searching,       //正在查找
+    BT40LayerState_Connecting,      //蓝牙与外围设备正在连接状态
+    BT40LayerState_IsAccessing,     //蓝牙设备正在存取
     
-    BT40LayerState_Connected,
-    BT40LayerState_ConnectFailed,
-    
-    BT40LayerState_Discovered,     //已建立蓝牙服务连接
-    BT40LayerState_DiscoverFailed, //蓝牙设备服务失败
-    
-    BT40LayerState_IsAccessing,    //蓝牙设备正在存取
-    
-    BT40LayerStateEnd
-
 };
 
 @class PeripheralDevice;
@@ -68,10 +60,9 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 }
 
 @property (nonatomic,assign)        id<Bluetooth40LayerDelegate>    delegate;
-@property (nonatomic,assign)        BT40LayerStateTypeDef state;    //连接设备的状态
+@property (nonatomic,assign)        BT40LayerStateTypeDef state;    //蓝牙连接的状态
 
-
-+(instancetype)sharedInstance;//单例模式静态接口
++ (instancetype)sharedInstance;//单例模式静态接口
 + (PeripheralDevice *)currentDisposedDevice;//返回当前正在处理的设备
 
 /*      
@@ -98,9 +89,12 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      参数:      建立数据通道的设备
  *      参见:
  */
--(void)startConnectWithDevice:(PeripheralDevice *)device;
+-(void)startConnectWithDevice:(PeripheralDevice *)device completed:(void(^)(BT40LayerStateTypeDef state))callback;
 
-
+/**
+ *  @brief 断开连接
+ */
+-(void)stopConnect;
 /**
  *  @brief 读取外围设备数据外围设备的服务
  *
@@ -149,7 +143,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 /*
  * 发现新的外围设备时
  */
-- (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
+- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didFoundNewPerigheralDevice:(PeripheralDevice *)device;
 
 
 @optional
@@ -159,31 +153,8 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *
  *  参见: 
  */
--(void)didBluetoothStateChange:(BT40LayerStatusTypeDef)btStatus;
+-(void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didBluetoothStateChange:(BT40LayerStatusTypeDef)btStatus;
 
-/**
- *  当中心连接到外围设备
- *
- *  @param device 已连接的外围设备
- */
-- (void)didConnectedPeripheralDevice:(PeripheralDevice *)device;
-
-/*
- *  描述: 当与设备的连接断开时的处理接口
- *
- *  有可能是被动断开，有可能是主动断开
- *
- */
--(void)didDisconnectedPeripheralDevice:(PeripheralDevice *)device;
-
-
-/**
- *  @brief 与外围设备连接失败
- *
- *  @param device 要连接的外围设备
- *  @param error  错误描述
- */
-- (void)didFailedConnectedPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
 
 
 /****************************************************/
@@ -192,18 +163,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *
  *  参见: createDataChannelWithDevice
  */
--(void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state;
-
-/*
- *  描述: 数据通道接收到数据时的处理接口
- */
--(void)didReceivedData:(NSData *)data fromPeripheralDevice:(PeripheralDevice *)device;
-
-
-/**
- *  @brief 数据通道接收到后续的数据处理
- */
-- (void)sendFollowWithType:(int)type;
+-(void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state;
 
 
 /**
@@ -212,7 +172,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  @param device 要写入的设备
  *  @param error  error会包含写入失败的信息
  */
-- (void)didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
+- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
 
 @required
 
