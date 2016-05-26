@@ -7,10 +7,27 @@
 //
 
 #import "PeripheralDevice.h"
+#import "BleCardInfo.h"
 
 #define  kDeviceInforModelNameString            @"keyDeviceInforModelNameString"
 #define  kDeviceInforModelIdentifierString      @"keyDeviceInforModelIdentifierString"
 
+
+@interface PeripheralDevice ()
+{
+    NSData* _cardReadedData;
+    NSData* _parsedData;
+}
+@property (nonatomic,strong) NSData*        cardReadedData;   //设备读取到的卡数据
+@property (nonatomic,strong) NSData*        parsedData;     //服务器解析后的数据
+
+@end
+
+const NSString*  DEVICE_CARD_READED_DATA_KEY = @"cardReadedData";
+const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
+
+
+//static inline void test(void){ return;}
 
 @implementation PeripheralDevice
 
@@ -18,6 +35,8 @@
     self = [super init];
     if (self) {
         // initiate code
+        self.cardReadedData = nil;
+        self.parsedData = nil;
         self.name = nil;
         self.identifier = nil;
         
@@ -25,6 +44,37 @@
     }
     return self;
 }
+
+- (NSData *)cardReadedData{
+    return _cardReadedData;
+}
+
+- (void)setCardReadedData:(NSData *)cardReadedData{
+    _cardReadedData = cardReadedData;
+}
+
+
+
+- (NSData *)parsedData{
+    return _parsedData;
+}
+
+- (void)setParsedData:(NSData *)parsedData{
+    _parsedData = parsedData;
+}
+
+- (NSString *)checkKey{
+    if(!_parsedData) return nil;
+    if(_parsedData.length > 129+16) nil;
+    return [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(129, 16)] encoding:NSUTF8StringEncoding];
+}
+
+- (NSString *)checkKeyNew{
+    if(!_parsedData) return nil;
+    if(_parsedData.length > 145+16) nil;
+    return [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(145, 16)] encoding:NSUTF8StringEncoding];
+}
+
 
 #pragma -NSCopying
 -(id)copyWithZone:(NSZone *)zone{
@@ -56,11 +106,10 @@
     self.peripheral = nil;
     self.rssi = nil;
     self.manufactureData = nil;
-    self.state = BT40DeviceState_Idle;
+    self.operationType = CardOperation_Idle;
     
     self.connectTimer = nil;
     self.discoverTimer = nil;
-    self.configureTimer = nil;
 }
 
 

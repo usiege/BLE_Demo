@@ -11,10 +11,19 @@
 #import "FoundNewPortViewController.h"
 
 @interface AppDelegate () 
-
+{
+    
+}
 @end
 
 @implementation AppDelegate
+
+- (instancetype)init{
+    if (self = [super init]) {
+        
+    }
+    return self;
+}
 
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
@@ -30,8 +39,40 @@
     self.window.rootViewController = foundNav;
     [self setupCompontents];
     
+    int a = 1;
+    int b = a;
+    printf("------>%p %p %p\n",a,1,b);
+    
+    
     [self.window makeKeyAndVisible];
     return YES;
+}
+
+- (void)testNewD:(NSString *)str{
+    str = @"321";
+    
+}
+
+- (void)testData:(NSString **)string{
+    //    NSString* oriString = @"123";
+    ////    NSString** oriSS = &oriString;
+    //
+    //    [self testData:&oriString];
+    //
+    //    //
+    //    [self testNewD:oriString];
+    //
+    //    NSLog(@"%@",oriString);
+    //
+    //    //
+    //    NSError* error = nil;
+    //
+    //    [NSURLConnection sendSynchronousRequest:nil returningResponse:nil error:&error];
+    //    
+    //    if(error){
+    //        
+    //    }
+    *string = @"进来了";
 }
 
 - (void)setupCompontents{

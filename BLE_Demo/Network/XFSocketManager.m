@@ -7,21 +7,39 @@
 //
 
 #import "XFSocketManager.h"
+
 #import "NetRefer.h"
 #import "AsyncSocket.h"
+#import "ConverUtil.h"
 
-typedef void(^ScoketCallback)(NSData* data);
+#import "Bluetooth40Layer.h"
+#import "PeripheralDevice.h"
+
+typedef void(^ScoketCallback)(NSData* data,CardDataType dataType);
+
+#define SINGNAL_READDATA_PRE    @"LYGASGS150100010001" //发送读卡数据
+#define SINGNAL_WRITEDATA_PRE   @"LYGASGS210100010001" //发送写卡数据
+
+#define SOCKET_OVERTIME_SECOND      5
+
+extern NSString* DEVICE_PARSED_DATA_KEY;
+extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 @interface XFSocketManager () <NSStreamDelegate>
 {
-//    AsyncSocket* _serverSock;
+    NSInputStream*      _inputStream;
+    NSOutputStream*     _outputStream;
     
-    NSInputStream* _inputStream;
-    NSOutputStream* _outputStream;
+    /**
+     *  @brief 需要发送的用户信息
+     */
+    NSDictionary*       _userInfo;
 }
 
-@property (nonatomic,copy) ScoketCallback sCallback;
-@property (nonatomic,strong) NSData* receiveData;
+@property (nonatomic,copy) ScoketCallback   sCallback;
+@property (nonatomic,strong) NSData*        receiveData; //外部接收到的数据
+
+@property (nonatomic,strong) NSTimer*       cancelTimer;
 
 @end
 
@@ -37,26 +55,37 @@ typedef void(^ScoketCallback)(NSData* data);
     return manager;
 }
 
-- (id)init
-{
-    if (self = [super init])
-    {
-//        _serverSock = [[AsyncSocket alloc] initWithDelegate:self];
+- (id)init{
+    if (self = [super init]){
+        self.receiveData = [[NSData alloc] init];
+        _userInfo = [NSMutableDictionary dictionary];
     }
     return self;
 }
 
-- (void)dealloc
-{
-//    _serverSock = nil;
+- (void)dealloc{
     _inputStream = nil;
     _outputStream = nil;
 }
 
-- (void)connectHostWithIP:(NSString *)host port:(NSString *)port data:(NSData *)data completed:(void (^)(NSData* data))callback{
-    [self connectToHostUseStreamWithIP:host port:port.intValue data:data];
-    self.receiveData = data;
+- (void)connectWithData:(NSData *)data userInfo:(NSDictionary *)userInfo completed:(void (^)(NSData *, CardDataType))callback{
+    
+    NSData* bleData = [[Bluetooth40Layer currentDisposedDevice] valueForKey:DEVICE_CARD_READED_DATA_KEY];
+    if(data == bleData)
+        self.receiveData = data;
+    
     self.sCallback = callback;
+    
+    _userInfo = userInfo;
+    
+    [self connectToHostUseStreamWithIP:self.host port:self.port.intValue data:data];
+    self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+}
+
+- (void)connectCancelAction:(id)sender{
+    [_outputStream close];
+    [_inputStream close];
+    NSLog(@"Socket 连接已超时！");
 }
 
 - (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
@@ -87,24 +116,51 @@ typedef void(^ScoketCallback)(NSData* data);
     [[NSRunLoop currentRunLoop] run];
 }
 
-- (void)sendData:(NSData *)data{
-    [_outputStream write:data.bytes maxLength:data.length];
+- (void)sendDataToSocket{
+    
+    if(_dataType == GasCardDataType_READ){
+        
+        NSMutableString* strIwant = [[NSMutableString alloc] init];
+        [strIwant appendString:SINGNAL_READDATA_PRE];
+        [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
+        NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];
+        [_outputStream write:dataIwant.bytes maxLength:dataIwant.length];
+        
+    }else if (_dataType == GasCardDataType_WRITE){
+        
+        NSMutableString* strIwant = [[NSMutableString alloc] init];
+        [strIwant appendString:SINGNAL_WRITEDATA_PRE];
+        [strIwant appendString:@"0000"];//这里需要添加4位，用于显示购气量
+        [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
+        NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];
+        [_outputStream write:dataIwant.bytes maxLength:dataIwant.length];
+        
+    }else{
+        NSLog(@"未知的网络发送数据类型！");
+    }
+    
 }
 
 
 - (void)readDataFromSocket{
-     //建立一个缓冲区 可以放1024个字节
-     uint8_t buf[1024];
-     // 返回实际装的字节数
-     NSInteger len = [_inputStream read:buf maxLength:sizeof(buf)];
+    //建立一个缓冲区 可以放1024个字节
+    uint8_t buf[1024];
+    // 返回实际装的字节数
+    NSInteger len = [_inputStream read:buf maxLength:sizeof(buf)];
     
      // 把字节数组转化成字符串
-     NSData *data = [NSData dataWithBytes:buf length:len];
+    NSData *data = [NSData dataWithBytes:buf length:len];
+    NSLog(@"data from server is:%lu",data.length);
     
-     // 从服务器接收到的数据
-     NSString *recStr =  [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-     NSLog(@"data from server is:%@",recStr);
-    self.sCallback(data);
+    PeripheralDevice* deviceIwant = [Bluetooth40Layer currentDisposedDevice];
+    [deviceIwant setValue:data forKey:DEVICE_PARSED_DATA_KEY];
+    
+    if(self.sCallback){
+        self.sCallback(data,self.dataType);
+    }
+    
+    [_outputStream close];
+    [_inputStream close];
 }
 
 #pragma mark -Stream callback
@@ -116,6 +172,7 @@ typedef void(^ScoketCallback)(NSData* data);
     //    NSStreamEventHasSpaceAvailable = 1UL << 2,//可以发放字节
     //    NSStreamEventErrorOccurred = 1UL << 3,// 连接出现错误
     //    NSStreamEventEndEncountered = 1UL << 4// 连接结束
+    
     switch (eventCode) {
         case NSStreamEventOpenCompleted:
                 NSLog(@"输入输出流打开完成");
@@ -126,7 +183,7 @@ typedef void(^ScoketCallback)(NSData* data);
                 break;
         case NSStreamEventHasSpaceAvailable:
                 NSLog(@"可以发送字节");
-            [self sendData:self.receiveData];
+            [self sendDataToSocket];
                 break;
         case NSStreamEventErrorOccurred:
                 NSLog(@"连接出现错误");
@@ -150,6 +207,7 @@ typedef void(^ScoketCallback)(NSData* data);
 }
 
 
+#if 0
 #pragma mark -AsyncSocket callback
 
 //接收到新的连接请求
@@ -203,5 +261,7 @@ typedef void(^ScoketCallback)(NSData* data);
     NSLog(@"断开连接成功");
 //    [clientArray removeObject:sock];
 }
+
+#endif
 
 @end

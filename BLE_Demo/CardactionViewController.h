@@ -12,11 +12,10 @@
 @class PeripheralDevice;
 @interface CardactionViewController : UIViewController
 {
-    UIAlertView *alert;
-    NSTimer *updata;
+   
 }
 
-@property (nonatomic,strong)    PeripheralDevice* device;
+@property (nonatomic,strong)   PeripheralDevice* device;
 
 @property(nonatomic,retain)    IBOutlet UILabel *cardmoney;
 @property(nonatomic,retain)    IBOutlet UILabel *cardnumber;

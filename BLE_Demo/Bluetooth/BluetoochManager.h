@@ -10,7 +10,9 @@
 
 @class CBPeripheral;
 @class PeripheralDevice;
+
 @protocol BluetoochDelegate;
+@protocol BleCardHandlerDelegate;
 
 /*
  *蓝牙连接管理器
@@ -21,13 +23,14 @@
  5.删除蓝牙设备；
 */
 
-@interface BluetoochManager : NSObject
+@interface BluetoochManager : NSObject <BleCardHandlerDelegate>
 
 + (instancetype)shareInstance;
 
 @property (nonatomic,weak)      id<BluetoochDelegate> delegate;
 @property (nonatomic,strong)    NSMutableArray* seekedDevices;
-@property (nonatomic,strong) NSMutableData*         resultData;
+@property (nonatomic,strong)    NSMutableArray* cardHandlers;
+
 
 - (PeripheralDevice *)getDeviceByPeripheral:(CBPeripheral *)peripheral;
 - (PeripheralDevice *)getDeviceByIdentifer:(NSString *)deviceID;
@@ -41,27 +44,47 @@
  */
 - (void)startSearchPeriphralsUntil:(NSDate *)date;
 
-//停止搜索
+/**
+ *  @brief 停止搜索
+ */
 - (void)stopSearchPeriphrals;
 
-/*
- * 与外围设备建立连接
- */
-- (void)startConnectPeriphralDevice:(PeripheralDevice *)pDevice;
 
-/*
- * 与外围设备断开连接
- */
 - (void)stopConectPeriphralDevice:(PeripheralDevice *)pDevice;
+/**
+ *  @brief 从外围设备中读数据
+ *
+ *  @param pDevice 外围设备
+ */
+- (void)readDataFromPeriphralDevice:(PeripheralDevice *)pDevice;
+
+/**
+ *  @brief 向外围设备中写数据
+ *
+ *  @param dataString 要写入的信息
+ *  @param pDevice    要写入的设备
+ */
+- (void)writeData:(NSString *)dataString toPeriphralDevice:(PeripheralDevice *)pDevice;
+
 
 @end
 
 @protocol BluetoochDelegate <NSObject>
 
-//发现新的外围设备时
+/**
+ *  @brief 发现了新的蓝牙设备
+ *
+ *  @param device 外围设备
+ */
 - (void)didFoundNewPerigheralDevice:(PeripheralDevice *)device;
 
-//接收到处理后的数据
+
+/**
+ *  @brief 接收到外围设备数据
+ *
+ *  @param data   接收到的数据
+ *  @param device 外围设备
+ */
 - (void)didReceiveDisposedData:(NSData *)data fromDevice:(PeripheralDevice *)device;
 
 @end

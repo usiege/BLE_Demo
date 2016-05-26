@@ -14,6 +14,7 @@
 
 #define SINGAL_RECEIVEDATA_SUCCESS @"9000"
 
+
 @interface BleCardHandler ()
 {
     NSTimer *check15Timer;          //////1015 超时计时
@@ -33,7 +34,6 @@
 @property (assign,nonatomic) int      actionsort;   //////执行指令类型
 
 @property (copy,nonatomic  )  NSString * requsetnow;
-@property (assign,nonatomic)  BOOL     isendsend;
 @property (assign,nonatomic)  int      serial;   //发送的第n个包
 @property (assign,nonatomic)  NSUInteger pagecount;
 
@@ -43,7 +43,6 @@
 @property(nonatomic,copy)      NSString*        datastring;
 @property(nonatomic,strong)    NSData*          receiveData;
 
-@property (nonatomic,assign) CardOperationState currentState;
 
 @end
 
@@ -55,6 +54,7 @@
         
         _requesetcount = 1;
         _actionsort = 12;
+        _sendEnded = YES;
         
         _device = device;
         _dataArr = [NSMutableArray array];
@@ -66,18 +66,19 @@
 }
 
 - (void)cardRequestWithCommand:(NSString *)command{
-    NSLog(@"正在连接外围设备，连接命令:%@",command);
+    
+    NSLog(@"正在请求卡片数据，连接命令:%@",command);
     
     _requsetnow = command;
     NSUInteger length=0;
     Byte temp[350]={0};
     Byte temp1[350]={0};
     
-    if(_isendsend){
+    if(_sendEnded){
         check15page=NO;
         _serial=0;
         _pagecount=0;
-        _isendsend = NO;
+        _sendEnded = NO;
         [_dataArr removeAllObjects];
     }
     
@@ -177,17 +178,17 @@
 
 -(void)sendfollow:(int)type
 {
+    printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
     if(type==0){
         [self sendsmalldata:_dataArr dserial:_serial];
     }else{
         _serial++;
         if(_serial<_pagecount){
-            NSLog(@"sendfollow 进入发送第 %d包\n",_serial+1);
             [self sendsmalldata:_dataArr dserial:_serial];
         }
         else{
             printf("结束发送\n");
-            _isendsend = YES;
+            _sendEnded = YES;
         }
     }
 }
@@ -334,12 +335,12 @@
             [_dataRevArray removeAllObjects];
             
             if(_actionsort == 12){
-                NSLog(@"燃气卡数据请求...");
-                if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)]){
-                    [self receiveDataSuccess];
-                    [self.delegate bleCardHandler:self didReceiveData:_receiveData state:_currentState];
-                }
+                NSLog(@"燃气卡片数据请求结束...");
+                
+                //5月25日修改，用于读写燃气卡片结束处理
+                [self gasCardAction];
             }
+            
             
             check15page = NO;
             if(checkrecive != nil){
@@ -363,19 +364,27 @@
 }
 
 //接收到结果数据
-- (void)receiveDataSuccess{
-    NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
-    if ([outstring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]) {
+- (void)gasCardAction{
+    
+    //接收到卡片回传数据 “9000”为成功
+    if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+        _currentState = CardOperationState_ReadCorrect;
+        //处理返回的数据
+        NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
         [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
         _datastring = outstring;
         _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
-        _currentState = CardOperationState_ReadCorrect;
+        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
+            [self.delegate bleCardHandler:self didReceiveData:_receiveData state:CardOperationState_ReadCorrect];
+        
     }else{
         _currentState = CardOperationState_ReadWrong;
+        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
+            [self.delegate bleCardHandler:self didReceiveData:nil state:CardOperationState_ReadWrong];
     }
 }
-                        
-                        
+
+
 
 -(void)ErrorRecovery:(int)ErrorSerial{
     Byte temp[20]={0};

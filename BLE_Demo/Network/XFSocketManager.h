@@ -8,6 +8,7 @@
 
 #import <Foundation/Foundation.h>
 #import "NetRefer.h"
+#import "BleCardInfo.h"
 
 @protocol XFSocketDelegate;
 @interface XFSocketManager : NSObject
@@ -15,7 +16,11 @@
 + (XFSocketManager *)sharedManager;
 @property (nonatomic,weak) id<XFSocketDelegate> delegate;
 
-- (void)connectHostWithIP:(NSString *)host port:(NSString *)port data:(NSData *)data completed:(void (^)(NSData* data))callback;
+@property (nonatomic,assign)    CardDataType    dataType;
+@property (nonatomic,copy)      NSString*       host;
+@property (nonatomic,copy)      NSString*       port;
+
+- (void)connectWithData:(NSData *)data userInfo:(NSDictionary *)userInfo completed:(void (^)(NSData* responseData,CardDataType dataType))callback;
 
 @end
 

@@ -55,7 +55,6 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
     _bleManager = [BluetoochManager shareInstance];
     _bleManager.delegate = self;
     
-//    [[NSNotificationCenter defaultCenter] addObserver:self forKeyPath:@"devicesCount" options:NSKeyValueObservingOptionNew|NSKeyValueObservingOptionOld context:nil];
 }
 
 - (void)viewWillAppear:(BOOL)animated{

@@ -12,13 +12,11 @@
 #import "PeripheralDevice.h"
 #import "BluetoochManager.h"
 #import "XFSocketManager.h"
+#import "BleCardModel.h"
 
 
 @interface CardactionViewController ()<BluetoochDelegate,XFSocketDelegate>
 {
-    BOOL addInputDeviceObs;
-    BOOL addOutputDeviceObs;
-    
     BluetoochManager*   _sharedBTManager;
     XFSocketManager*    _sharedSocketManager;
 }
@@ -34,6 +32,7 @@
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
     [self createUI];
+    [self setupData];
     
     _sharedBTManager = [BluetoochManager shareInstance];
     _sharedBTManager.delegate = self;
@@ -41,9 +40,29 @@
     _sharedSocketManager = [XFSocketManager sharedManager];
     _sharedSocketManager.delegate = self;
     
-    addInputDeviceObs = false;
-    addOutputDeviceObs = false;
+}
+
+- (void)viewDidUnload{
+    [super viewDidUnload];
+}
+
+- (void)didReceiveMemoryWarning {
+    [super didReceiveMemoryWarning];
+    // Dispose of any resources that can be recreated.
+}
+
+- (void)createUI{
+    self.title = self.device.name;
     
+    self.aiView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
+    UIBarButtonItem* aiItem = [[UIBarButtonItem alloc] initWithCustomView:_aiView];
+    self.navigationItem.rightBarButtonItem = aiItem;
+    
+    self.Sendchaxunaction.enabled = YES;
+    self.Sendchongzhiaction.enabled = NO;
+}
+
+- (void)setupData{
     self.chongzhilab.pattern=@"^((0|[1-9]{1}\\d{0,5}))(?:\\.)\\d{2}$";
     
     NSDate *  senddate=[NSDate date];
@@ -51,76 +70,61 @@
     [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
     NSString *  locationString=[dateformatter stringFromDate:senddate];
     NSLog(@"locationString:%@",locationString);
-    
-    //连接卡
-    [_sharedBTManager startConnectPeriphralDevice:self.device];
-}
-
--(void)createUI{
-    self.title = self.device.name;
-    
-    self.aiView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    UIBarButtonItem* aiItem = [[UIBarButtonItem alloc] initWithCustomView:_aiView];
-    self.navigationItem.rightBarButtonItem = aiItem;
-}
-
-
-- (void)didReceiveMemoryWarning {
-    [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
-}
-
-- (void)viewDidUnload{
-    [super viewDidUnload];
-    if(addInputDeviceObs)
-    {
-        //        [_bleController removeObserver:self forKeyPath:@"inputDevice"];
-        addInputDeviceObs = false;
-    }
-    if(addOutputDeviceObs)
-    {
-        //        [_bleController removeObserver:self forKeyPath:@"outputDevice"];
-        addOutputDeviceObs = false;
-    }
 }
 
 
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
-    [_sharedBTManager startConnectPeriphralDevice:self.device];
+    
+    self.device.operationType = GasCardOperation_READ;
+    [_sharedBTManager readDataFromPeriphralDevice:self.device];
+}
 
+/////充值
+-(IBAction)Bluechongzhi:(id)sender{
+    
+    self.device.operationType = GasCardOperation_WRITE;
+    [_sharedBTManager writeData:@"" toPeriphralDevice:self.device];
 }
 
 
 //接收到蓝牙卡版本数据
 - (void)didReceiveDisposedData:(NSData *)data fromDevice:(PeripheralDevice *)device{
-    NSLog(@"发送数据到服务器，开始解析");
-    [[XFSocketManager sharedManager] connectHostWithIP:LOCAL_BLUETOOTH_HOST_IP port:LOCAL_BLUETOOTH_HOST_PORT data:data completed:^(NSData *responseData) {
-        NSLog(@"服务器返回的数据：%@",responseData);
-    }];
-}
-
-/////充值
--(IBAction)Bluechongzhi:(id)sender
-{
     
-}
-
-
--(void)performDismisschaxun
-{
-    [alert dismissWithClickedButtonIndex:0 animated:NO];
-    alert= [[UIAlertView alloc]initWithTitle:@"成功！" message:nil delegate:self cancelButtonTitle:@"OK" otherButtonTitles:nil];
-    [alert show];
-
-    NSDate *  senddate=[NSDate date];
-    NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
-    [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
-    NSString *  locationString=[dateformatter stringFromDate:senddate];
-
-//    self.cardmoney.text = _bleController.databuff;
-    self.chaxuntime.text = locationString;
+//    [_sharedBTManager stopConectPeriphralDevice:device];
+    
+    NSLog(@"发送数据到服务器，开始解析");
+    [XFSocketManager sharedManager].dataType = GasCardDataType_READ;
+    [XFSocketManager sharedManager].host = RELEASE_BLUETOOCH_HOST_IP;
+    [XFSocketManager sharedManager].port = RELEASE_BLUETOOCH_HOST_PORT;
+    
+    
+//    NSBlockOperation* parseOp = [NSBlockOperation blockOperationWithBlock:^{
+//        [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
+//            
+//            
+//            
+//            self.Sendchongzhiaction.enabled = YES;
+//            //        NSLog(@"服务器返回的数据：%@",responseData);
+//            
+//            if (responseData) {
+//                
+//                BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:GasCardDataType_READ];
+//                
+//                NSLog(@"%@",infoIwish);
+//                
+//                self.cardname.text = infoIwish.username;
+//                self.cardnumber.text = infoIwish.userID;
+//                self.chaxuntime.text = [NSDate date].description;
+//                
+//            }
+//            
+//            
+//        }];
+//    }];
+//    [[NSOperationQueue mainQueue] addOperation:parseOp];
+    
 }
 
 

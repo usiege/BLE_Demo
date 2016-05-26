@@ -37,6 +37,14 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
 @property (nonatomic,weak) id<BleCardHandlerDelegate> delegate;
 
 /**
+ *  @brief 卡片发送是否结束
+ */
+@property (assign,nonatomic)  BOOL     sendEnded;
+/**
+ *  @brief 卡片操作状态
+ */
+@property (nonatomic,assign) CardOperationState currentState;
+/**
  *  @brief 读取的最终完整结果数据
  */
 //@property (nonatomic,strong) NSData* finalData;

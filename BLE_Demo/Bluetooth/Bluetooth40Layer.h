@@ -14,7 +14,6 @@
  定义一些模块用类型
  */
 
-
 /*
  *  蓝牙状态枚举定义
  */
@@ -33,31 +32,20 @@ typedef NS_ENUM(NSInteger, BT40LayerStatusTypeDef) {
 
 
 /*
- *  结果枚举定义
- *  代理返回的各结果值
- *
+ * 蓝牙连接过程状态
  */
-
-typedef NS_ENUM(NSInteger, BT40LayerResultTypeDef) {
-
-    //成功
-    BT40LayerResult_Success,
-    
-    //连接过程结果
-    BT40LayerResult,
-    BT40LayerResult_ConnectFailed,
-    BT40LayerResult_DiscoverFailed,
-    BT40LayerResult_ConfigureFailed,
-    
-    BT40LayerResultTypeEnd
-};
-
-//*  Idle            蓝牙未使用
-//*  Searching       蓝牙在搜索
 typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
     
     BT40LayerState_Idle,            //
-    BT40LayerState_Searching,       //
+    BT40LayerState_Searching,       // 正在查找
+    
+    BT40LayerState_Connected,
+    BT40LayerState_ConnectFailed,
+    
+    BT40LayerState_Discovered,     //已建立蓝牙服务连接
+    BT40LayerState_DiscoverFailed, //蓝牙设备服务失败
+    
+    BT40LayerState_IsAccessing,    //蓝牙设备正在存取
     
     BT40LayerStateEnd
 
@@ -80,27 +68,11 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 }
 
 @property (nonatomic,assign)        id<Bluetooth40LayerDelegate>    delegate;
-@property (nonatomic,assign)        BT40LayerStateTypeDef state;
-
-//
+@property (nonatomic,assign)        BT40LayerStateTypeDef state;    //连接设备的状态
 
 
-
-//单例模式静态接口
-+(instancetype)sharedInstance;
-
-//返回当前正在处理的设备
-+ (PeripheralDevice *)currentDisposedDevice;
-
-///**
-// *  @brief <#Description#>
-// *
-// *  @param device <#device description#>
-// *
-// *  @return <#return value description#>
-// */
-//-(CBCharacteristic *)getCharacteristicOfDevice:(PeripheralDevice *)device;
-
++(instancetype)sharedInstance;//单例模式静态接口
++ (PeripheralDevice *)currentDisposedDevice;//返回当前正在处理的设备
 
 /*      
  *      函数名称:   startScan
@@ -129,12 +101,26 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 -(void)startConnectWithDevice:(PeripheralDevice *)device;
 
 
+/**
+ *  @brief 读取外围设备数据外围设备的服务
+ *
+ *  @param device 外围设备
+ */
+- (void)readDataFromPeriphralDevice:(PeripheralDevice *)device;
+
+/**
+ *  @brief 向外围设备写入数据
+ *
+ *  @param data   要写入的数据
+ *  @param device 要写入的设备
+ */
+- (void)writeData:(NSData *)data toDevice:(PeripheralDevice *)device;
 
 /*
  *      函数名称:    sendData:toDevice:
  *      功能描述:    发送数据
- *      返回值:     是否发送成功
- *      参数:       向设备发送数据
+ *      返回值:      是否发送成功
+ *      参数:        向设备发送数据
  *      参见:
  */
 -(BOOL)sendData:(NSData *)data toDevice:(PeripheralDevice *)device;
@@ -147,7 +133,6 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *      参见:
  */
 -(void)disconnectWithDevice:(PeripheralDevice *)device;
-
 
 
 @end
@@ -176,14 +161,6 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  */
 -(void)didBluetoothStateChange:(BT40LayerStatusTypeDef)btStatus;
 
-///*
-// *  描述: 发现设备代理接口
-// *
-// *  参见: startScan:withServices:
-// *
-// */
-//-(void)didFoundDevice:(PeripheralDevice *)device;
-
 /**
  *  当中心连接到外围设备
  *
@@ -200,12 +177,22 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 -(void)didDisconnectedPeripheralDevice:(PeripheralDevice *)device;
 
 
+/**
+ *  @brief 与外围设备连接失败
+ *
+ *  @param device 要连接的外围设备
+ *  @param error  错误描述
+ */
+- (void)didFailedConnectedPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
+
+
+/****************************************************/
 /*
  *  描述: 创建数据通道时，代理反馈结果状态接口
  *
  *  参见: createDataChannelWithDevice
  */
--(void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerResultTypeDef)state;
+-(void)isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state;
 
 /*
  *  描述: 数据通道接收到数据时的处理接口
@@ -214,11 +201,18 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 
 /**
- *  @brief <#Description#>
- *
- *  @param type <#type description#>
+ *  @brief 数据通道接收到后续的数据处理
  */
 - (void)sendFollowWithType:(int)type;
+
+
+/**
+ *  @brief 向外围设置中写入数据成功会调用此函数，
+ *
+ *  @param device 要写入的设备
+ *  @param error  error会包含写入失败的信息
+ */
+- (void)didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
 
 @required
 
