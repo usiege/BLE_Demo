@@ -29,7 +29,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     int  outtimecount;              //////超时记述
     BOOL lostpackge;                ////// 丢包标志
  
-    CardRequestCallBack             _cardRequestCallBack;
+//    CardRequestCallBack             _cardRequestCallBack;
     NSData*                         _receiveData;
 }
 
@@ -44,8 +44,10 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 @property (nonatomic,strong)   NSMutableArray*  dataArr;
 @property (strong,nonatomic)   NSMutableArray*  dataRevArray;
 @property(nonatomic,copy)      NSString*        datastring;
+
 //@property(nonatomic,strong)    NSData*          receiveData;
 
+@property (nonatomic,copy)      CardRequestCallBack cardRequestCallBack;
 
 @end
 
@@ -73,7 +75,10 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     
 //    NSLog(@"正在请求卡片数据，连接命令:%@",command);
     NSLog(@"卡片请求callback：%@",callback);
-    _cardRequestCallBack = callback;
+    
+    self.cardRequestCallBack = callback;
+
+    
     _requsetnow = command;
     
     NSUInteger length=0;
@@ -432,10 +437,10 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
         }
     }
     
+    if(self.cardRequestCallBack){
+        self.cardRequestCallBack(_receiveData,self.currentState);
     
-    if(_cardRequestCallBack){
-        _cardRequestCallBack(_receiveData,self.currentState);
-        _cardRequestCallBack = nil;
+//        self.cardRequestCallBack = nil;
     }
 }
 

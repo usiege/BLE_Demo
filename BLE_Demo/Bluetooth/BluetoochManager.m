@@ -306,10 +306,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                         NSLog(@"最终的结果数据是：%@",[[NSString alloc] initWithData:_readResultData encoding:NSUTF8StringEncoding]);
                         //设备数据写入
                         [device setValue:_readResultData forKey:DEVICE_CARD_READED_DATA_KEY];
-                        [self delegateActionWithData:_readResultData device:device result:YES operationType:GasCardOperation_READ];
+                        [weakSelf delegateActionWithData:_readResultData device:device result:YES operationType:GasCardOperation_READ];
+                        return ;
                     }];
                 }
-                return;
             }];
         }
         else if(device.operationType == GasCardOperation_WRITE){

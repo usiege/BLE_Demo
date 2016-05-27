@@ -88,7 +88,6 @@ HHAlertViewDelegate>
 -(IBAction)Bluechaxun:(id)sender{
     
     self.device.operationType = GasCardOperation_READ;
-    
     NSLog(@"thread %@",[NSThread currentThread]);
     
     NSBlockOperation* bo = [NSBlockOperation blockOperationWithBlock:^{
@@ -125,6 +124,13 @@ HHAlertViewDelegate>
     NSLog(@"thread %@",[NSThread currentThread]);
     
     if (!isSuccess) {
+        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"恭喜你，操作顺利的实行了！\n换个行试试看效果" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+        [alertview setEnterMode:HHAlertEnterModeLeft];
+        [alertview setLeaveMode:HHAlertLeaveModeBottom];
+        [alertview showWithBlock:^(NSInteger index) {
+            NSLog(@"%ld",index);
+        }];
+    }else{
         HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败" cancelButtonTitle:@"不要" otherButtonTitles:@[@"好的"]];
         alertview.mode = HHAlertViewModeError;
         [alertview show];
@@ -169,7 +175,19 @@ HHAlertViewDelegate>
 }
 
 - (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
-    NSLog(@"%@",isSuccess?@"写卡成功":@"写卡失败");
+    
+    if (!isSuccess) {
+        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"恭喜你，操作顺利的实行了！\n换个行试试看效果" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+        [alertview setEnterMode:HHAlertEnterModeLeft];
+        [alertview setLeaveMode:HHAlertLeaveModeBottom];
+        [alertview showWithBlock:^(NSInteger index) {
+            NSLog(@"%ld",index);
+        }];
+    }else{
+        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败" cancelButtonTitle:@"不要" otherButtonTitles:@[@"好的"]];
+        alertview.mode = HHAlertViewModeError;
+        [alertview show];
+    }
 }
 
 
