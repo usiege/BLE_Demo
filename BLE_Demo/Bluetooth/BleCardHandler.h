@@ -13,7 +13,6 @@
 */
 
 @class PeripheralDevice;
-@protocol BleCardHandlerDelegate;
 
 typedef NS_ENUM(NSUInteger,CardOperationState) {
     CardOperationState_idle,
@@ -32,9 +31,6 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
  *  @return BleCardHandler
  */
 - (instancetype)initWithPeripheralDevice:(PeripheralDevice *)device;
-
-
-@property (nonatomic,weak) id<BleCardHandlerDelegate> delegate;
 
 /**
  *  @brief 卡片发送是否结束
@@ -57,7 +53,8 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
 /**
  *  @brief 开始处理蓝牙卡请求
  */
-- (void)cardRequestWithCommand:(NSString *)command;
+- (void)cardRequestWithCommand:(NSString *)command
+                     completed:(void(^)(NSData* receiveData,CardOperationState state))callback;
 
 /**
  *  @brief 处理卡数据
@@ -72,19 +69,6 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
  *  @param type
  */
 -(void)sendfollow:(int)type;
-@end
-
-
-@protocol BleCardHandlerDelegate <NSObject>
-
-/**
- *  @brief 接收到处理类处理过的数据
- *
- *  @param cardHander 卡片处理对象
- *  @param data       返回的数据
- *  @param state      此时处理的状态
- */
-- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data state:(CardOperationState)state;
 
 @end
 

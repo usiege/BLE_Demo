@@ -13,7 +13,6 @@
 @class BleCardHandler;
 
 @protocol BluetoochDelegate;
-@protocol BleCardHandlerDelegate;
 
 /*
  *蓝牙连接管理器
@@ -24,7 +23,7 @@
  5.删除蓝牙设备；
 */
 
-@interface BluetoochManager : NSObject <BleCardHandlerDelegate>
+@interface BluetoochManager : NSObject
 
 + (instancetype)shareInstance;
 

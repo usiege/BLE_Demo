@@ -136,7 +136,6 @@ PeripheralDevice* _currentDisposedDevice;
         return;
     }else{
         //连接设备
-        NSLog(@"设备已连接");
         device.stateType = PeripheralState_Connected;
         if(_connectCallBack)
             _connectCallBack(BT40LayerState_Connecting);
@@ -339,7 +338,6 @@ PeripheralDevice* _currentDisposedDevice;
     printf("新建蓝牙卡处理对象！\n");
     //新建卡处理器用于蓝牙卡处理
     BleCardHandler* cardHandler = [[BleCardHandler alloc] initWithPeripheralDevice:device];
-    cardHandler.delegate = BLUETOOCHMANAGER;
     [BLUETOOCHMANAGER.cardHandlers addObject:cardHandler];
     
     dispatch_async(dispatch_get_main_queue(), ^{

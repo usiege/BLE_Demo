@@ -14,6 +14,7 @@
 
 #define SINGAL_RECEIVEDATA_SUCCESS @"9000"
 
+typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state);
 
 @interface BleCardHandler ()
 {
@@ -27,7 +28,8 @@
     int  lastcountfill;             ////// 上一个包序号
     int  outtimecount;              //////超时记述
     BOOL lostpackge;                ////// 丢包标志
-    
+ 
+    CardRequestCallBack             _cardRequestCallBack;
 }
 
 @property (assign,nonatomic) int      requesetcount;//////执行第几个指令
@@ -65,11 +67,14 @@
     return self;
 }
 
-- (void)cardRequestWithCommand:(NSString *)command{
+- (void)cardRequestWithCommand:(NSString *)command
+                     completed:(void(^)(NSData* receiveData,CardOperationState state))callback{
     
     NSLog(@"正在请求卡片数据，连接命令:%@",command);
     
+    _cardRequestCallBack = callback;
     _requsetnow = command;
+    
     NSUInteger length=0;
     Byte temp[350]={0};
     Byte temp1[350]={0};
@@ -380,8 +385,9 @@
     }else{
         _currentState = CardOperationState_ReadWrong;
     }
-    if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
-        [self.delegate bleCardHandler:self didReceiveData:_receiveData state:_currentState];
+    if(_cardRequestCallBack){
+        _cardRequestCallBack(_receiveData,_currentState);
+    }
 }
 
 
