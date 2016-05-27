@@ -91,11 +91,11 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     oneortow=[command length];
     
     if((command == nil)||(oneortow%2!=0)) return;
-    printf("卡片请求命令：%s",[command UTF8String]);
+    printf("卡片请求命令：%s\n",[command UTF8String]);
     
     
     NSData *valueData = [ConverUtil hexString2Data:command];
-    NSLog(@"有效数据段:%@ Length:%lu",valueData,(unsigned long)valueData.length);
+//    NSLog(@"有效数据段:%@ Length:%lu",valueData,(unsigned long)valueData.length);
     [valueData getBytes:temp1 length:valueData.length];
     
     length=[valueData length];
@@ -126,8 +126,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     int lastcount=0;
     NSData * tmp;
     
-    printf("pagenum:%ld\n",_pagecount);
-    printf("serial:%d\n",_serial);
+//    printf("pagenum:%ld\n",_pagecount);
+//    printf("serial:%d\n",_serial);
     
     for(int n=0;n<_pagecount;n++){
         
@@ -159,20 +159,20 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             tmp = [NSData dataWithBytes:twinty length:20];
             
         }
-        NSLog(@"小包数据:%@ Length:%lu",tmp,tmp.length);
+//        NSLog(@"小包数据:%@ Length:%lu",tmp,tmp.length);
         [_dataArr addObject:tmp];
     }
     
-    printf("进入发送第 %d 包 \n",_serial+1);
+//    printf("进入发送第 %d 包 \n",_serial+1);
     [self sendsmalldata:_dataArr dserial:_serial];
 }
 
 
 ///数据发送
 -(void)sendsmalldata:(NSMutableArray*)data dserial:(int)dserial{
-    NSLog(@"获取数组 %d",dserial);
+//    NSLog(@"获取数组 %d",dserial);
     NSData *mydata = [data objectAtIndex:dserial];
-    NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
+//    NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
     
     BOOL sendResult = NO;
     Bluetooth40Layer* _sharedBleLayer = [Bluetooth40Layer sharedInstance];
@@ -183,7 +183,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 
 -(void)sendfollow:(int)type
 {
-    printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
+//    printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
     if(type==0){
         [self sendsmalldata:_dataArr dserial:_serial];
     }else{
@@ -254,7 +254,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
         });
     }
     
-    NSLog(@"datawith =%@",[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)]);
+//    NSLog(@"datawith =%@",[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)]);
     
     if(check15page){
         /////收到recive关闭定时

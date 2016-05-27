@@ -58,11 +58,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/Bluetooth40Layer.m"
-            timestampString = "486028164.94184"
+            timestampString = "486030753.197617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "404"
-            endingLineNumber = "404"
+            startingLineNumber = "402"
+            endingLineNumber = "402"
             landmarkName = "-peripheral:didDiscoverServices:"
             landmarkType = "5">
          </BreakpointContent>
@@ -74,11 +74,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/Bluetooth40Layer.m"
-            timestampString = "486028164.94184"
+            timestampString = "486030753.197617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "441"
-            endingLineNumber = "441"
+            startingLineNumber = "439"
+            endingLineNumber = "439"
             landmarkName = "-peripheral:didUpdateNotificationStateForCharacteristic:error:"
             landmarkType = "5">
          </BreakpointContent>
@@ -106,11 +106,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/Bluetooth40Layer.m"
-            timestampString = "486028164.94184"
+            timestampString = "486030753.197617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "318"
-            endingLineNumber = "318"
+            startingLineNumber = "316"
+            endingLineNumber = "316"
             landmarkName = "-centralManager:didDiscoverPeripheral:advertisementData:RSSI:"
             landmarkType = "5">
          </BreakpointContent>
@@ -138,11 +138,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/CardactionViewController.m"
-            timestampString = "486011452.688886"
+            timestampString = "486030661.900843"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "94"
-            endingLineNumber = "94"
+            startingLineNumber = "93"
+            endingLineNumber = "93"
             landmarkName = "-Bluechaxun:"
             landmarkType = "5">
          </BreakpointContent>
@@ -170,11 +170,11 @@
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "BLE_Demo/Bluetooth/Bluetooth40Layer.m"
-            timestampString = "486028164.94184"
+            timestampString = "486030753.197617"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "369"
-            endingLineNumber = "369"
+            startingLineNumber = "367"
+            endingLineNumber = "367"
             landmarkName = "-centralManager:didDisconnectPeripheral:error:"
             landmarkType = "5">
          </BreakpointContent>
@@ -233,13 +233,13 @@
             shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "BLE_Demo/Bluetooth/BluetoochManager.m"
-            timestampString = "486029462.0125"
+            filePath = "BLE_Demo/CardactionViewController.m"
+            timestampString = "486030661.900843"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "389"
-            endingLineNumber = "389"
-            landmarkName = "-bluetoochLayer:isConnectingPeripheralDevice:withState:"
+            startingLineNumber = "172"
+            endingLineNumber = "172"
+            landmarkName = "-bluetoochManager:didEndWriteWithResponseData:fromDevice:result:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>

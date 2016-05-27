@@ -276,7 +276,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 //与外围设备连接中... （2次）
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer isConnectingPeripheralDevice:(PeripheralDevice *)pDevice withState:(BT40LayerStateTypeDef)state{
     
-    NSLog(@"%s",__FUNCTION__);
+    
     BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:pDevice];
     PeripheralDevice* device = pDevice;
     __weak typeof(self) weakSelf = self;
@@ -340,6 +340,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                     //加卡片数据(64-512)位
                     [commandIwant appendString:stringIwant];
                     
+                    NSLog(@"校验成功！");
                     NSLog(@"正在写入卡片数据，命令：%@",commandIwant);
                     [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
                         
@@ -353,6 +354,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                                     NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_CHANGPASS4442_COMMAND];
                                     [commandIwant appendString:keyNew];
                                     
+                                    NSLog(@"写卡成功！");
                                     NSLog(@"需要更新密码，命令：%@",commandIwant);
                                     [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
                                         [self delegateActionWithData:receiveData device:device result:state operationType:GasCardOperation_WRITE];
@@ -364,7 +366,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                                     return;
                                 }
                                 else{
-                                    NSLog(@"卡片不必更新密码,写卡成功");
+                                    NSLog(@"卡片不必更新密码,写卡成功！");
                                     //更新请求后将已状态置为： 已写入,已更新
                                     weakSelf.beenWritedCard = YES;
                                     weakSelf.beenUpdatePass = YES;
@@ -383,7 +385,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                                 return;
                             }
                         }
-                        
+                        else{
+                            //6F06卡片超时
+                            [self delegateActionWithData:receiveData device:device result:NO operationType:GasCardOperation_WRITE];
+                        }
                     }];// end 写入
                     //写入请求后将已状态置为： 已写入,未更新
                     weakSelf.beenWritedCard = YES;
@@ -392,15 +397,12 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             }]; // end 校验
         }// end if
     }
-    NSLog(@"%s 与外围设备连接中...",__FUNCTION__);
+    NSLog(@"与外围设备连接中...");
 }
 
 
-//先(3次)
+//蓝牙向外围设备写入成功！
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error{
-    NSLog(@"%s",__FUNCTION__);
-    NSLog(@"蓝牙写入外围成功！");
-    
     if (error) {
         NSLog(@"写入设备失败:%@",error);
         [self stopConectPeriphralDevice:device];

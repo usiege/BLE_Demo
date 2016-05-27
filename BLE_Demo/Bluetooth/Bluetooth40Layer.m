@@ -242,9 +242,7 @@ PeripheralDevice* _currentDisposedDevice;
     for (CBService *service in device.peripheral.services){
         if ([service.UUID isEqual:[CBUUID UUIDWithString:BUSINESS_SERVICE_UUID_STRING]]){
             for (CBCharacteristic *characteristic in service.characteristics){
-                NSLog(@"characteristic %@", [characteristic.UUID UUIDString]);
                 if ([characteristic.UUID isEqual:[CBUUID UUIDWithString:WRITE_CHARACTERISTIC_UUID_STRING]]){
-                    NSLog(@"find it");
                     return characteristic;
                 }
             }
@@ -294,7 +292,7 @@ PeripheralDevice* _currentDisposedDevice;
 -(void)centralManager:(CBCentralManager *)central didDiscoverPeripheral:(CBPeripheral *)peripheral advertisementData:(NSDictionary *)advertisementData RSSI:(NSNumber *)RSSI{
     
     printf("didDiscoverPeripheral\n");
-    NSLog(@"advertisement data is :%@",advertisementData);
+//    NSLog(@"advertisement data is :%@",advertisementData);
     NSString* identifer = [peripheral.identifier UUIDString];
     self.state = BT40LayerState_Idle;
     
@@ -303,7 +301,7 @@ PeripheralDevice* _currentDisposedDevice;
         
         [_localDeviceNames addObject:identifer];
         printf("发现新设备\n");
-        NSLog(@"device identifier is :%@",identifer);
+        printf(":%s",identifer.cString);
         
         PeripheralDevice *device = [[PeripheralDevice alloc] init];
         device.stateType = PeripheralState_Disconnected;
@@ -422,7 +420,7 @@ PeripheralDevice* _currentDisposedDevice;
         return;
     }
     
-    NSLog(@"service characteristics is %@",service.characteristics);
+//    NSLog(@"service characteristics is %@",service.characteristics);
     
     printf("开始读取外围服务数据...\n");
     for (CBCharacteristic *characteristic in service.characteristics) {
@@ -464,7 +462,7 @@ PeripheralDevice* _currentDisposedDevice;
         return;
     }
     
-    NSLog(@"characteristic data is:%@ ",characteristic.value);
+//    NSLog(@"characteristic data is:%@ ",characteristic.value);
     NSLog(@"characteristic data length is %ld",characteristic.value.length);
 
     //卡处理器处理数据
@@ -480,21 +478,21 @@ PeripheralDevice* _currentDisposedDevice;
 ///发送完成
 //用于检测中心向外设写数据是否成功
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
-    NSLog(@"发送结束");
+//    NSLog(@"发送结束");
     self.state = BT40LayerState_Connecting;
     
     BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:_currentDisposedDevice];
     if(!cardHandler) return;
-    NSLog(@"send follow!");
+//    NSLog(@"send follow!");
     
     if(error!=nil){
-        NSLog(@"发送失败");
+//        NSLog(@"发送失败");
         if(count<3){
             [cardHandler sendfollow:0];
         }
         count++;
     }else{
-        NSLog(@"发送成功");
+//        NSLog(@"发送成功");
         [cardHandler sendfollow:1];
         count=0;
     }
