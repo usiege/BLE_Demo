@@ -30,6 +30,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     BOOL lostpackge;                ////// 丢包标志
  
     CardRequestCallBack             _cardRequestCallBack;
+    NSData*                         _receiveData;
 }
 
 @property (assign,nonatomic) int      requesetcount;//////执行第几个指令
@@ -43,7 +44,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 @property (nonatomic,strong)   NSMutableArray*  dataArr;
 @property (strong,nonatomic)   NSMutableArray*  dataRevArray;
 @property(nonatomic,copy)      NSString*        datastring;
-@property(nonatomic,strong)    NSData*          receiveData;
+//@property(nonatomic,strong)    NSData*          receiveData;
 
 
 @end
@@ -70,8 +71,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 - (void)cardRequestWithCommand:(NSString *)command
                      completed:(void(^)(NSData* receiveData,CardOperationState state))callback{
     
-    NSLog(@"正在请求卡片数据，连接命令:%@",command);
-    
+//    NSLog(@"正在请求卡片数据，连接命令:%@",command);
+    NSLog(@"卡片请求callback：%@",callback);
     _cardRequestCallBack = callback;
     _requsetnow = command;
     
@@ -181,8 +182,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 }
 
 
--(void)sendfollow:(int)type
-{
+-(void)sendfollow:(int)type{
 //    printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
     if(type==0){
         [self sendsmalldata:_dataArr dserial:_serial];
@@ -227,7 +227,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             checkrecive = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(CheckreciveSelector:) userInfo:nil repeats:NO];
         });
         return;
-    }else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
+    }
+    else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
         
         
         NSLog(@"接收到正确结尾报文\n");
@@ -265,8 +266,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
         }
         
         //////收到数据包关闭等待packge;
-        if(checkpackge !=nil)
-        {
+        if(checkpackge !=nil){
             [checkpackge invalidate];
             checkpackge = nil;
             outtimecount = 0;
@@ -280,7 +280,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
         /////丢包状态，等待正确包接入
         if(lostpackge && current!=(lastcountfill+1)){
             return;
-        }else{
+        }
+        else{
             
             ///////正确包接入，取消时钟
             if(checkfollow!=nil){
@@ -303,7 +304,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             maxnow = max;
             lastcountfill = current;
             
-        }else{
+        }
+        else{
             ////////重复包丢弃
             if(current<=lastcountfill){
                 NSLog(@"重复包丢弃\n");
@@ -331,7 +333,8 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             for (int i=0; i<[_dataRevArray count]; i++) {
                 if (i == 0) {
                     _datastring =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
-                }else{
+                }
+                else{
                     _datastring = [_datastring stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
                 }
             }
@@ -368,30 +371,6 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     }
 }
 
-//接收到结果数据
-- (void)gasCardAction{
-    
-    //接收到卡片回传数据 “9000”为成功
-    if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
-        _currentState = CardOperationState_ReadCorrect;
-        //处理返回的数据
-        NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
-        [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
-        _datastring = outstring;
-        _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
-    }else if([_datastring hasSuffix:@"6F06"]){
-        _currentState = CardOperationState_ReadWrong;
-        _receiveData = nil;
-    }else{
-        _currentState = CardOperationState_ReadWrong;
-    }
-    if(_cardRequestCallBack){
-        _cardRequestCallBack(_receiveData,_currentState);
-    }
-}
-
-
-
 -(void)ErrorRecovery:(int)ErrorSerial{
     Byte temp[20]={0};
     temp[0] = 0x10;
@@ -410,7 +389,6 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 //////等待接受超时处理/////
 -(void)CheckreciveSelector:(id)sender{
     NSLog(@"等待接受数据超时\n");
-    //    requsetnow = nil;
 }
 
 /////等待接受packge超时///////
@@ -419,45 +397,47 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
     [self ErrorRecovery:lastcountfill+1];
 }
 
+#pragma mark 李中欢-----接收到结果数据
 
-
-///////进制转换
--(NSString*)hex2tenstring:(NSString*)hexdata{
-    NSString *tensting;
-    
-    char datachar[350];
-    long int dataint;
-    strcpy(datachar, (char*)[hexdata UTF8String]);
-    dataint = strtol(datachar, NULL, 16);
-    
-    NSLog(@"dataint = %ld",dataint);
-    double datafloat = (double)dataint/100;
-    NSLog(@"datafloat = %.2f",datafloat);
-    
-    tensting = [NSString stringWithFormat:@"%.2f",datafloat];
-    return tensting;
+- (NSData *)receiveData{
+    return _receiveData;
 }
 
 
--(NSString*)int2tenstring:(NSString*)hexdata{
-    NSString *tensting;
-    NSString *geweiString;
-    NSString *xiaoshuString;
+- (void)gasCardAction{
     
-    geweiString = [hexdata substringToIndex:10];
-    xiaoshuString = [hexdata substringFromIndex:10];
+    if ([Bluetooth40Layer currentDisposedDevice].stateType == GasCardOperation_READ) {
+        //接收到卡片回传数据 “9000”为成功
+        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+            _currentState = CardOperationState_ReadCorrect;
+            //处理返回的数据
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
+            _datastring = outstring;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+        }else{
+            _currentState = CardOperationState_ReadWrong;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];;
+        }
+    }else if ([Bluetooth40Layer currentDisposedDevice].stateType == GasCardOperation_WRITE){
+        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+            self.currentState = self.currentState | CardOperationState_ReadCorrect;
+            //处理返回的数据
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
+            _datastring = outstring;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+        }else{
+            
+        }
+    }
     
-    char datachar[350];
-    long int dataint;
-    strcpy(datachar, (char*)[geweiString UTF8String]);
-    dataint = strtol(datachar, NULL, 10);
     
-    tensting = [NSString stringWithFormat:@"%ld",dataint];
-    
-    tensting = [tensting stringByAppendingString:@"."];
-    tensting = [tensting stringByAppendingString:xiaoshuString];
-    
-    return tensting;
+    if(_cardRequestCallBack){
+        _cardRequestCallBack(_receiveData,self.currentState);
+        _cardRequestCallBack = nil;
+    }
 }
+
 
 @end

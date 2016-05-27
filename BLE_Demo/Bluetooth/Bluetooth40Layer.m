@@ -430,60 +430,58 @@ PeripheralDevice* _currentDisposedDevice;
     }
 }
 
-//中心读取外设实时数据
+//中心读取外设实时数据，该方法只调用一次
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateNotificationStateForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     printf("didUpdateNotificationStateForCharacteristic: (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
-    PeripheralDevice *device = _currentDisposedDevice;
-    if(!device) return;
     self.state = BT40LayerState_IsAccessing;
     
     //连接失败
     if(error){
         printf("error is : %s\n",[error.description UTF8String]);
-        [self disconnectWithDevice:device];
+        [self disconnectWithDevice:_currentDisposedDevice];
         return;
     }
     NSLog(@"蓝牙中心读取外设实时数据");
-
-
     if ([self.delegate respondsToSelector:@selector(bluetoochLayer:isConnectingPeripheralDevice:withState:)]){
-        [self.delegate bluetoochLayer:self isConnectingPeripheralDevice:device withState:BT40LayerState_IsAccessing];
+        [self.delegate bluetoochLayer:self isConnectingPeripheralDevice:_currentDisposedDevice withState:BT40LayerState_IsAccessing];
     }
 }
     
 
 
-//获取外设发来的数据，不论是read和notify,获取数据都是从这个方法中读取。
+//读数据返回
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
-    self.state = BT40LayerState_IsAccessing;
+    printf("didUpdateValueForCharacteristic: (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
+    
+    //卡处理器处理数据
+    BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:_currentDisposedDevice];
+    if(!cardHandler) return;
+    NSLog(@"卡正在读写数据，这个过程可能会被调用多次...");
+    //卡正在读取数据，这个是读取卡的过程
+    [cardHandler dataProcessing:characteristic.value];
+    //    NSLog(@"characteristic data is:%@ ",characteristic.value);
+    NSLog(@"characteristic data length is %ld",characteristic.value.length);
+    
+    static int count = 0;
+    NSLog(@"count  === %d",count++);
+    
+    
     if (error) {
         NSLog(@"There is a error in peripheral:didUpdateValueForCharacteristic:error: which called:%@",error);
         [self disconnectWithDevice:_currentDisposedDevice];
         return;
     }
     
-//    NSLog(@"characteristic data is:%@ ",characteristic.value);
-    NSLog(@"characteristic data length is %ld",characteristic.value.length);
-
-    //卡处理器处理数据
-    BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:_currentDisposedDevice];
-    if(!cardHandler) return;
-    
-    NSLog(@"卡正在读写数据，这个过程可能会被调用多次...");
-    //卡正在读取数据，这个是读取卡的过程
-    [cardHandler dataProcessing:characteristic.value];
 }
 
 
-///发送完成
-//用于检测中心向外设写数据是否成功
+
+//写数据返回
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
-//    NSLog(@"发送结束");
-    self.state = BT40LayerState_Connecting;
+    printf("didWriteValueForCharacteristic: (%s)\n",[[characteristic.UUID UUIDString] UTF8String]);
     
     BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:_currentDisposedDevice];
     if(!cardHandler) return;
-//    NSLog(@"send follow!");
     
     if(error!=nil){
 //        NSLog(@"发送失败");

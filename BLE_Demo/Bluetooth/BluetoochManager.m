@@ -34,17 +34,13 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 >
 {
     Bluetooth40Layer*   _sharedBleLayer;
-    
-//    BOOL                _beenWritedCard;          //写卡是否已完成
-//    BOOL                _beenUpdatePass;          //更新密码是否已完成
-//    CardOperationType   _lastOperation;         //上次执行的操作
 }
 
 @property (nonatomic,strong)    NSMutableData*      readResultData;     //读卡后的结果
 @property (nonatomic,strong)    NSData*             writeData;          //要写入卡的数据
 
-@property (nonatomic,assign)    BOOL                beenWritedCard;          //写卡是否已完成
-@property (nonatomic,assign)    BOOL                beenUpdatePass;          //更新密码是否已完成
+//@property (nonatomic,assign)    BOOL                beenWritedCard;          //写卡是否已完成
+//@property (nonatomic,assign)    BOOL                beenUpdatePass;          //更新密码是否已完成
 
 @end
 
@@ -64,10 +60,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         _cardHandlers = [NSMutableArray array];
         
         _readResultData = [NSMutableData data];
-        
         _writeData = nil;
-        _beenWritedCard = NO;
-        _beenUpdatePass = NO;
         
         _sharedBleLayer = [Bluetooth40Layer sharedInstance];
         _sharedBleLayer.delegate = self;
@@ -96,6 +89,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 - (void)readDataFromPeriphralDevice:(PeripheralDevice *)pDevice{
     if(!pDevice) return;
     pDevice.operationType = GasCardOperation_READ;
+    
+    //读卡前状态为0
+    BleCardHandler* ch = [self cardHandlerForPeripheralDevice:pDevice];
+    ch.currentState = CardOperationState_idle;
     
     //正在存取卡片数据
     if(_sharedBleLayer.state == BT40LayerState_IsAccessing){
@@ -135,9 +132,9 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     if(!pDevice) return;
     pDevice.operationType = GasCardOperation_WRITE;
     
-    //状态置为： 未写入,未更新
-    _beenWritedCard = NO;
-    _beenUpdatePass = NO;
+    //写卡前状态置空
+    BleCardHandler* ch = [self cardHandlerForPeripheralDevice:pDevice];
+    ch.currentState = CardOperationState_idle;
     
     //如果此时正在存取数据，直接返回
     if(_sharedBleLayer.state == BT40LayerState_IsAccessing){
@@ -276,7 +273,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 //与外围设备连接中... （2次）
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer isConnectingPeripheralDevice:(PeripheralDevice *)pDevice withState:(BT40LayerStateTypeDef)state{
     
-    
     BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:pDevice];
     PeripheralDevice* device = pDevice;
     __weak typeof(self) weakSelf = self;
@@ -287,6 +283,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     if(state == BT40LayerState_IsAccessing){
 
         if(device.operationType == GasCardOperation_READ){
+            
             //进行第一次读请求
             NSString* command = CARD_READ4442_COMMAND_FOR_FIRSTTIME;
             NSLog(@"正在进行第一次读卡请求，命令：%@",command);
@@ -327,8 +324,16 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             NSLog(@"正在进行校验，校验命令：%@",commandIwant);
             if([device.checkKey isEqualToString:@"147178"])
             [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
+                
                 //校验结果如果完成，开始写入卡片数据
-                if (state == CardOperationState_ReadCorrect && !_beenWritedCard && !_beenUpdatePass) {
+                if (cardHandler.currentState & CardOperationState_Checkouted //已校验
+                    &&!(cardHandler.currentState & CardOperationState_Written) //未写入
+                    && !(cardHandler.currentState & CardOperationState_ChangedPass) //未修改过密码
+                    && cardHandler.currentState & CardOperationState_ReadCorrect //读取卡回执成功
+                    ) {
+                    //清除读取状态，以方便下一次状态添加
+                    cardHandler.currentState = cardHandler.currentState & (~state);
+                    
                     //请求命令
                     NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_WRITE4442_COMMAND_FOR_ONCE];
                     NSData* dataIwant = _writeData; //要写入的数据，外部接收
@@ -343,72 +348,86 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
                     NSLog(@"校验成功！");
                     NSLog(@"正在写入卡片数据，命令：%@",commandIwant);
                     [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
-                        
+                        //清除读取状态
+                        cardHandler.currentState = cardHandler.currentState & (~state);
+                        NSLog(@"写卡回调");
                         //如果当前为写卡操作，且写入卡数据成功，则进行密码更新
-                        if (_beenWritedCard && !_beenUpdatePass) {
-                            if (state == CardOperationState_ReadCorrect) {
-                                //密码判断
-                                NSString* keyold = device.checkKey;
-                                NSString* keyNew = device.checkKeyNew;
-                                if (![keyold isEqualToString:keyNew]) {
-                                    NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_CHANGPASS4442_COMMAND];
-                                    [commandIwant appendString:keyNew];
+                        if (cardHandler.currentState & CardOperationState_Checkouted //已校验
+                            && cardHandler.currentState & CardOperationState_Written //已写入
+                            && !(cardHandler.currentState & CardOperationState_ChangedPass) //未修改过密码
+                            && cardHandler.currentState & CardOperationState_ReadCorrect //读取卡回执成功
+                            ){
+                            
+                            //密码判断
+                            NSString* keyold = device.checkKey;
+                            NSString* keyNew = device.checkKeyNew;
+                            if (![keyold isEqualToString:keyNew]) {
+                                NSMutableString* commandIwant = [[NSMutableString alloc] initWithString:CARD_CHANGPASS4442_COMMAND];
+                                [commandIwant appendString:keyNew];
+                                
+                                NSLog(@"写卡成功！");
+                                NSLog(@"需要更新密码，命令：%@",commandIwant);
+                                [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
                                     
-                                    NSLog(@"写卡成功！");
-                                    NSLog(@"需要更新密码，命令：%@",commandIwant);
-                                    [cardHandler cardRequestWithCommand:commandIwant completed:^(NSData *receiveData, CardOperationState state) {
-                                        [self delegateActionWithData:receiveData device:device result:state operationType:GasCardOperation_WRITE];
-                                        return;
-                                    }];//end 更新
-                                    //更新请求后将已状态置为： 已写入,已更新
-                                    weakSelf.beenWritedCard = YES;
-                                    weakSelf.beenUpdatePass = YES;
+                                    [self delegateActionWithData:receiveData device:device result:state operationType:GasCardOperation_WRITE];
                                     return;
-                                }
-                                else{
-                                    NSLog(@"卡片不必更新密码,写卡成功！");
-                                    //更新请求后将已状态置为： 已写入,已更新
-                                    weakSelf.beenWritedCard = YES;
-                                    weakSelf.beenUpdatePass = YES;
-                                    [self delegateActionWithData:nil device:device result:YES operationType:GasCardOperation_WRITE];
-                                    return;
-                                }
-
+                                }];//end 更新
+                                //更新请求后将已状态置为： 已写入,已更新，已修改密码
+                                cardHandler.currentState = cardHandler.currentState | CardOperationState_ChangedPass;
+                                return;
                             }
-                            else{//已经写完卡并收到写卡后的回复错误
-                                NSLog(@"写入卡片不成功！");
-                                //不成功则状态置为： 已写入,已更新
-                                weakSelf.beenWritedCard = YES;
-                                weakSelf.beenUpdatePass = YES;
-                                [self stopConectPeriphralDevice:device];
-                                [self delegateActionWithData:receiveData device:device result:NO operationType:GasCardOperation_WRITE];
+                            else{
+                                NSLog(@"卡片不必更新密码,写卡成功！");
+                                //更新请求后将已状态置为： 已写入,已更新，已修改密码
+                                cardHandler.currentState = cardHandler.currentState | CardOperationState_ChangedPass;
+                                [self delegateActionWithData:nil device:device result:YES operationType:GasCardOperation_WRITE];
                                 return;
                             }
                         }
-                        else{
-                            //6F06卡片超时
-                            [self delegateActionWithData:receiveData device:device result:NO operationType:GasCardOperation_WRITE];
+                        else{//已经写完卡并收到写卡后的回复错误
+                            NSLog(@"写入卡片不成功！");
+                            //不成功则状态置为： 已写入,已更新
+                            cardHandler.currentState = cardHandler.currentState | CardOperationState_ChangedPass;
+                            [self stopConectPeriphralDevice:device];
+                            [self delegateActionWithData:cardHandler.receiveData device:device result:NO operationType:GasCardOperation_WRITE];
+                            return;
                         }
+                        
                     }];// end 写入
-                    //写入请求后将已状态置为： 已写入,未更新
-                    weakSelf.beenWritedCard = YES;
-                    weakSelf.beenUpdatePass = NO;
-                } // end if
+                    //写入请求后将已状态置为： 已校验，已写入,未更新
+                    cardHandler.currentState = cardHandler.currentState | CardOperationState_Written;//增加已写卡状态；
+                }else{
+                    NSLog(@"校验失败！");
+                    [self delegateActionWithData:receiveData device:device result:NO operationType:GasCardOperation_WRITE];
+                    return;
+                }
+                
             }]; // end 校验
+            //校验请求后将已状态置为： 已校验，未写入,未更新
+            cardHandler.currentState = cardHandler.currentState | CardOperationState_Checkouted;//增加已校验状态
         }// end if
     }
     NSLog(@"与外围设备连接中...");
 }
 
-
+#if 1
 //蓝牙向外围设备写入成功！
-- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error{
+- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)pDevice error:(NSError *)error{
+    
+    BleCardHandler* cardHandler = [self cardHandlerForPeripheralDevice:pDevice];
+    PeripheralDevice* device = pDevice;
+    
     if (error) {
         NSLog(@"写入设备失败:%@",error);
         [self stopConectPeriphralDevice:device];
         [self delegateActionWithData:nil device:device result:NO operationType:GasCardOperation_WRITE];
+        return;
+    }
+    
+    if(device.operationType == GasCardOperation_WRITE){
+        
     }
 }
-
+#endif
 
 @end
