@@ -13,6 +13,8 @@
 #import "BluetoochManager.h"
 #import "PeripheralDevice.h"
 
+#import "HHAlertView.h"
+
 static NSString* RIGHT_BUTTON_STATE_NORMAL = @"正常";
 static NSString* RIGHT_BUTTON_STATE_SCAN = @"扫描";
 static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
@@ -35,19 +37,10 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 
 @implementation FoundNewPortViewController
 
-- (id)initWithNibName:(NSString *)nibNameOrNil bundle:(NSBundle *)nibBundleOrNil
-{
-    self = [super initWithNibName:nibNameOrNil bundle:nibBundleOrNil];
-    if (self) {
-        // Custom initialization
-        self.title = @"BLE Demo";
-    }
-    return self;
-}
-
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+    self.title = @"BLE Demo";
     self.devicesCount = 0;
 
 
@@ -70,17 +63,6 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 - (void)bluetoochManager:(BluetoochManager *)manager didFoundNewPerigheralDevice:(PeripheralDevice *)device{
     self.devicesCount = _bleManager.seekedDevices.count;
     [self.foundDevicesTableView reloadData];
-}
-
-
-- (void)observeValueForKeyPath:(NSString *)keyPath ofObject:(id)object change:(NSDictionary *)change context:(void *)context{
-    
-    if ([object isKindOfClass:[self class]]) {
-        if ([keyPath isEqualToString:@"devicesCount"]) {
-            [self.foundDevicesTableView reloadData];
-        }
-    }
-
 }
 
 
@@ -108,10 +90,6 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
 
 
 - (void)viewDidUnload{
-    
-    [[NSNotificationCenter defaultCenter] removeObserver:self forKeyPath:@"devicesCount"];
-//    [_bleController removeObserver:self forKeyPath:@"countOfFoundDevices"];
-
 }
 
 - (void)didReceiveMemoryWarning

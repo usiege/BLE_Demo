@@ -37,10 +37,10 @@ typedef NS_ENUM(NSInteger, BT40LayerStatusTypeDef) {
 typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
     
     BT40LayerState_Idle,            //无状态
+    
     BT40LayerState_Searching,       //正在查找
     BT40LayerState_Connecting,      //蓝牙与外围设备正在连接状态
     BT40LayerState_IsAccessing,     //蓝牙设备正在存取
-    
 };
 
 @class PeripheralDevice;
@@ -158,11 +158,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 
 /****************************************************/
-/*
- *  描述: 创建数据通道时，代理反馈结果状态接口
- *
- *  参见: createDataChannelWithDevice
- */
+
 -(void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer isConnectingPeripheralDevice:(PeripheralDevice *)device withState:(BT40LayerStateTypeDef)state;
 
 
@@ -173,6 +169,9 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  *  @param error  error会包含写入失败的信息
  */
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)device error:(NSError *)error;
+
+//
+//- (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didDisconnectPeripheralDevice:(PeripheralDevice *)device;
 
 @required
 

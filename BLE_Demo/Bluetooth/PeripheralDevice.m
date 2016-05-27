@@ -54,8 +54,6 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
     _cardReadedData = cardReadedData;
 }
 
-
-
 - (NSData *)parsedData{
     return _parsedData;
 }

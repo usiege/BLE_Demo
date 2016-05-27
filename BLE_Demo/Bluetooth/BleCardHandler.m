@@ -89,7 +89,7 @@
     printf("卡片请求命令：%s",[command UTF8String]);
     
     
-    NSData *valueData = [ConverUtil stringToByte:command];
+    NSData *valueData = [ConverUtil hexString2Data:command];
     NSLog(@"有效数据段:%@ Length:%lu",valueData,(unsigned long)valueData.length);
     [valueData getBytes:temp1 length:valueData.length];
     
@@ -374,14 +374,14 @@
         [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
         _datastring = outstring;
         _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
-        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
-            [self.delegate bleCardHandler:self didReceiveData:_receiveData state:CardOperationState_ReadCorrect];
-        
+    }else if([_datastring hasSuffix:@"6F06"]){
+        _currentState = CardOperationState_ReadWrong;
+        _receiveData = nil;
     }else{
         _currentState = CardOperationState_ReadWrong;
-        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
-            [self.delegate bleCardHandler:self didReceiveData:nil state:CardOperationState_ReadWrong];
     }
+    if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
+        [self.delegate bleCardHandler:self didReceiveData:_receiveData state:_currentState];
 }
 
 

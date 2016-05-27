@@ -37,7 +37,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     NSDictionary*       _userInfo;
 }
 
-@property (nonatomic,copy) ScoketCallback   sCallback;
+@property (nonatomic,copy)  ScoketCallback   sCallback;
 @property (nonatomic,strong) NSData*        receiveData; //外部接收到的数据
 
 @property (nonatomic,strong) NSTimer*       cancelTimer;
@@ -84,9 +84,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 }
 
 - (void)connectCancelAction:(id)sender{
-    [_outputStream close];
-    [_inputStream close];
     NSLog(@"Socket 连接已超时！");
+    [_cancelTimer invalidate];
+    _cancelTimer = nil;
+    [self stopConnect];
 }
 
 - (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
@@ -143,7 +144,12 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         
         NSMutableString* strIwant = [[NSMutableString alloc] init];
         [strIwant appendString:SINGNAL_WRITEDATA_PRE];
-        [strIwant appendString:@"0000"];//这里需要添加4位，用于显示购气量
+        NSString* amountStr = @"0000";
+        if([_userInfo.allKeys containsObject:METERS_OF_GAS_FOR_SENDING_KEY]){
+            amountStr = [_userInfo valueForKey:METERS_OF_GAS_FOR_SENDING_KEY];
+            
+        }
+        [strIwant appendString:amountStr];//这里需要添加4位，用于显示购气量
         [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
         NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];
         [_outputStream write:dataIwant.bytes maxLength:dataIwant.length];

@@ -64,7 +64,7 @@
  *  @param dataString 要写入的信息
  *  @param pDevice    要写入的设备
  */
-- (void)writeData:(NSString *)dataString toPeriphralDevice:(PeripheralDevice *)pDevice;
+- (void)writeData:(NSData *)data toPeriphralDevice:(PeripheralDevice *)pDevice;
 
 @end
 

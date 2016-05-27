@@ -139,7 +139,7 @@ static const char encodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopq
 }
 
 
-+(NSData*)stringToByte:(NSString*)string
++(NSData*)hexString2Data:(NSString*)string
 {
     NSString *hexString=[[string uppercaseString] stringByReplacingOccurrencesOfString:@" " withString:@""];
     if ([hexString length]%2!=0) {

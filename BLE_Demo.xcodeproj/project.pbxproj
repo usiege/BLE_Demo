@@ -29,7 +29,8 @@
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 		BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */; };
-		BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */; };
+		BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */; };
+		BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */; };
 		BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */; };
 		BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardModel.m */; };
 		BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB2B33B21CF28F0600823C23 /* XFSocketManager.m */; };
@@ -98,8 +99,11 @@
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
 		BB06E9AB1CEC0DF2000162D6 /* BluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BluetoochManager.h; sourceTree = "<group>"; };
 		BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BluetoochManager.m; sourceTree = "<group>"; };
-		BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBProgressHUD.h; sourceTree = "<group>"; };
-		BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBProgressHUD.m; sourceTree = "<group>"; };
+		BB19C7A51CF7E0ED00907E1F /* HHAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertView.h; sourceTree = "<group>"; };
+		BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHAlertView.m; sourceTree = "<group>"; };
+		BB19C7A71CF7E0ED00907E1F /* HHAlertViewConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertViewConst.h; sourceTree = "<group>"; };
+		BB19C7A81CF7E0ED00907E1F /* UIView+Draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Draw.h"; sourceTree = "<group>"; };
+		BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Draw.m"; sourceTree = "<group>"; };
 		BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardInfo.h; sourceTree = "<group>"; };
 		BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardInfo.m; sourceTree = "<group>"; };
 		BB1D82881CF443D900FA1DE7 /* BleCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardModel.h; sourceTree = "<group>"; };
@@ -288,10 +292,21 @@
 		BB19C7A01CF6E87A00907E1F /* ControlLib */ = {
 			isa = PBXGroup;
 			children = (
-				BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */,
-				BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */,
+				BB19C7A41CF7E0ED00907E1F /* HHAlertView */,
 			);
 			path = ControlLib;
+			sourceTree = "<group>";
+		};
+		BB19C7A41CF7E0ED00907E1F /* HHAlertView */ = {
+			isa = PBXGroup;
+			children = (
+				BB19C7A51CF7E0ED00907E1F /* HHAlertView.h */,
+				BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */,
+				BB19C7A71CF7E0ED00907E1F /* HHAlertViewConst.h */,
+				BB19C7A81CF7E0ED00907E1F /* UIView+Draw.h */,
+				BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */,
+			);
+			path = HHAlertView;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -478,6 +493,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */,
 				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
 				BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */,
@@ -491,8 +507,8 @@
 				BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */,
 				BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */,
 				BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */,
+				BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */,
 				BB06E9871CEAB7D0000162D6 /* FoundNewPortViewController.m in Sources */,
-				BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */,
 				BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */,
 				BB06E92F1CEAAD7E000162D6 /* main.m in Sources */,
 				BB06E9891CEAB927000162D6 /* README.md in Sources */,

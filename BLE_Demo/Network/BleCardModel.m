@@ -50,19 +50,15 @@
         info.gases = [info.gases stringByReplacingOccurrencesOfString:@" " withString:@""];
         info.userID = [[NSString alloc] initWithData:[data subdataWithRange:readCardSubRanges[3]] encoding:NSUTF8StringEncoding];
         info.userID = [info.userID stringByReplacingOccurrencesOfString:@" " withString:@""];
-
         
-        info.username = //[ConverUtil stringFromHexString:
-//                         [ConverUtil parseByte2HexString:
-//                          (Byte *)[data subdataWithRange:readCardSubRanges[4]].bytes];
-        [[NSString alloc] initWithData:[ConverUtil stringToByte:[ConverUtil parseByte2HexString:(Byte *)[data subdataWithRange:readCardSubRanges[4]].bytes]] encoding:NSUTF8StringEncoding];
-        
-        info.userAddr = [ConverUtil stringFromHexString:
-                         [ConverUtil parseByte2HexString:
-                          (Byte *)[data subdataWithRange:readCardSubRanges[5]].bytes]];
-        info.userDesc = [ConverUtil stringFromHexString:
-                         [ConverUtil parseByte2HexString:
-                          (Byte *)[data subdataWithRange:readCardSubRanges[6]].bytes]];
+        //Gbk编码
+        NSStringEncoding encode = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+        info.username = [[NSString alloc] initWithData:[data subdataWithRange:readCardSubRanges[4]] encoding:encode];
+        info.username = [info.username stringByReplacingOccurrencesOfString:@" " withString:@""];
+        info.userAddr = [[NSString alloc] initWithData:[data subdataWithRange:readCardSubRanges[5]] encoding:encode];
+        info.userAddr = [info.userAddr stringByReplacingOccurrencesOfString:@" " withString:@""];
+        info.userDesc = [[NSString alloc] initWithData:[data subdataWithRange:readCardSubRanges[6]] encoding:encode];
+        info.userDesc = [info.userDesc stringByReplacingOccurrencesOfString:@" " withString:@""];;
         
         info.userSta = [[NSString alloc] initWithData:[data subdataWithRange:readCardSubRanges[7]] encoding:NSUTF8StringEncoding];
         info.userSta = [info.userSta stringByReplacingOccurrencesOfString:@" " withString:@""];
@@ -112,6 +108,7 @@
             NSMakeRange(167, 512),
             
         };
+        
         info.retCode = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[0]] encoding:NSUTF8StringEncoding];
         info.transDate = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[1]] encoding:NSUTF8StringEncoding];
         info.transTime = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[2]] encoding:NSUTF8StringEncoding];
@@ -119,18 +116,35 @@
         
         info.cardType = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[4]] encoding:NSUTF8StringEncoding];
         info.userID = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[5]] encoding:NSUTF8StringEncoding];
-        info.username = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[6]] encoding:NSUTF8StringEncoding];
+        info.userID = [info.userID stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
+        //Gbk编码
+        NSStringEncoding encode = CFStringConvertEncodingToNSStringEncoding(kCFStringEncodingGB_18030_2000);
+        info.username = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[6]] encoding:encode];
+        info.username = [info.username stringByReplacingOccurrencesOfString:@" " withString:@""];
         
         info.userDesc = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[7]] encoding:NSUTF8StringEncoding];
+        
         info.amount = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[8]] encoding:NSUTF8StringEncoding];
+        info.amount = [info.amount stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         info.purchaseCount = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[9]] encoding:NSUTF8StringEncoding];
+        info.purchaseCount = [info.purchaseCount stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         info.pwLength = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[10]] encoding:NSUTF8StringEncoding];
+        info.pwLength = [info.pwLength stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         info.verifyPw = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[11]] encoding:NSUTF8StringEncoding];
+        info.verifyPw = [info.verifyPw stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         info.pwNew = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[12]] encoding:NSUTF8StringEncoding];
+        info.pwNew = [info.pwNew stringByReplacingOccurrencesOfString:@" " withString:@""];
+        
         info.offset = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[13]] encoding:NSUTF8StringEncoding];
         info.wrLength = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[14]] encoding:NSUTF8StringEncoding];
-        info.dataBuf = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[15]] encoding:NSUTF8StringEncoding];
         
+        info.dataBuf = [[NSString alloc] initWithData:[data subdataWithRange:writeCardSubRanges[15]] encoding:NSUTF8StringEncoding];
+
         
         unsigned int count;
         objc_property_t *properties = class_copyPropertyList([self class], &count);

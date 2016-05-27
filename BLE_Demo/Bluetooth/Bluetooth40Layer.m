@@ -85,6 +85,7 @@ PeripheralDevice* _currentDisposedDevice;
         _localDeviceNames = [[NSMutableArray alloc] init];
         
         _scanTimer = nil;
+        _connectTimer = nil;
         self.state = BT40LayerState_Idle;
 
     }
@@ -125,6 +126,7 @@ PeripheralDevice* _currentDisposedDevice;
 -(void)startConnectWithDevice:(PeripheralDevice *)device completed:(void (^)(BT40LayerStateTypeDef))callback{
     
     _connectCallBack = callback;
+    self.state = BT40LayerState_Connecting;
     
     if (device.peripheral.state == CBPeripheralStateDisconnected) {
         //连接外围设备
@@ -144,6 +146,7 @@ PeripheralDevice* _currentDisposedDevice;
 
 //断开蓝牙
 -(void)disconnectWithDevice:(PeripheralDevice *)device{
+    self.state = BT40LayerState_Connecting;
     NSLog(@"\n-- disconnect with device :%@\n",device.identifier);
     if(device && device.peripheral && device.peripheral.state != CBPeripheralStateDisconnected)
         [_centralManager cancelPeripheralConnection:device.peripheral];
@@ -201,15 +204,12 @@ PeripheralDevice* _currentDisposedDevice;
     printf("停止连接！\n");
     self.state = BT40LayerState_Idle;
     if (_connectTimer != nil) {
+        [_connectTimer invalidate];
+        _connectTimer = nil;
         PeripheralDevice* device = _currentDisposedDevice;
         if(device && device.peripheral && device.peripheral.state != CBPeripheralStateDisconnected){
             [_centralManager cancelPeripheralConnection:device.peripheral];
         }
-        [_connectTimer invalidate];
-        _connectTimer = nil;
-    }
-    if (_connectCallBack){
-        _connectCallBack(self.state);
     }
 }
 
@@ -225,12 +225,8 @@ PeripheralDevice* _currentDisposedDevice;
 
 -(void)connectTimeoutHandler:(NSTimer *)_timer{
     printf("连接已超时! \n");
-    if (self.state == BT40LayerState_Connecting) {
-        [self stopConnect];
-        self.state = BT40LayerState_Idle;
-    }
     [self cancelTimer:_timer];
-    
+    [self stopConnect];
 }
 
 
@@ -301,6 +297,7 @@ PeripheralDevice* _currentDisposedDevice;
     printf("didDiscoverPeripheral\n");
     NSLog(@"advertisement data is :%@",advertisementData);
     NSString* identifer = [peripheral.identifier UUIDString];
+    self.state = BT40LayerState_Idle;
     
     //根据设备的UUID进行检索
     if (![_localDeviceNames containsObject:identifer]) {
@@ -308,8 +305,6 @@ PeripheralDevice* _currentDisposedDevice;
         [_localDeviceNames addObject:identifer];
         printf("发现新设备\n");
         NSLog(@"device identifier is :%@",identifer);
-        
-        self.state = BT40LayerState_Idle;
         
         PeripheralDevice *device = [[PeripheralDevice alloc] init];
         device.stateType = PeripheralState_Disconnected;
@@ -347,25 +342,34 @@ PeripheralDevice* _currentDisposedDevice;
     cardHandler.delegate = BLUETOOCHMANAGER;
     [BLUETOOCHMANAGER.cardHandlers addObject:cardHandler];
     
-    if (_connectCallBack){
-        _connectCallBack(self.state);
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_connectCallBack){
+            _connectCallBack(self.state);
+        };
+    });
 }
 
 
 //断开回调处理
 - (void)centralManager:(CBCentralManager *)central didDisconnectPeripheral:(CBPeripheral *)peripheral error:(NSError *)error{
-    printf("外围设备 %s 已断开！\n",[peripheral.name UTF8String]);
+//    printf("外围设备 %s 已断开！\n",[peripheral.name UTF8String]);
+    
+    NSLog(@"thread %@",[NSThread currentThread]);
     
     PeripheralDevice *device = _currentDisposedDevice;
     if (!device) return;
     device.stateType = PeripheralState_Disconnected;
+    self.state = BT40LayerState_Idle;
     
-    printf("删除蓝牙卡处理对象！");
+    printf("删除蓝牙卡处理对象！\n");
     //删除卡处理器
     BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:device];
     if(!cardHandler) return;
     [BLUETOOCHMANAGER.cardHandlers removeObject:cardHandler];
+    
+    if (_connectCallBack && peripheral.state == CBPeripheralStateDisconnected){
+        _connectCallBack(self.state);
+    };
 }
 
 //连接失败回调
@@ -375,10 +379,13 @@ PeripheralDevice* _currentDisposedDevice;
     PeripheralDevice *device = _currentDisposedDevice;
     if (!device) return;
     device.stateType = PeripheralState_Disconnected;
+    self.state = BT40LayerState_Idle;
     
-    if (_connectCallBack){
-        _connectCallBack(self.state);
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (_connectCallBack){
+            _connectCallBack(self.state);
+        };
+    });
 }
 
 
@@ -393,7 +400,6 @@ PeripheralDevice* _currentDisposedDevice;
     
     if(error){
         NSLog(@"发现服务错误：%@",error);
-        self.state = BT40LayerState_Idle;
         [self disconnectWithDevice:device];
         return;
     }
@@ -401,9 +407,7 @@ PeripheralDevice* _currentDisposedDevice;
     
     for (CBService *service in peripheral.services) {
         printf("-- service : %s\n",[[service.UUID UUIDString] UTF8String]);
-        dispatch_sync(dispatch_get_main_queue(), ^{
-            [peripheral discoverCharacteristics:nil forService:service];
-        });
+        [peripheral discoverCharacteristics:nil forService:service];
     }
 }
 
@@ -416,7 +420,6 @@ PeripheralDevice* _currentDisposedDevice;
     
     if (error) {
         NSLog(@"There is a error in peripheral:didDiscoverCharacteristicsForService:error: which called:%@",error);
-        self.state = BT40LayerState_Idle;
         [self disconnectWithDevice:device];
         return;
     }
@@ -440,7 +443,6 @@ PeripheralDevice* _currentDisposedDevice;
     
     //连接失败
     if(error){
-        self.state = BT40LayerState_Idle;
         printf("error is : %s\n",[error.description UTF8String]);
         [self disconnectWithDevice:device];
         return;
@@ -459,8 +461,8 @@ PeripheralDevice* _currentDisposedDevice;
 - (void)peripheral:(CBPeripheral *)peripheral didUpdateValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     self.state = BT40LayerState_IsAccessing;
     if (error) {
-        self.state = BT40LayerState_Idle;
         NSLog(@"There is a error in peripheral:didUpdateValueForCharacteristic:error: which called:%@",error);
+        [self disconnectWithDevice:_currentDisposedDevice];
         return;
     }
     
@@ -481,9 +483,9 @@ PeripheralDevice* _currentDisposedDevice;
 //用于检测中心向外设写数据是否成功
 -(void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error{
     NSLog(@"发送结束");
-    self.state = BT40LayerState_Idle;
+    self.state = BT40LayerState_Connecting;
     
-    BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:[Bluetooth40Layer currentDisposedDevice]];
+    BleCardHandler* cardHandler = [BLUETOOCHMANAGER cardHandlerForPeripheralDevice:_currentDisposedDevice];
     if(!cardHandler) return;
     NSLog(@"send follow!");
     
@@ -500,7 +502,7 @@ PeripheralDevice* _currentDisposedDevice;
     }
     
     if([self.delegate respondsToSelector:@selector(bluetoochLayer:didWriteDataPeripheralDevice:error:)]){
-        [self.delegate bluetoochLayer:self didWriteDataPeripheralDevice:[Bluetooth40Layer currentDisposedDevice] error:error];
+        [self.delegate bluetoochLayer:self didWriteDataPeripheralDevice:_currentDisposedDevice error:error];
     }
 }
 
