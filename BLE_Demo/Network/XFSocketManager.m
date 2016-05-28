@@ -71,7 +71,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 - (void)connectWithData:(NSData *)data userInfo:(NSDictionary *)userInfo completed:(void (^)(NSData *, CardDataType))callback{
     
-    NSData* bleData = [[Bluetooth40Layer currentDisposedDevice] valueForKey:DEVICE_CARD_READED_DATA_KEY];
+    NSData* bleData = [Bluetooth40Layer currentDisposedDevice].readedData;
     if(data == bleData)
         self.receiveData = data;
     

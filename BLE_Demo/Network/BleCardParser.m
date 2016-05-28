@@ -6,17 +6,18 @@
 //  Copyright © 2016年 先锋电子技术. All rights reserved.
 //
 
-#import "BleCardModel.h"
+#import "BleCardParser.h"
 #import "ConverUtil.h"
 #import <objc/runtime.h>
 
-@interface BleCardModel ()
+@interface BleCardParser ()
 {
     
 }
 @end
 
-@implementation BleCardModel
+@implementation BleCardParser
+
 
 + (BleCardInfo *)parseGasCardDataWithReponseData:(NSData *)data dataType:(CardDataType)type{
     BleCardInfo* info = [[BleCardInfo alloc] init];

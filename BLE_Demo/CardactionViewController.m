@@ -12,7 +12,7 @@
 #import "PeripheralDevice.h"
 #import "BluetoochManager.h"
 #import "XFSocketManager.h"
-#import "BleCardModel.h"
+#import "BleCardParser.h"
 
 #import "ConverUtil.h"
 #import "HHAlertView.h"
@@ -107,12 +107,16 @@ HHAlertViewDelegate>
     //改变 113，8 的值，值为
     
     
-    BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:data dataType:GasCardDataType_WRITE];
+    BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:data dataType:GasCardDataType_WRITE];
 //    NSLog(@"%@",infoIwish);
     
     //购气量是（113,8）第9个是购气量，替换成输入的
     
-    [_sharedBTManager writeData:data toPeriphralDevice:self.device];
+    self.device.checkKey = infoIwish.verifyPw;
+    self.device.checkKeyNew = @"11";
+    
+    NSData* sendData = [infoIwish.dataBuf dataUsingEncoding:NSUTF8StringEncoding];
+    [_sharedBTManager writeData:sendData toPeriphralDevice:self.device];
 }
 
 
@@ -123,21 +127,21 @@ HHAlertViewDelegate>
     
     NSLog(@"thread %@",[NSThread currentThread]);
     
-    dispatch_async(dispatch_get_main_queue(), ^{
-        if (isSuccess) {
-            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"读卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
-            [alertview setEnterMode:HHAlertEnterModeLeft];
-            [alertview setLeaveMode:HHAlertLeaveModeBottom];
-            [alertview showWithBlock:^(NSInteger index) {
-                NSLog(@"%ld",index);
-            }];
-        }else{
-            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
-            alertview.mode = HHAlertViewModeError;
-            [alertview show];
-            return;
-        }
-    });
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        if (isSuccess) {
+//            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"读卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+//            [alertview setEnterMode:HHAlertEnterModeLeft];
+//            [alertview setLeaveMode:HHAlertLeaveModeBottom];
+//            [alertview showWithBlock:^(NSInteger index) {
+//                NSLog(@"%ld",index);
+//            }];
+//        }else{
+//            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+//            alertview.mode = HHAlertViewModeError;
+//            [alertview show];
+//            return;
+//        }
+//    });
     
     [XFSocketManager sharedManager].dataType = GasCardDataType_READ;
     [XFSocketManager sharedManager].host = RELEASE_BLUETOOCH_HOST_IP;
@@ -153,14 +157,16 @@ HHAlertViewDelegate>
         
         
         if (responseData) {
-            BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:type];
+            BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:responseData dataType:type];
             
             NSLog(@"%@",infoIwish);
             
-            self.cardname.text = infoIwish.username;
-            self.cardnumber.text = infoIwish.userID;
-            self.chaxuntime.text = [NSDate date].description;
-            self.cardAddr.text = infoIwish.userAddr;
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cardname.text = infoIwish.username;
+                self.cardnumber.text = infoIwish.userID;
+                self.chaxuntime.text = [NSDate date].description;
+                self.cardAddr.text = infoIwish.userAddr;
+            });
         }
         
         [[XFSocketManager sharedManager] stopConnect];

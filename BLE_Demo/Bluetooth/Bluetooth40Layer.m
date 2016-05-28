@@ -21,8 +21,6 @@
 #define LOCAL_DEVICE_NAMES          @"LocalDeviceID"
 #define BLUETOOCHMANAGER            [BluetoochManager shareInstance]
 
-//extern NSString* DEVICE_PARSED_DATA_KEY;
-//extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 //函数处理结果返回值
 typedef NS_ENUM(NSInteger, UtilityFuncHandleResultDef) {
@@ -489,14 +487,12 @@ PeripheralDevice* _currentDisposedDevice;
     if(!cardHandler) return;
     
     if(error!=nil){
-//        NSLog(@"发送失败");
         if(count<3){
-            [cardHandler sendfollow:0];
+            [cardHandler sendfollowing:0];
         }
         count++;
     }else{
-//        NSLog(@"发送成功");
-        [cardHandler sendfollow:1];
+        [cardHandler sendfollowing:1];
         count=0;
     }
     

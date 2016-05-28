@@ -45,19 +45,22 @@ typedef NS_ENUM(NSUInteger,PeripheralOperationType) {
 
 @interface PeripheralDevice : NSObject<NSCopying,NSCoding>
 
-@property (nonatomic, strong)   CBPeripheral * peripheral;
-@property (nonatomic, strong)   NSData * manufactureData;
+@property (nonatomic, strong) CBPeripheral            * peripheral;
+@property (nonatomic, strong) NSData                  * manufactureData;
 
-@property (nonatomic, copy)     NSString * name;
-@property (nonatomic, copy)     NSString * identifier;
-@property (nonatomic,strong)    NSNumber * rssi;
-@property (nonatomic,strong)    NSDictionary* advertisementData;
+@property (nonatomic, copy  ) NSString                * name;
+@property (nonatomic, copy  ) NSString                * identifier;
+@property (nonatomic,strong ) NSNumber                * rssi;
+@property (nonatomic,strong ) NSDictionary            * advertisementData;
 
-@property (nonatomic,assign)    PeripheralStateType         stateType;      //外围设备状态类型
-@property (nonatomic,assign)    PeripheralOperationType     operationType;  //外围设置操作类型
+@property (nonatomic,assign ) PeripheralStateType     stateType;//外围设备状态类型
+@property (nonatomic,assign ) PeripheralOperationType operationType;//外围设置操作类型
 
-@property (nonatomic,copy)      NSString*       checkKey;      //写数据校验密码
-@property (nonatomic,copy)      NSString*       checkKeyNew;   //写数据校验新密码
+@property (nonatomic,strong ) NSData                  *         readedData;//设备读取到的卡数据
+@property (nonatomic,strong ) NSData                  *         parsedData;//服务器解析后的数据
+
+@property (nonatomic,copy   ) NSString                *       checkKey;//写数据校验密码
+@property (nonatomic,copy   ) NSString                *       checkKeyNew;//写数据校验新密码
 
 +(BOOL)checkDeviceA:(PeripheralDevice *)deviceA sameAsDeviceB:(PeripheralDevice *)deviceB;
 

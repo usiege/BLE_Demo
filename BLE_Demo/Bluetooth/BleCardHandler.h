@@ -25,6 +25,9 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
     CardOperationState_ChangedPass = 1 << 4,     //已修改密码
 };
 
+typedef void (^CardRequestBlock)(NSData* receiveData,CardOperationState state);
+typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state);
+
 @interface BleCardHandler : NSObject
 
 /**
@@ -51,11 +54,6 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
  */
 @property (nonatomic,strong,readonly) NSData* receiveData;
 /**
- *  @brief 读取的最终完整结果数据
- */
-//@property (nonatomic,strong) NSData* finalData;
-
-/**
  *  @brief 蓝牙卡对应设备信息
  */
 @property (nonatomic,readonly,strong) PeripheralDevice* device;
@@ -78,7 +76,7 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
  *
  *  @param type
  */
--(void)sendfollow:(int)type;
+-(void)sendfollowing:(int)type;
 
 @end
 

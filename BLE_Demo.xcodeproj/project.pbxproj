@@ -32,7 +32,7 @@
 		BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */; };
 		BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */; };
 		BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */; };
-		BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardModel.m */; };
+		BB1D828A1CF443D900FA1DE7 /* BleCardParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardParser.m */; };
 		BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB2B33B21CF28F0600823C23 /* XFSocketManager.m */; };
 		BB65ED051CEDA612005E4803 /* BleCardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BB65ED041CEDA612005E4803 /* BleCardHandler.m */; };
 /* End PBXBuildFile section */
@@ -106,8 +106,8 @@
 		BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Draw.m"; sourceTree = "<group>"; };
 		BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardInfo.h; sourceTree = "<group>"; };
 		BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardInfo.m; sourceTree = "<group>"; };
-		BB1D82881CF443D900FA1DE7 /* BleCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardModel.h; sourceTree = "<group>"; };
-		BB1D82891CF443D900FA1DE7 /* BleCardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardModel.m; sourceTree = "<group>"; };
+		BB1D82881CF443D900FA1DE7 /* BleCardParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardParser.h; sourceTree = "<group>"; };
+		BB1D82891CF443D900FA1DE7 /* BleCardParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardParser.m; sourceTree = "<group>"; };
 		BB2B33B11CF28F0600823C23 /* XFSocketManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XFSocketManager.h; sourceTree = "<group>"; };
 		BB2B33B21CF28F0600823C23 /* XFSocketManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XFSocketManager.m; sourceTree = "<group>"; };
 		BB65ED031CEDA612005E4803 /* BleCardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardHandler.h; sourceTree = "<group>"; };
@@ -266,8 +266,8 @@
 				BB06E9661CEAADA9000162D6 /* NetRefer.h */,
 				BB2B33B11CF28F0600823C23 /* XFSocketManager.h */,
 				BB2B33B21CF28F0600823C23 /* XFSocketManager.m */,
-				BB1D82881CF443D900FA1DE7 /* BleCardModel.h */,
-				BB1D82891CF443D900FA1DE7 /* BleCardModel.m */,
+				BB1D82881CF443D900FA1DE7 /* BleCardParser.h */,
+				BB1D82891CF443D900FA1DE7 /* BleCardParser.m */,
 				BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */,
 				BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */,
 			);
@@ -497,7 +497,7 @@
 				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
 				BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */,
-				BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */,
+				BB1D828A1CF443D900FA1DE7 /* BleCardParser.m in Sources */,
 				BB06E9701CEAB1D9000162D6 /* PeripheralDevice.m in Sources */,
 				BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */,
 				BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */,
