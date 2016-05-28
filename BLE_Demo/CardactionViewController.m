@@ -123,19 +123,21 @@ HHAlertViewDelegate>
     
     NSLog(@"thread %@",[NSThread currentThread]);
     
-    if (!isSuccess) {
-        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"恭喜你，操作顺利的实行了！\n换个行试试看效果" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
-        [alertview setEnterMode:HHAlertEnterModeLeft];
-        [alertview setLeaveMode:HHAlertLeaveModeBottom];
-        [alertview showWithBlock:^(NSInteger index) {
-            NSLog(@"%ld",index);
-        }];
-    }else{
-        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败" cancelButtonTitle:@"不要" otherButtonTitles:@[@"好的"]];
-        alertview.mode = HHAlertViewModeError;
-        [alertview show];
-        return;
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (isSuccess) {
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"读卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            [alertview setEnterMode:HHAlertEnterModeLeft];
+            [alertview setLeaveMode:HHAlertLeaveModeBottom];
+            [alertview showWithBlock:^(NSInteger index) {
+                NSLog(@"%ld",index);
+            }];
+        }else{
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            alertview.mode = HHAlertViewModeError;
+            [alertview show];
+            return;
+        }
+    });
     
     [XFSocketManager sharedManager].dataType = GasCardDataType_READ;
     [XFSocketManager sharedManager].host = RELEASE_BLUETOOCH_HOST_IP;
@@ -143,7 +145,7 @@ HHAlertViewDelegate>
     
 //    NSLog(@"发送数据到服务器，开始解析");
     
-#if 0
+#if 1
     [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
         
         self.Sendchongzhiaction.enabled = YES;
@@ -151,7 +153,6 @@ HHAlertViewDelegate>
         
         
         if (responseData) {
-            
             BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:type];
             
             NSLog(@"%@",infoIwish);
@@ -160,13 +161,6 @@ HHAlertViewDelegate>
             self.cardnumber.text = infoIwish.userID;
             self.chaxuntime.text = [NSDate date].description;
             self.cardAddr.text = infoIwish.userAddr;
-            
-            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"读卡成功" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
-            [alertview setEnterMode:HHAlertEnterModeLeft];
-            [alertview setLeaveMode:HHAlertLeaveModeBottom];
-            [alertview showWithBlock:^(NSInteger index) {
-                NSLog(@"%ld",index);
-            }];
         }
         
         [[XFSocketManager sharedManager] stopConnect];
@@ -176,18 +170,20 @@ HHAlertViewDelegate>
 
 - (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
     
-    if (!isSuccess) {
-        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"恭喜你，操作顺利的实行了！\n换个行试试看效果" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
-        [alertview setEnterMode:HHAlertEnterModeLeft];
-        [alertview setLeaveMode:HHAlertLeaveModeBottom];
-        [alertview showWithBlock:^(NSInteger index) {
-            NSLog(@"%ld",index);
-        }];
-    }else{
-        HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败" cancelButtonTitle:@"不要" otherButtonTitles:@[@"好的"]];
-        alertview.mode = HHAlertViewModeError;
-        [alertview show];
-    }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        if (isSuccess) {
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"写卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            [alertview setEnterMode:HHAlertEnterModeLeft];
+            [alertview setLeaveMode:HHAlertLeaveModeBottom];
+            [alertview showWithBlock:^(NSInteger index) {
+                NSLog(@"%ld",index);
+            }];
+        }else{
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"写卡失败，请重试..." cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            alertview.mode = HHAlertViewModeError;
+            [alertview show];
+        }
+    });
 }
 
 

@@ -411,7 +411,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
 
 - (void)gasCardAction{
     
-    if ([Bluetooth40Layer currentDisposedDevice].stateType == GasCardOperation_READ) {
+    if (_device.operationType == GasCardOperation_READ) {
         //接收到卡片回传数据 “9000”为成功
         if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
             _currentState = CardOperationState_ReadCorrect;
@@ -424,7 +424,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             _currentState = CardOperationState_ReadWrong;
             _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];;
         }
-    }else if ([Bluetooth40Layer currentDisposedDevice].stateType == GasCardOperation_WRITE){
+    }else if (_device.operationType == GasCardOperation_WRITE){
         if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
             self.currentState = self.currentState | CardOperationState_ReadCorrect;
             //处理返回的数据
@@ -433,7 +433,7 @@ typedef void (^CardRequestCallBack)(NSData* receiveData,CardOperationState state
             _datastring = outstring;
             _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
         }else{
-            
+            self.currentState = self.currentState & (~CardOperationState_ReadCorrect);
         }
     }
     

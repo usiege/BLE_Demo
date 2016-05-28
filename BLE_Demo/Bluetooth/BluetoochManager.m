@@ -1,3 +1,4 @@
+
 //
 //  BluetoochManager.m
 //  BLE_Demo
@@ -65,7 +66,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         _sharedBleLayer = [Bluetooth40Layer sharedInstance];
         _sharedBleLayer.delegate = self;
     }
-    
     return self;
 }
 
@@ -410,7 +410,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     NSLog(@"与外围设备连接中...");
 }
 
-#if 1
 //蓝牙向外围设备写入成功！
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)pDevice error:(NSError *)error{
     
@@ -423,11 +422,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         [self delegateActionWithData:nil device:device result:NO operationType:GasCardOperation_WRITE];
         return;
     }
-    
-    if(device.operationType == GasCardOperation_WRITE){
-        
-    }
 }
-#endif
 
 @end

@@ -79,7 +79,7 @@ PeripheralDevice* _currentDisposedDevice;
     
     self =  [super init];
     if (self) {
-        dispatch_queue_t centralQ = dispatch_queue_create(BLUETOOCH_QUEUE_IDENTIFER, DISPATCH_QUEUE_CONCURRENT);
+        dispatch_queue_t centralQ = dispatch_queue_create(BLUETOOCH_QUEUE_IDENTIFER, DISPATCH_QUEUE_SERIAL);
         _centralManager = [[CBCentralManager alloc] initWithDelegate:self queue:centralQ];
         
         _localDeviceNames = [[NSMutableArray alloc] init];
@@ -116,7 +116,9 @@ PeripheralDevice* _currentDisposedDevice;
         [_centralManager scanForPeripheralsWithServices:services options:scanOption];
         printf("start scan peripheral .... \n");
         
-        _scanTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(scanTimeoutHandler:) userInfo:nil repeats:NO];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            _scanTimer = [NSTimer scheduledTimerWithTimeInterval:seconds target:self selector:@selector(scanTimeoutHandler:) userInfo:nil repeats:NO];
+        });
         self.state = BT40LayerState_Searching;
     }
 }
@@ -131,7 +133,10 @@ PeripheralDevice* _currentDisposedDevice;
     if (device.peripheral.state == CBPeripheralStateDisconnected) {
         //连接外围设备
         [_centralManager connectPeripheral:device.peripheral options:nil];
-        _connectTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_CONNECT_PROCEDURE_ target:self selector:@selector(connectTimeoutHandler:) userInfo:nil repeats:NO];
+        dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+            _connectTimer = [NSTimer scheduledTimerWithTimeInterval:TIMEOUT_TIME_SECONDS_CONNECT_PROCEDURE_ target:self selector:@selector(connectTimeoutHandler:) userInfo:nil repeats:NO];
+        });
+        
         device.stateType = PeripheralState_Disconnected;
         return;
     }else{

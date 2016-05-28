@@ -80,14 +80,15 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     _userInfo = userInfo;
     
     [self connectToHostUseStreamWithIP:self.host port:self.port.intValue data:data];
-    self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+    });
 }
 
 - (void)connectCancelAction:(id)sender{
     NSLog(@"Socket 连接已超时！");
     [_cancelTimer invalidate];
     _cancelTimer = nil;
-    [self stopConnect];
 }
 
 - (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
@@ -120,12 +121,17 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 - (void)stopConnect{
 
+    [self cancelTimer];
+    
     // 从运行循环移除
     [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     // 关闭输入输出流
     [_inputStream close];
     [_outputStream close];
+    
+    _inputStream = nil;
+    _outputStream = nil;
     
     NSLog(@"Socket 连接已断开！");
 }

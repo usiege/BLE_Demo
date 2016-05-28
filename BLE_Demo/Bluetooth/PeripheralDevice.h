@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger,PeripheralOperationType) {
     /**
      *  燃气卡读操作
      */
-    GasCardOperation_READ = 1,
+    GasCardOperation_READ = 20,
     /**
      *  燃气卡写操作
      */
