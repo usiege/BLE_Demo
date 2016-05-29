@@ -11,6 +11,9 @@
 #import "BleCardInfo.h"
 
 @protocol XFSocketDelegate;
+
+static const NSString* METERS_OF_GAS_FOR_SENDING_KEY = @"GasAmount";
+
 @interface XFSocketManager : NSObject
 
 + (XFSocketManager *)sharedManager;

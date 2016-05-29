@@ -111,7 +111,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "118"
             endingLineNumber = "118"
-            landmarkName = "-getDeviceByPeripheral:"
+            landmarkName = "-readDataFromPeriphralDevice:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -175,7 +175,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "297"
             endingLineNumber = "297"
-            landmarkName = "-bleCardHandler:didReceiveData:state:"
+            landmarkName = "-bluetoochLayer:isConnectingPeripheralDevice:withState:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
@@ -191,7 +191,7 @@
             endingColumnNumber = "9223372036854775807"
             startingLineNumber = "323"
             endingLineNumber = "323"
-            landmarkName = "-bleCardHandler:didReceiveData:state:"
+            landmarkName = "-bluetoochLayer:isConnectingPeripheralDevice:withState:"
             landmarkType = "5">
          </BreakpointContent>
       </BreakpointProxy>
