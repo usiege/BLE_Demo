@@ -12,7 +12,8 @@
 #import "ConverUtil.h"
 #import "Bluetooth40Layer.h"
 
-#define SINGAL_RECEIVEDATA_SUCCESS @"9000"
+#define SINGAL_RECEIVEDATA_SUCCESS @"9000"   //卡片请求成功
+#define SINGAL_TIMEOUT             @"6F06"   //超时
 
 
 @interface BleCardHandler ()
@@ -27,7 +28,9 @@
     int  lastcountfill;             ////// 上一个包序号
     int  outtimecount;              //////超时记述
     BOOL lostpackge;                ////// 丢包标志
-    
+ 
+//    CardRequestCallBack             _cardRequestCallBack;
+    NSData*                         _receiveData;
 }
 
 @property (assign,nonatomic) int      requesetcount;//////执行第几个指令
@@ -41,8 +44,8 @@
 @property (nonatomic,strong)   NSMutableArray*  dataArr;
 @property (strong,nonatomic)   NSMutableArray*  dataRevArray;
 @property(nonatomic,copy)      NSString*        datastring;
-@property(nonatomic,strong)    NSData*          receiveData;
 
+@property (nonatomic,copy)      CardRequestBlock cardRequestCallBack;
 
 @end
 
@@ -59,17 +62,20 @@
         _device = device;
         _dataArr = [NSMutableArray array];
         _dataRevArray = [NSMutableArray array];
-        
-//        _finalDataDic = [NSMutableDictionary dictionary];
+
     }
     return self;
 }
 
-- (void)cardRequestWithCommand:(NSString *)command{
+- (void)cardRequestWithCommand:(NSString *)command
+                     completed:(void(^)(NSData* receiveData,CardOperationState state))callback{
     
-    NSLog(@"正在请求卡片数据，连接命令:%@",command);
+//    NSLog(@"正在请求卡片数据，连接命令:%@",command);
+    NSLog(@"卡片请求callback：%@",callback);
     
+    self.cardRequestCallBack = callback;
     _requsetnow = command;
+    
     NSUInteger length=0;
     Byte temp[350]={0};
     Byte temp1[350]={0};
@@ -86,10 +92,10 @@
     oneortow=[command length];
     
     if((command == nil)||(oneortow%2!=0)) return;
-    printf("卡片请求命令：%s",[command UTF8String]);
+    printf("卡片请求命令：%s\n",[command UTF8String]);
     
     
-    NSData *valueData = [ConverUtil stringToByte:command];
+    NSData *valueData = [ConverUtil hexString2Data:command];
     NSLog(@"有效数据段:%@ Length:%lu",valueData,(unsigned long)valueData.length);
     [valueData getBytes:temp1 length:valueData.length];
     
@@ -169,15 +175,13 @@
     NSData *mydata = [data objectAtIndex:dserial];
     NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
     
-    BOOL sendResult = NO;
+//    BOOL sendResult = NO;
     Bluetooth40Layer* _sharedBleLayer = [Bluetooth40Layer sharedInstance];
-    sendResult = 
     [_sharedBleLayer sendData:mydata toDevice:[Bluetooth40Layer currentDisposedDevice]];
 }
 
 
--(void)sendfollow:(int)type
-{
+-(void)sendfollowing:(int)type{
     printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
     if(type==0){
         [self sendsmalldata:_dataArr dserial:_serial];
@@ -222,7 +226,8 @@
             checkrecive = [NSTimer scheduledTimerWithTimeInterval:3.0 target:self selector:@selector(CheckreciveSelector:) userInfo:nil repeats:NO];
         });
         return;
-    }else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
+    }
+    else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
         
         
         NSLog(@"接收到正确结尾报文\n");
@@ -260,8 +265,7 @@
         }
         
         //////收到数据包关闭等待packge;
-        if(checkpackge !=nil)
-        {
+        if(checkpackge !=nil){
             [checkpackge invalidate];
             checkpackge = nil;
             outtimecount = 0;
@@ -275,7 +279,8 @@
         /////丢包状态，等待正确包接入
         if(lostpackge && current!=(lastcountfill+1)){
             return;
-        }else{
+        }
+        else{
             
             ///////正确包接入，取消时钟
             if(checkfollow!=nil){
@@ -298,7 +303,8 @@
             maxnow = max;
             lastcountfill = current;
             
-        }else{
+        }
+        else{
             ////////重复包丢弃
             if(current<=lastcountfill){
                 NSLog(@"重复包丢弃\n");
@@ -326,7 +332,8 @@
             for (int i=0; i<[_dataRevArray count]; i++) {
                 if (i == 0) {
                     _datastring =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
-                }else{
+                }
+                else{
                     _datastring = [_datastring stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
                 }
             }
@@ -363,29 +370,6 @@
     }
 }
 
-//接收到结果数据
-- (void)gasCardAction{
-    
-    //接收到卡片回传数据 “9000”为成功
-    if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
-        _currentState = CardOperationState_ReadCorrect;
-        //处理返回的数据
-        NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
-        [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
-        _datastring = outstring;
-        _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
-        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
-            [self.delegate bleCardHandler:self didReceiveData:_receiveData state:CardOperationState_ReadCorrect];
-        
-    }else{
-        _currentState = CardOperationState_ReadWrong;
-        if([self.delegate respondsToSelector:@selector(bleCardHandler:didReceiveData:state:)])
-            [self.delegate bleCardHandler:self didReceiveData:nil state:CardOperationState_ReadWrong];
-    }
-}
-
-
-
 -(void)ErrorRecovery:(int)ErrorSerial{
     Byte temp[20]={0};
     temp[0] = 0x10;
@@ -404,7 +388,6 @@
 //////等待接受超时处理/////
 -(void)CheckreciveSelector:(id)sender{
     NSLog(@"等待接受数据超时\n");
-    //    requsetnow = nil;
 }
 
 /////等待接受packge超时///////
@@ -413,45 +396,46 @@
     [self ErrorRecovery:lastcountfill+1];
 }
 
+#pragma mark 李中欢-----接收到结果数据
 
-
-///////进制转换
--(NSString*)hex2tenstring:(NSString*)hexdata{
-    NSString *tensting;
-    
-    char datachar[350];
-    long int dataint;
-    strcpy(datachar, (char*)[hexdata UTF8String]);
-    dataint = strtol(datachar, NULL, 16);
-    
-    NSLog(@"dataint = %ld",dataint);
-    double datafloat = (double)dataint/100;
-    NSLog(@"datafloat = %.2f",datafloat);
-    
-    tensting = [NSString stringWithFormat:@"%.2f",datafloat];
-    return tensting;
+- (NSData *)receiveData{
+    return _receiveData;
 }
 
 
--(NSString*)int2tenstring:(NSString*)hexdata{
-    NSString *tensting;
-    NSString *geweiString;
-    NSString *xiaoshuString;
+- (void)gasCardAction{
     
-    geweiString = [hexdata substringToIndex:10];
-    xiaoshuString = [hexdata substringFromIndex:10];
+    if (_device.operationType == GasCardOperation_READ) {
+        //接收到卡片回传数据 “9000”为成功
+        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+            _currentState = CardOperationState_ReadCorrect;
+            //处理返回的数据
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
+            _datastring = outstring;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+        }else{
+            _currentState = CardOperationState_ReadWrong;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];;
+        }
+    }else if (_device.operationType == GasCardOperation_WRITE){
+        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+            self.currentState = self.currentState | CardOperationState_ReadCorrect;
+            //处理返回的数据
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
+            _datastring = outstring;
+            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+        }else{
+            self.currentState = self.currentState & (~CardOperationState_ReadCorrect);
+        }
+    }
     
-    char datachar[350];
-    long int dataint;
-    strcpy(datachar, (char*)[geweiString UTF8String]);
-    dataint = strtol(datachar, NULL, 10);
-    
-    tensting = [NSString stringWithFormat:@"%ld",dataint];
-    
-    tensting = [tensting stringByAppendingString:@"."];
-    tensting = [tensting stringByAppendingString:xiaoshuString];
-    
-    return tensting;
+    if(self.cardRequestCallBack){
+        self.cardRequestCallBack(_receiveData,self.currentState);
+//        self.cardRequestCallBack = nil;
+    }
 }
+
 
 @end

@@ -18,8 +18,6 @@
     NSData* _cardReadedData;
     NSData* _parsedData;
 }
-@property (nonatomic,strong) NSData*        cardReadedData;   //设备读取到的卡数据
-@property (nonatomic,strong) NSData*        parsedData;     //服务器解析后的数据
 
 @end
 
@@ -35,25 +33,27 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
     self = [super init];
     if (self) {
         // initiate code
-        self.cardReadedData = nil;
+        self.readedData = nil;
         self.parsedData = nil;
         self.name = nil;
         self.identifier = nil;
+        self.operationType = CardOperation_Idle;
+        self.stateType = PeripheralState_Disconnected;
         
-        [self initAllVariable];
+        self.peripheral = nil;
+        self.rssi = nil;
+        self.manufactureData = nil;
     }
     return self;
 }
 
-- (NSData *)cardReadedData{
+- (NSData *)readedData{
     return _cardReadedData;
 }
 
-- (void)setCardReadedData:(NSData *)cardReadedData{
-    _cardReadedData = cardReadedData;
+- (void)setReadedData:(NSData *)readedData{
+    _cardReadedData = readedData;
 }
-
-
 
 - (NSData *)parsedData{
     return _parsedData;
@@ -61,20 +61,6 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
 
 - (void)setParsedData:(NSData *)parsedData{
     _parsedData = parsedData;
-}
-
-- (NSString *)checkKey{
-    if(!_parsedData) return nil;
-    if(_parsedData.length < 129+16) return nil;
-    NSString* strIwant = [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(129, 16)] encoding:NSUTF8StringEncoding];
-    return [strIwant stringByReplacingOccurrencesOfString:@" " withString:@""];
-}
-
-- (NSString *)checkKeyNew{
-    if(!_parsedData) return nil;
-    if(_parsedData.length < 145+16) return nil;
-    NSString* strIwant = [[NSString alloc] initWithData:[_parsedData subdataWithRange:NSMakeRange(145, 16)] encoding:NSUTF8StringEncoding];
-    return [strIwant stringByReplacingOccurrencesOfString:@" " withString:@""];
 }
 
 
@@ -89,11 +75,23 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
     if (self) {
         self.name = [aDecoder decodeObjectForKey:kDeviceInforModelNameString];
         self.identifier = [aDecoder decodeObjectForKey:kDeviceInforModelIdentifierString];
-        
-        [self initAllVariable];
-        
+        [self initilization];
     }
     return self;
+}
+
+
+- (void)initilization{
+    self.readedData = nil;
+    self.parsedData = nil;
+    self.name = nil;
+    self.identifier = nil;
+    self.operationType = CardOperation_Idle;
+    self.stateType = PeripheralState_Disconnected;
+    
+    self.peripheral = nil;
+    self.rssi = nil;
+    self.manufactureData = nil;
 }
 
 -(void)encodeWithCoder:(NSCoder *)aCoder{
@@ -102,17 +100,6 @@ const NSString*  DEVICE_PARSED_DATA_KEY = @"parsedData"; //不能加static
     [aCoder encodeObject:self.identifier forKey:kDeviceInforModelIdentifierString];
 }
 
-#pragma mark -Utility
--(void)initAllVariable{
-    
-    self.peripheral = nil;
-    self.rssi = nil;
-    self.manufactureData = nil;
-    self.operationType = CardOperation_Idle;
-    
-    self.connectTimer = nil;
-    self.discoverTimer = nil;
-}
 
 
 +(BOOL)checkDeviceA:(PeripheralDevice *)deviceA sameAsDeviceB:(PeripheralDevice *)deviceB{

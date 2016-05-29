@@ -17,6 +17,7 @@
 
 @property (nonatomic,strong)   PeripheralDevice* device;
 
+@property (retain, nonatomic) IBOutlet UILabel *cardAddr;
 @property(nonatomic,retain)    IBOutlet UILabel *cardmoney;
 @property(nonatomic,retain)    IBOutlet UILabel *cardnumber;
 @property(nonatomic,retain)    IBOutlet UILabel *cardname;

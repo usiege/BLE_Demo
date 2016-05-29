@@ -12,19 +12,20 @@
 #import "PeripheralDevice.h"
 #import "BluetoochManager.h"
 #import "XFSocketManager.h"
-#import "BleCardModel.h"
-#import "LBProgressHUD.h"
+#import "BleCardParser.h"
 
+#import "ConverUtil.h"
+#import "HHAlertView.h"
+#import "MBProgressHUD.h"
 
-@interface CardactionViewController ()<BluetoochDelegate,XFSocketDelegate>
+@interface CardactionViewController ()<BluetoochDelegate,XFSocketDelegate,
+HHAlertViewDelegate>
 {
     BluetoochManager*   _sharedBTManager;
     XFSocketManager*    _sharedSocketManager;
 }
 
-@property (strong) UIActivityIndicatorView* aiView;
-
-@property (strong,nonatomic) LBProgressHUD* mProgress;
+@property (nonatomic,strong) MBProgressHUD*     progress;
 
 @end
 
@@ -57,15 +58,9 @@
 - (void)createUI{
     self.title = self.device.name;
     
-    self.aiView = [[UIActivityIndicatorView alloc] initWithActivityIndicatorStyle:UIActivityIndicatorViewStyleWhite];
-    UIBarButtonItem* aiItem = [[UIBarButtonItem alloc] initWithCustomView:_aiView];
-    self.navigationItem.rightBarButtonItem = aiItem;
     
     self.Sendchaxunaction.enabled = YES;
     self.Sendchongzhiaction.enabled = NO;
-    
-    self.mProgress = [[LBProgressHUD alloc] initWithFrame:CGRectMake(320/2-50, 480/2-50, 100, 100)];
-    [self.view addSubview:self.mProgress];
 }
 
 - (void)setupData{
@@ -75,69 +70,126 @@
     NSDateFormatter  *dateformatter=[[NSDateFormatter alloc] init];
     [dateformatter setDateFormat:@"YYYY-MM-dd  HH:mm:ss"];
     NSString *  locationString=[dateformatter stringFromDate:senddate];
-    NSLog(@"locationString:%@",locationString);
 }
 
+- (void)viewDidDisappear:(BOOL)animated{
+    [_sharedBTManager stopSearchPeriphrals];
+}
 
 
 /////查询
 -(IBAction)Bluechaxun:(id)sender{
     
     self.device.operationType = GasCardOperation_READ;
-    [_sharedBTManager readDataFromPeriphralDevice:self.device];
-    [self.mProgress show:YES];
+    NSLog(@"thread %@",[NSThread currentThread]);
+    
+    self.progress = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    NSBlockOperation* bo = [NSBlockOperation blockOperationWithBlock:^{
+       [_sharedBTManager readDataFromPeriphralDevice:self.device];
+    }];
+    [[NSOperationQueue mainQueue] addOperation:bo];
 }
 
 /////充值
 -(IBAction)Bluechongzhi:(id)sender{
     
+    self.progress = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     self.device.operationType = GasCardOperation_WRITE;
-    [self.mProgress show:YES];
-    [_sharedBTManager writeData:@"" toPeriphralDevice:self.device];
     
+    NSString* str16response = @"4c59474153303030303230313630353237313131333030303030303031303138313233303435363738202020202020c4a3c4e2d3c3bba7202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202020202030312020202020202030202020202031203631343731373820202020202020202020313437313738202020202020202020203058323045304646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464639373530304331453034333834453030303030303030303030463130303531423030303035313030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030303030463132303039344646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646463230313630354537303030303135464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464631323334353637384646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646464646";
+    NSData* data = [ConverUtil hexString2Data:str16response];
+//    NSLog(@"data length is %ld",data.length);
+    //改变 113，8 的值，值为
+    
+    
+    BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:data dataType:GasCardDataType_WRITE];
+//    NSLog(@"%@",infoIwish);
+    
+    //购气量是（113,8）第9个是购气量，替换成输入的
+    
+    self.device.checkKey = infoIwish.verifyPw;
+    self.device.checkKeyNew = infoIwish.pwNew;
+    
+    NSData* sendData = [infoIwish.dataBuf dataUsingEncoding:NSUTF8StringEncoding];
+    [_sharedBTManager writeData:sendData toPeriphralDevice:self.device];
 }
+
+
 
 
 //接收到蓝牙卡版本数据
-- (void)bluetoochManager:(BluetoochManager *)manager didReadSuccessWithDisposeData:(NSData *)data fromDevice:(PeripheralDevice *)device{
-    [self.mProgress hide:YES];
-    NSLog(@"发送数据到服务器，开始解析");
-    [XFSocketManager sharedManager].dataType = GasCardDataType_WRITE;
+- (void)bluetoochManager:(BluetoochManager *)manager didEndReadWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
+    
+    NSLog(@"thread %@",[NSThread currentThread]);
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        if (isSuccess) {
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"读卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            [alertview setEnterMode:HHAlertEnterModeLeft];
+            [alertview setLeaveMode:HHAlertLeaveModeBottom];
+            [alertview showWithBlock:^(NSInteger index) {
+                NSLog(@"%ld",index);
+            }];
+        }else{
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"读卡失败！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            alertview.mode = HHAlertViewModeError;
+            [alertview show];
+            return;
+        }
+    });
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+        self.progress = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    });
+    [XFSocketManager sharedManager].dataType = GasCardDataType_READ;
     [XFSocketManager sharedManager].host = RELEASE_BLUETOOCH_HOST_IP;
     [XFSocketManager sharedManager].port = RELEASE_BLUETOOCH_HOST_PORT;
     
-    //
+    NSLog(@"发送数据到服务器，开始解析");
     [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
         
-        self.Sendchongzhiaction.enabled = YES;
-        //        NSLog(@"服务器返回的数据：%@",responseData);
+        NSLog(@"服务器返回的数据：%@",[ConverUtil convertDataToHexStr:responseData]);
         
         if (responseData) {
-            
-            BleCardInfo* infoIwish = [BleCardModel parseGasCardDataWithReponseData:responseData dataType:type];
+            BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:responseData dataType:type];
             
             NSLog(@"%@",infoIwish);
             
-            self.cardname.text = infoIwish.username;
-            self.cardnumber.text = infoIwish.userID;
-            self.chaxuntime.text = [NSDate date].description;
-            
+            dispatch_async(dispatch_get_main_queue(), ^{
+                self.cardname.text = infoIwish.username;
+                self.cardnumber.text = infoIwish.userID;
+                self.chaxuntime.text = [NSDate date].description;
+                self.cardAddr.text = infoIwish.userAddr;
+                self.Sendchongzhiaction.enabled = YES;
+                [MBProgressHUD hideHUDForView:self.view animated:YES];
+            });
         }
-        [self.mProgress hide:YES];
+        
         [[XFSocketManager sharedManager] stopConnect];
     }];
+}
 
+- (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess{
     
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        if (isSuccess) {
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"成功" detailText:@"写卡成功！" cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            [alertview setEnterMode:HHAlertEnterModeLeft];
+            [alertview setLeaveMode:HHAlertLeaveModeBottom];
+            [alertview showWithBlock:^(NSInteger index) {
+                NSLog(@"%ld",index);
+            }];
+        }else{
+            HHAlertView *alertview = [[HHAlertView alloc] initWithTitle:@"失败" detailText:@"写卡失败，请重试..." cancelButtonTitle:nil otherButtonTitles:@[@"确定"]];
+            alertview.mode = HHAlertViewModeError;
+            [alertview show];
+        }
+    });
 }
 
 
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteSuccesToDevice:(PeripheralDevice *)device{
-    [self.mProgress hide:YES];
-}
-
-- (void)bluetoochManager:(BluetoochManager *)manager didWriteFailedToDevice:(PeripheralDevice *)device{
-    [self.mProgress hide:YES];
-}
 
 /*
 #pragma mark - Navigation

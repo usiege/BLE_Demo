@@ -13,14 +13,20 @@
 */
 
 @class PeripheralDevice;
-@protocol BleCardHandlerDelegate;
 
-typedef NS_ENUM(NSUInteger,CardOperationState) {
-    CardOperationState_idle,
-    CardOperationState_ReadCorrect = 1,
-    CardOperationState_ReadWrong = 2,
+typedef NS_OPTIONS(NSUInteger,CardOperationState) {
+    CardOperationState_idle = 0,
     
+    CardOperationState_ReadCorrect = 1 << 0, //读卡成功 1
+    CardOperationState_ReadWrong = 1 << 1,   //读卡失败 2
+    
+    CardOperationState_Checkouted = 1 << 2,      //已校验密码 4
+    CardOperationState_Written = 1 << 3,         //数据已写入成功 8
+    CardOperationState_ChangedPass = 1 << 4,     //已修改密码
 };
+
+typedef void (^CardRequestBlock)(NSData* receiveData,CardOperationState state);
+typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state);
 
 @interface BleCardHandler : NSObject
 
@@ -33,22 +39,20 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
  */
 - (instancetype)initWithPeripheralDevice:(PeripheralDevice *)device;
 
-
-@property (nonatomic,weak) id<BleCardHandlerDelegate> delegate;
-
 /**
  *  @brief 卡片发送是否结束
  */
-@property (assign,nonatomic)  BOOL     sendEnded;
+@property (assign,nonatomic)  BOOL  sendEnded;
+
 /**
  *  @brief 卡片操作状态
  */
 @property (nonatomic,assign) CardOperationState currentState;
-/**
- *  @brief 读取的最终完整结果数据
- */
-//@property (nonatomic,strong) NSData* finalData;
 
+/**
+ *  @brief 收到的数据
+ */
+@property (nonatomic,strong,readonly) NSData* receiveData;
 /**
  *  @brief 蓝牙卡对应设备信息
  */
@@ -57,7 +61,8 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
 /**
  *  @brief 开始处理蓝牙卡请求
  */
-- (void)cardRequestWithCommand:(NSString *)command;
+- (void)cardRequestWithCommand:(NSString *)command
+                     completed:(void(^)(NSData* receiveData,CardOperationState state))callback;
 
 /**
  *  @brief 处理卡数据
@@ -71,20 +76,7 @@ typedef NS_ENUM(NSUInteger,CardOperationState) {
  *
  *  @param type
  */
--(void)sendfollow:(int)type;
-@end
-
-
-@protocol BleCardHandlerDelegate <NSObject>
-
-/**
- *  @brief 接收到处理类处理过的数据
- *
- *  @param cardHander 卡片处理对象
- *  @param data       返回的数据
- *  @param state      此时处理的状态
- */
-- (void)bleCardHandler:(BleCardHandler *)cardHander didReceiveData:(NSData *)data state:(CardOperationState)state;
+-(void)sendfollowing:(int)type;
 
 @end
 

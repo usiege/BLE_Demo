@@ -37,7 +37,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     NSDictionary*       _userInfo;
 }
 
-@property (nonatomic,copy) ScoketCallback   sCallback;
+@property (nonatomic,copy)  ScoketCallback   sCallback;
 @property (nonatomic,strong) NSData*        receiveData; //外部接收到的数据
 
 @property (nonatomic,strong) NSTimer*       cancelTimer;
@@ -71,7 +71,7 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 - (void)connectWithData:(NSData *)data userInfo:(NSDictionary *)userInfo completed:(void (^)(NSData *, CardDataType))callback{
     
-    NSData* bleData = [[Bluetooth40Layer currentDisposedDevice] valueForKey:DEVICE_CARD_READED_DATA_KEY];
+    NSData* bleData = [Bluetooth40Layer currentDisposedDevice].readedData;
     if(data == bleData)
         self.receiveData = data;
     
@@ -80,13 +80,15 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     _userInfo = userInfo;
     
     [self connectToHostUseStreamWithIP:self.host port:self.port.intValue data:data];
-    self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+    dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
+        self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+    });
 }
 
 - (void)connectCancelAction:(id)sender{
-    [_outputStream close];
-    [_inputStream close];
     NSLog(@"Socket 连接已超时！");
+    [_cancelTimer invalidate];
+    _cancelTimer = nil;
 }
 
 - (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
@@ -119,12 +121,17 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 
 - (void)stopConnect{
 
+    [self cancelTimer];
+    
     // 从运行循环移除
     [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     // 关闭输入输出流
     [_inputStream close];
     [_outputStream close];
+    
+    _inputStream = nil;
+    _outputStream = nil;
     
     NSLog(@"Socket 连接已断开！");
 }
@@ -143,7 +150,12 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         
         NSMutableString* strIwant = [[NSMutableString alloc] init];
         [strIwant appendString:SINGNAL_WRITEDATA_PRE];
-        [strIwant appendString:@"0000"];//这里需要添加4位，用于显示购气量
+        NSString* amountStr = @"0000";
+        if([_userInfo.allKeys containsObject:METERS_OF_GAS_FOR_SENDING_KEY]){
+            amountStr = [_userInfo valueForKey:METERS_OF_GAS_FOR_SENDING_KEY];
+            
+        }
+        [strIwant appendString:amountStr];//这里需要添加4位，用于显示购气量
         [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
         NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];
         [_outputStream write:dataIwant.bytes maxLength:dataIwant.length];

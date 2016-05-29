@@ -26,16 +26,20 @@
 +(NSString *) parseByteArray2HexString:(Byte[]) bytes;
 
 /*
- 将16进制数据转化成NSData数组
+ 将16进制数据转化成NSData（均可用）
  */
++(NSData*) hexString2Data:(NSString*)hexString;
 +(NSData*) parseHexToByteArray:(NSString*)hexString;
-+(NSData*) stringToByte:(NSString*)hexString;
 
-//NSdata 转成 十六进制
+/*
+ 将NSData转到十六进制
+ */
++ (NSString*) data2HexString:(NSData *)data;
+
+//NSdata 转成 十六进制（可用）
 + (NSString *)convertDataToHexStr:(NSData *)data;
 
 
-+ (NSString*) data2HexString:(NSData *) data;
 //十六进制数据转成字符
 + (NSString *)stringFromHexString:(NSString *)hexString;
 

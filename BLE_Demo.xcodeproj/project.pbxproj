@@ -29,11 +29,13 @@
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 		BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */; };
-		BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */; };
+		BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */; };
+		BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */; };
 		BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */; };
-		BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardModel.m */; };
+		BB1D828A1CF443D900FA1DE7 /* BleCardParser.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82891CF443D900FA1DE7 /* BleCardParser.m */; };
 		BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB2B33B21CF28F0600823C23 /* XFSocketManager.m */; };
 		BB65ED051CEDA612005E4803 /* BleCardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BB65ED041CEDA612005E4803 /* BleCardHandler.m */; };
+		BB6C04AA1CF9A6C50012664C /* MBProgressHUD.m in Sources */ = {isa = PBXBuildFile; fileRef = BB6C04A91CF9A6C50012664C /* MBProgressHUD.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -98,16 +100,21 @@
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
 		BB06E9AB1CEC0DF2000162D6 /* BluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BluetoochManager.h; sourceTree = "<group>"; };
 		BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BluetoochManager.m; sourceTree = "<group>"; };
-		BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LBProgressHUD.h; sourceTree = "<group>"; };
-		BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = LBProgressHUD.m; sourceTree = "<group>"; };
+		BB19C7A51CF7E0ED00907E1F /* HHAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertView.h; sourceTree = "<group>"; };
+		BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHAlertView.m; sourceTree = "<group>"; };
+		BB19C7A71CF7E0ED00907E1F /* HHAlertViewConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertViewConst.h; sourceTree = "<group>"; };
+		BB19C7A81CF7E0ED00907E1F /* UIView+Draw.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIView+Draw.h"; sourceTree = "<group>"; };
+		BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIView+Draw.m"; sourceTree = "<group>"; };
 		BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardInfo.h; sourceTree = "<group>"; };
 		BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardInfo.m; sourceTree = "<group>"; };
-		BB1D82881CF443D900FA1DE7 /* BleCardModel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardModel.h; sourceTree = "<group>"; };
-		BB1D82891CF443D900FA1DE7 /* BleCardModel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardModel.m; sourceTree = "<group>"; };
+		BB1D82881CF443D900FA1DE7 /* BleCardParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardParser.h; sourceTree = "<group>"; };
+		BB1D82891CF443D900FA1DE7 /* BleCardParser.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardParser.m; sourceTree = "<group>"; };
 		BB2B33B11CF28F0600823C23 /* XFSocketManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XFSocketManager.h; sourceTree = "<group>"; };
 		BB2B33B21CF28F0600823C23 /* XFSocketManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = XFSocketManager.m; sourceTree = "<group>"; };
 		BB65ED031CEDA612005E4803 /* BleCardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BleCardHandler.h; sourceTree = "<group>"; };
 		BB65ED041CEDA612005E4803 /* BleCardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BleCardHandler.m; sourceTree = "<group>"; };
+		BB6C04A81CF9A6C50012664C /* MBProgressHUD.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MBProgressHUD.h; sourceTree = "<group>"; };
+		BB6C04A91CF9A6C50012664C /* MBProgressHUD.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MBProgressHUD.m; sourceTree = "<group>"; };
 		ED369344C4E04C54662C66C3 /* libPods-BLE_Demo.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-BLE_Demo.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -262,8 +269,8 @@
 				BB06E9661CEAADA9000162D6 /* NetRefer.h */,
 				BB2B33B11CF28F0600823C23 /* XFSocketManager.h */,
 				BB2B33B21CF28F0600823C23 /* XFSocketManager.m */,
-				BB1D82881CF443D900FA1DE7 /* BleCardModel.h */,
-				BB1D82891CF443D900FA1DE7 /* BleCardModel.m */,
+				BB1D82881CF443D900FA1DE7 /* BleCardParser.h */,
+				BB1D82891CF443D900FA1DE7 /* BleCardParser.m */,
 				BB1D82821CF42C7500FA1DE7 /* BleCardInfo.h */,
 				BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */,
 			);
@@ -288,10 +295,31 @@
 		BB19C7A01CF6E87A00907E1F /* ControlLib */ = {
 			isa = PBXGroup;
 			children = (
-				BB19C7A11CF6E8A500907E1F /* LBProgressHUD.h */,
-				BB19C7A21CF6E8A500907E1F /* LBProgressHUD.m */,
+				BB6C04A71CF9A6C50012664C /* MBProgressHUD */,
+				BB19C7A41CF7E0ED00907E1F /* HHAlertView */,
 			);
 			path = ControlLib;
+			sourceTree = "<group>";
+		};
+		BB19C7A41CF7E0ED00907E1F /* HHAlertView */ = {
+			isa = PBXGroup;
+			children = (
+				BB19C7A51CF7E0ED00907E1F /* HHAlertView.h */,
+				BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */,
+				BB19C7A71CF7E0ED00907E1F /* HHAlertViewConst.h */,
+				BB19C7A81CF7E0ED00907E1F /* UIView+Draw.h */,
+				BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */,
+			);
+			path = HHAlertView;
+			sourceTree = "<group>";
+		};
+		BB6C04A71CF9A6C50012664C /* MBProgressHUD */ = {
+			isa = PBXGroup;
+			children = (
+				BB6C04A81CF9A6C50012664C /* MBProgressHUD.h */,
+				BB6C04A91CF9A6C50012664C /* MBProgressHUD.m */,
+			);
+			path = MBProgressHUD;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -478,10 +506,11 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */,
 				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
 				BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */,
-				BB1D828A1CF443D900FA1DE7 /* BleCardModel.m in Sources */,
+				BB1D828A1CF443D900FA1DE7 /* BleCardParser.m in Sources */,
 				BB06E9701CEAB1D9000162D6 /* PeripheralDevice.m in Sources */,
 				BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */,
 				BB06E9921CEABB0B000162D6 /* WTReParser.m in Sources */,
@@ -490,9 +519,10 @@
 				BB06E97C1CEAB505000162D6 /* desLib.m in Sources */,
 				BB06E9931CEABB0B000162D6 /* WTReTextField.m in Sources */,
 				BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */,
+				BB6C04AA1CF9A6C50012664C /* MBProgressHUD.m in Sources */,
 				BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */,
+				BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */,
 				BB06E9871CEAB7D0000162D6 /* FoundNewPortViewController.m in Sources */,
-				BB19C7A31CF6E8A500907E1F /* LBProgressHUD.m in Sources */,
 				BB06E96D1CEAB1AD000162D6 /* Bluetooth40Layer.m in Sources */,
 				BB06E92F1CEAAD7E000162D6 /* main.m in Sources */,
 				BB06E9891CEAB927000162D6 /* README.md in Sources */,
@@ -648,6 +678,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -664,6 +695,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.xianfeng.BLE-Demo";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				PROVISIONING_PROFILE = "";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};
