@@ -12,7 +12,9 @@
 #import "ConverUtil.h"
 #import "Bluetooth40Layer.h"
 
-#define SINGAL_RECEIVEDATA_SUCCESS @"9000"
+#define SINGAL_RECEIVEDATA_SUCCESS @"9000"   //卡片请求成功
+#define SINGAL_TIMEOUT             @"6F06"   //超时
+
 
 @interface BleCardHandler ()
 {

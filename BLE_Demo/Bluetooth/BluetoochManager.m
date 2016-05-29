@@ -402,7 +402,7 @@ static const NSUInteger STANTARD_CARDDATA_LENGTH = 512; //卡片最长可读写�
                     return;
                 }
                 
-            }]; // end 校验
+            }]; // end 校验请求
             //校验请求后将已状态置为： 已校验，未写入,未更新
             cardHandler.currentState = cardHandler.currentState | CardOperationState_Checkouted;//增加已校验状态
         }// end if
