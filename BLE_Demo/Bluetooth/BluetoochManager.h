@@ -65,6 +65,11 @@
  */
 - (void)writeData:(NSData *)data toPeriphralDevice:(PeripheralDevice *)pDevice;
 
+/**
+ *  @brief 停止连接外围设备
+ */
+- (void)stopConnectPerpheral;
+
 @end
 
 @protocol BluetoochDelegate <NSObject>
@@ -78,23 +83,23 @@
 
 
 /**
- *  @brief <#Description#>
+ *  @brief 蓝牙读到设备数据时
  *
- *  @param manager   <#manager description#>
- *  @param data      <#data description#>
- *  @param device    <#device description#>
- *  @param isSuccess <#isSuccess description#>
+ *  @param manager   蓝牙管理器
+ *  @param data      读取到的数据
+ *  @param device    外围设备
+ *  @param isSuccess 读是否成功
  */
 - (void)bluetoochManager:(BluetoochManager *)manager didEndReadWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess;
 
 
 /**
- *  @brief <#Description#>
+ *  @brief 向外围设备中写数据后
  *
- *  @param manager   <#manager description#>
- *  @param data      <#data description#>
- *  @param device    <#device description#>
- *  @param isSuccess <#isSuccess description#>
+ *  @param manager   蓝牙管理器
+ *  @param data      写数据后的返回结果
+ *  @param device    外围设备
+ *  @param isSuccess 写是否成功
  */
 - (void)bluetoochManager:(BluetoochManager *)manager didEndWriteWithResponseData:(NSData *)data fromDevice:(PeripheralDevice *)device result:(BOOL)isSuccess;
 

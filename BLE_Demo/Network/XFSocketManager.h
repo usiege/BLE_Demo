@@ -10,6 +10,11 @@
 #import "NetRefer.h"
 #import "BleCardInfo.h"
 
+typedef NS_ENUM(NSUInteger,SocketConnectType) {
+    SocketConnectType_Failed,       //连接失败
+    SocketConnectType_Timeout,      //连接超时
+};
+
 @protocol XFSocketDelegate;
 
 static const NSString* METERS_OF_GAS_FOR_SENDING_KEY = @"GasAmount";
@@ -29,10 +34,7 @@ static const NSString* METERS_OF_GAS_FOR_SENDING_KEY = @"GasAmount";
 @end
 
 @protocol XFSocketDelegate <NSObject>
-
-/**
- *  @brief socket可以发送字节
- */
-- (void)socketEventHasSpaceAvailable;
+@optional
+- (void)socket:(XFSocketManager *)manager handleEvent:(SocketConnectType)event;
 
 @end
