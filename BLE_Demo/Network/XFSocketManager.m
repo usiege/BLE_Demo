@@ -163,11 +163,17 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         
         NSMutableString* strIwant = [[NSMutableString alloc] init];
         [strIwant appendString:SINGNAL_WRITEDATA_PRE];
+        
         NSString* amountStr = @"0000";
         if([_userInfo.allKeys containsObject:METERS_OF_GAS_FOR_SENDING_KEY]){
             amountStr = [_userInfo valueForKey:METERS_OF_GAS_FOR_SENDING_KEY];
-        
+            if (amountStr) {
+                //右对齐，共四位，左补0，十六进制
+                amountStr = [NSString stringWithFormat:@"%04x",amountStr.intValue];
+            }
+            if(amountStr.length > 4) return;
         }
+        
         [strIwant appendString:amountStr];//这里需要添加4位，用于显示购气量
         [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
         NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];

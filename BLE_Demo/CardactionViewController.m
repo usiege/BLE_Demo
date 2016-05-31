@@ -151,25 +151,26 @@ HHAlertViewDelegate>
     
     NSLog(@"发送数据到服务器，开始解析");
     dispatch_async(dispatch_get_main_queue(), ^{
-//        self.progress = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
-//        [[XFSocketManager sharedManager] connectWithData:data userInfo:nil completed:^(NSData *responseData,CardDataType type) {
-//            NSLog(@"服务器返回的数据：%@",[ConverUtil convertDataToHexStr:responseData]);
-//            if (responseData) {
-//                BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:responseData dataType:type];
-//                NSLog(@"%@",infoIwish);
-//                
-//                dispatch_async(dispatch_get_main_queue(), ^{
-//                    self.cardname.text = infoIwish.username;
-//                    self.cardnumber.text = infoIwish.userID;
-//                    self.chaxuntime.text = [NSDate date].description;
-//                    self.cardAddr.text = infoIwish.userAddr;
-//                    self.Sendchongzhiaction.enabled = YES;
-//                    [MBProgressHUD hideHUDForView:self.view animated:YES];
-//                });
-//            }
-//            
-//            [[XFSocketManager sharedManager] stopConnect];
-//        }];
+        self.progress = [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+        NSDictionary* userInfo = @{METERS_OF_GAS_FOR_SENDING_KEY:(self.chongzhilab.text?self.chongzhilab.text:@"")};
+        [[XFSocketManager sharedManager] connectWithData:data userInfo:userInfo completed:^(NSData *responseData,CardDataType type) {
+            NSLog(@"服务器返回的数据：%@",[ConverUtil convertDataToHexStr:responseData]);
+            if (responseData) {
+                BleCardInfo* infoIwish = [BleCardParser parseGasCardDataWithReponseData:responseData dataType:type];
+                NSLog(@"%@",infoIwish);
+                
+                dispatch_async(dispatch_get_main_queue(), ^{
+                    self.cardname.text = infoIwish.username;
+                    self.cardnumber.text = infoIwish.userID;
+                    self.chaxuntime.text = [NSDate date].description;
+                    self.cardAddr.text = infoIwish.userAddr;
+                    self.Sendchongzhiaction.enabled = YES;
+                    [MBProgressHUD hideHUDForView:self.view animated:YES];
+                });
+            }
+            
+            [[XFSocketManager sharedManager] stopConnect];
+        }];
     });
 }
 
