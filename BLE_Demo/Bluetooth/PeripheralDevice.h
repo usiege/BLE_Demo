@@ -17,7 +17,7 @@ typedef NS_ENUM(NSUInteger,PeripheralStateType) {
     /**
      *  已连接上
      */
-    PeripheralState_Connected = 1,
+    PeripheralState_Connected = 20,
     /**
      *  未连接
      */
@@ -33,7 +33,7 @@ typedef NS_ENUM(NSUInteger,PeripheralOperationType) {
     /**
      *  燃气卡读操作
      */
-    GasCardOperation_READ = 20,
+    GasCardOperation_READ = 200,
     /**
      *  燃气卡写操作
      */

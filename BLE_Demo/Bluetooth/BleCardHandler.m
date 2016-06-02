@@ -15,6 +15,8 @@
 #define SINGAL_RECEIVEDATA_SUCCESS @"9000"   //卡片请求成功
 #define SINGAL_TIMEOUT             @"6F06"   //超时
 
+typedef void (^CardRequestBlock)(NSData* receiveData,CardOperationState state); //卡片读请求block
+typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); //卡片写请求block
 
 @interface BleCardHandler ()
 {

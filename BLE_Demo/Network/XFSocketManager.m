@@ -21,7 +21,7 @@ typedef void(^ScoketCallback)(NSData* data,CardDataType dataType);
 #define SINGNAL_WRITEDATA_PRE   @"LYGASGS210100010001" //发送写卡数据
 //LYGAS00002016
 
-#define SOCKET_OVERTIME_SECOND      3
+#define SOCKET_OVERTIME_SECOND      3.0
 
 extern NSString* DEVICE_PARSED_DATA_KEY;
 extern NSString* DEVICE_CARD_READED_DATA_KEY;
@@ -37,10 +37,10 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     NSDictionary*       _userInfo;
 }
 
-@property (nonatomic,copy)  ScoketCallback   sCallback;
-@property (nonatomic,strong) NSData*        receiveData; //外部接收到的数据
+@property (nonatomic,copy)   ScoketCallback   sCallback;
+@property (nonatomic,strong) NSData*         receiveData; //外部接收到的数据
 
-@property (nonatomic,strong) NSTimer*       cancelTimer;
+@property (nonatomic,strong) NSTimer*        cancelTimer;
 
 @end
 
@@ -79,16 +79,26 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     
     _userInfo = userInfo;
     
-    [self connectToHostUseStreamWithIP:self.host port:self.port.intValue data:data];
     dispatch_async(dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0), ^{
         self.cancelTimer = [NSTimer scheduledTimerWithTimeInterval:SOCKET_OVERTIME_SECOND target:self selector:@selector(connectCancelAction:) userInfo:nil repeats:NO];
+        [self connectToHostUseStreamWithIP:self.host port:self.port.intValue data:data];
     });
+    
 }
 
 - (void)connectCancelAction:(id)sender{
     NSLog(@"Socket 连接已超时！");
+    
+    //取消超时
     [_cancelTimer invalidate];
     _cancelTimer = nil;
+    
+    //停止连接
+    [self stopConnect];
+    
+    //回调
+    if([self.delegate respondsToSelector:@selector(socket:handleEvent:)])
+        [self.delegate socket:self handleEvent:SocketConnectType_Timeout];
 }
 
 - (void)connectToHostUseStreamWithIP:(NSString *)host port:(int)port data:(NSData *)data{
@@ -107,7 +117,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     _outputStream.delegate = self;
     
     // 把输入输入流添加到运行循环
-    // 不添加主运行循环 代理有可能不工作
     [_inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [_outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     
@@ -120,8 +129,6 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
 }
 
 - (void)stopConnect{
-
-    [self cancelTimer];
     
     // 从运行循环移除
     [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
@@ -132,6 +139,12 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
     
     _inputStream = nil;
     _outputStream = nil;
+    
+    //超时取消
+    [self.cancelTimer invalidate];
+    self.cancelTimer = nil;
+    
+    _sCallback = nil;
     
     NSLog(@"Socket 连接已断开！");
 }
@@ -150,11 +163,17 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
         
         NSMutableString* strIwant = [[NSMutableString alloc] init];
         [strIwant appendString:SINGNAL_WRITEDATA_PRE];
+        
         NSString* amountStr = @"0000";
         if([_userInfo.allKeys containsObject:METERS_OF_GAS_FOR_SENDING_KEY]){
             amountStr = [_userInfo valueForKey:METERS_OF_GAS_FOR_SENDING_KEY];
-            
+            if (amountStr) {
+                //右对齐，共四位，左补0，十六进制
+                amountStr = [NSString stringWithFormat:@"%04x",amountStr.intValue];
+            }
+            if(amountStr.length > 4) return;
         }
+        
         [strIwant appendString:amountStr];//这里需要添加4位，用于显示购气量
         [strIwant appendString:[[NSString alloc] initWithData:self.receiveData encoding:NSUTF8StringEncoding]];
         NSData* dataIwant = [strIwant dataUsingEncoding:NSUTF8StringEncoding];
@@ -211,11 +230,13 @@ extern NSString* DEVICE_CARD_READED_DATA_KEY;
             [self sendDataToSocket];
                 break;
         case NSStreamEventErrorOccurred:
-                NSLog(@"连接出现错误");
+                NSLog(@"socket连接出现错误");
+            [self stopConnect];
+            if([self.delegate respondsToSelector:@selector(socket:handleEvent:)])
+                [self.delegate socket:self handleEvent:SocketConnectType_Failed];
                 break;
         case NSStreamEventEndEncountered:
-                NSLog(@"连接结束");
-     
+                NSLog(@"socket连接结束");
      
         // 从运行循环移除
         [_inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];

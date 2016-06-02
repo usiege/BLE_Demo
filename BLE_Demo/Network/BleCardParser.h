@@ -24,7 +24,7 @@
 + (BleCardInfo *)parseGasCardDataWithReponseData:(NSData *)data dataType:(CardDataType)type;
 
 
-+ (NSString *)parseCheckoutPasswordWithData:(NSData *)data;
-+ (NSString *)parsePasswordNesWithData:(NSData *)data;
+//+ (NSString *)parseCheckoutPasswordWithData:(NSData *)data;
+//+ (NSString *)parsePasswordNesWithData:(NSData *)data;
 
 @end

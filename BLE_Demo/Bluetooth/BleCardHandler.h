@@ -25,8 +25,6 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
     CardOperationState_ChangedPass = 1 << 4,     //已修改密码
 };
 
-typedef void (^CardRequestBlock)(NSData* receiveData,CardOperationState state);
-typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state);
 
 @interface BleCardHandler : NSObject
 
