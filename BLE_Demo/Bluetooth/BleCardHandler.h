@@ -6,10 +6,10 @@
 //  Copyright © 2016年 先锋电子技术. All rights reserved.
 //
 
-#import <Foundation/Foundation.h>
+#import "CardHandler.h"
 
 /*
- 蓝牙卡片的数据读取类，卡片的数据处理过程被封装在此类中
+ 4442蓝牙卡片的数据读取类，卡片的数据处理过程被封装在此类中
 */
 
 @class PeripheralDevice;
@@ -20,13 +20,13 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
     CardOperationState_ReadCorrect = 1 << 0, //读卡成功 1
     CardOperationState_ReadWrong = 1 << 1,   //读卡失败 2
     
-    CardOperationState_Checkouted = 1 << 2,      //已校验密码 4
-    CardOperationState_Written = 1 << 3,         //数据已写入成功 8
-    CardOperationState_ChangedPass = 1 << 4,     //已修改密码
+    CardOperationState_Checkouted = 1 << 2,   //已校验密码 4
+    CardOperationState_Written = 1 << 3,      //数据已写入成功 8
+    CardOperationState_ChangedPass = 1 << 4,  //已修改密码
 };
 
 
-@interface BleCardHandler : NSObject
+@interface BleCardHandler : CardHandler
 
 /**
  *  @brief 创建一个对应外围设备的读卡器
@@ -48,9 +48,10 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
 @property (nonatomic,assign) CardOperationState currentState;
 
 /**
- *  @brief 收到的数据
+ *  @brief 卡片收到的数据
  */
 @property (nonatomic,strong,readonly) NSData* receiveData;
+
 /**
  *  @brief 蓝牙卡对应设备信息
  */
@@ -74,12 +75,6 @@ typedef NS_OPTIONS(NSUInteger,CardOperationState) {
  *
  *  @param type
  */
--(void)sendfollowing:(int)type;
+-(void)sendFollowing:(NSUInteger)type;
 
 @end
-
-
-
-
-
-

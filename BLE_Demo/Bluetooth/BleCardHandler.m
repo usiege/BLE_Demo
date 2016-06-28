@@ -12,6 +12,7 @@
 #import "ConverUtil.h"
 #import "Bluetooth40Layer.h"
 
+
 #define SINGAL_RECEIVEDATA_SUCCESS @"9000"   //卡片请求成功
 #define SINGAL_TIMEOUT             @"6F06"   //超时
 
@@ -25,29 +26,24 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     NSTimer *checkpackge;           //////接受数据包［20字节］超时
     NSTimer *checkfollow;           //////等待正确小数据包接入超时
     
-    bool check15page;               //////收到1015标志
-    int  maxnow;                    //////总包数
-    int  lastcountfill;             ////// 上一个包序号
-    int  outtimecount;              //////超时记述
-    BOOL lostpackge;                ////// 丢包标志
- 
-//    CardRequestCallBack             _cardRequestCallBack;
-    NSData*                         _receiveData;
+    bool check15page_;               //////收到1015标志
+    int  maxnow_;                    //////总包数
+    int  lastcountfill_;             ////// 上一个包序号
+    int  outtimecount_;              //////超时记述
+    BOOL lostpackge_;                ////// 丢包标志
+
 }
 
-@property (assign,nonatomic) int      requesetcount;//////执行第几个指令
-@property (assign,nonatomic) int      actionsort;   //////执行指令类型
 
 @property (copy,nonatomic  )  NSString * requsetnow;
-@property (assign,nonatomic)  int      serial;   //发送的第n个包
-@property (assign,nonatomic)  NSUInteger pagecount;
 
+@property (assign,nonatomic)  NSUInteger    serial;   //发送的第n个包
+@property (assign,nonatomic)  NSUInteger    pagecount;
 
 @property (nonatomic,strong)   NSMutableArray*  dataArr;
 @property (strong,nonatomic)   NSMutableArray*  dataRevArray;
-@property(nonatomic,copy)      NSString*        datastring;
 
-@property (nonatomic,copy)      CardRequestBlock cardRequestCallBack;
+@property (nonatomic,copy)     CardRequestBlock cardRequestCallBack;
 
 @end
 
@@ -57,17 +53,18 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
 - (instancetype)initWithPeripheralDevice:(PeripheralDevice *)device{
     if (self = [super init]) {
         
-        _requesetcount = 1;
-        _actionsort = 12;
         _sendEnded = YES;
         
         _device = device;
+        
         _dataArr = [NSMutableArray array];
         _dataRevArray = [NSMutableArray array];
-
+        _cardRequestCallBack = nil;
     }
     return self;
 }
+
+
 
 - (void)cardRequestWithCommand:(NSString *)command
                      completed:(void(^)(NSData* receiveData,CardOperationState state))callback{
@@ -83,7 +80,7 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     Byte temp1[350]={0};
     
     if(_sendEnded){
-        check15page=NO;
+        check15page_=NO;
         _serial=0;
         _pagecount=0;
         _sendEnded = NO;
@@ -104,10 +101,10 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     length=[valueData length];
     
     temp[0]=0x08;
-    temp[3]=length/256;
-    temp[4]=length%256;
     temp[1]=(length+2)/256;
     temp[2]=(length+2)%256;
+    temp[3]=length/256;
+    temp[4]=length%256;
     
     for(int i=0;i<length;i++){
         temp[i+5]=temp1[i];
@@ -130,7 +127,7 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     NSData * tmp;
     
     printf("pagenum:%ld\n",_pagecount);
-    printf("serial:%d\n",_serial);
+    printf("serial:%ld\n",_serial);
     
     for(int n=0;n<_pagecount;n++){
         
@@ -166,25 +163,14 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
         [_dataArr addObject:tmp];
     }
     
-    printf("进入发送第 %d 包 \n",_serial+1);
+    printf("进入发送第 %lu 包 \n",_serial+1);
     [self sendsmalldata:_dataArr dserial:_serial];
 }
 
 
-///数据发送
--(void)sendsmalldata:(NSMutableArray*)data dserial:(int)dserial{
-    NSLog(@"获取数组 %d",dserial);
-    NSData *mydata = [data objectAtIndex:dserial];
-    NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
+-(void)sendFollowing:(NSUInteger)type{
     
-//    BOOL sendResult = NO;
-    Bluetooth40Layer* _sharedBleLayer = [Bluetooth40Layer sharedInstance];
-    [_sharedBleLayer sendData:mydata toDevice:[Bluetooth40Layer currentDisposedDevice]];
-}
-
-
--(void)sendfollowing:(int)type{
-    printf(" sendfollow 正在发送第 %d包...\n",_serial+1);
+    printf(" sendfollow 正在发送第 %lu包...\n",_serial+1);
     if(type==0){
         [self sendsmalldata:_dataArr dserial:_serial];
     }else{
@@ -199,24 +185,35 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     }
 }
 
+///数据发送
+-(void)sendsmalldata:(NSMutableArray*)data dserial:(NSUInteger)dserial{
+    
+    NSLog(@"获取数组 %lu",dserial);
+    NSData *mydata = [data objectAtIndex:dserial];
+    NSLog(@"send:%@ Length:%lu",mydata,mydata.length);
+    
+    [self sendData:mydata];
+}
 
 
 //////数据接收处理
 -(void)dataProcessing:(NSData*)data{
     
+    //卡片当前收到的数据
     _receiveData=data;
+    
     if (data.length>=2 && ([[ConverUtil data2HexString:data] hasPrefix:@"1015"])) {
         NSLog(@"接收到1015报文\n");
-        check15page = YES;
+        check15page_ = YES;
         // 关闭1015定时器
         if(check15Timer != nil){
             [check15Timer invalidate];
             check15Timer = nil;
         }
-        maxnow = 0 ;
-        lastcountfill = 0;
+        maxnow_ = 0 ;
+        lastcountfill_ = 0;
         
-        outtimecount=0;
+        outtimecount_=0;
         [_dataRevArray removeAllObjects];
         
         // 开启接受数据等待定时器
@@ -229,21 +226,22 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
         });
         return;
     }
-    else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])|| [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
-        
-        
+    else if (( [[ConverUtil data2HexString:data] hasPrefix:(@"1011")])
+             ||( [[ConverUtil data2HexString:data] hasPrefix:(@"1012")])
+             ||( [[ConverUtil data2HexString:data] hasPrefix:(@"1014")])
+             || [[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)] isEqual:@"012"]){
         NSLog(@"接收到正确结尾报文\n");
         
-        check15page = YES;
+        check15page_ = YES;
         // 关闭1015定时器
         if(check15Timer != nil){
             [check15Timer invalidate];
             check15Timer = nil;
         }
-        maxnow = 0 ;
-        lastcountfill = 0;
+        maxnow_ = 0 ;
+        lastcountfill_ = 0;
         
-        outtimecount=0;
+        outtimecount_=0;
         [_dataRevArray removeAllObjects];
         
         // 开启接受数据等待定时器
@@ -258,118 +256,127 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     
     NSLog(@"datawith =%@",[[ConverUtil data2HexString:data] substringWithRange:NSMakeRange(1, 3)]);
     
-    if(check15page){
-        /////收到recive关闭定时
+    if(check15page_){
+        [self receiveCheck15PageEventWithData:data];
+    }
+    
+}
+
+//接收到正确报文
+- (void)receiveCheck15PageEventWithData:(NSData *)data{
+    
+    /////收到recive关闭定时
+    if(checkrecive != nil){
+        [checkrecive invalidate];
+        checkrecive = nil;
+        outtimecount_ = 0;
+    }
+    
+    //////收到数据包关闭等待packge;
+    if(checkpackge !=nil){
+        [checkpackge invalidate];
+        checkpackge = nil;
+        outtimecount_ = 0;
+    }
+    
+    Byte tempValue[20] = {0};
+    [data getBytes:tempValue length:data.length];
+    
+    int max = tempValue[0]>>4;
+    int current = tempValue[0]&0x0F; //00001111
+    
+    /////丢包状态，等待正确包接入
+    if(lostpackge_ && current!=(lastcountfill_+1)){
+        return;
+    }
+    else{
+        ///////正确包接入，取消时钟
+        if(checkfollow!=nil){
+            [checkfollow invalidate];
+            checkfollow = nil;
+        }
+        lostpackge_ = NO;
+    }
+    
+    /////判断第一个包是否丢失
+    if([_dataRevArray count] == 0 && current!=0){
+        NSLog(@"第一个数据包丢失\n");
+        [self ErrorRecovery:0];
+        //            lostpackge = YES;
+        return;
+    }
+    
+    //////记录第一个数据，
+    if ([_dataRevArray count] == 0 && current==0){
+        maxnow_ = max;
+        lastcountfill_ = current;
+        
+    }
+    else{
+        ////////重复包丢弃
+        if(current<=lastcountfill_){
+            NSLog(@"重复包丢弃\n");
+            return;
+        }
+        
+        //////判断中间是否有丢包
+        if((current-lastcountfill_)>1){
+            NSLog(@"第%d个包丢失\n",lastcountfill_+2);
+            [self ErrorRecovery:lastcountfill_+1];
+            lostpackge_ = YES;
+            return;
+        }
+        
+        ////判断最后一个包是否丢失
+        if([_dataRevArray count]!=0 && maxnow_!=max){
+            NSLog(@"最后一个包丢失\n");
+            return;
+        }
+        lastcountfill_ = current;
+    }
+    
+    if(current == maxnow_-1){
+        [_dataRevArray addObject:data];
+        
+        /**
+         *  @brief 卡片返回的结果
+         */
+        NSString* dataString = @"";
+        for (int i=0; i<[_dataRevArray count]; i++) {
+            if (i == 0) {
+                dataString =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
+            }
+            else{
+                dataString = [dataString stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
+            }
+        }
+        
+        NSLog(@"接收到的有效数据:%@\n",dataString);
+        [_dataRevArray removeAllObjects];
+        
+        NSLog(@"燃气卡片数据请求结束...");
+        
+        //5月25日修改，用于读写燃气卡片结束处理
+        [self gasCardActionWithString:dataString];
+        
+        
+        check15page_ = NO;
         if(checkrecive != nil){
             [checkrecive invalidate];
-            checkrecive = nil;
-            outtimecount = 0;
+            checkrecive=nil;
         }
-        
-        //////收到数据包关闭等待packge;
-        if(checkpackge !=nil){
-            [checkpackge invalidate];
-            checkpackge = nil;
-            outtimecount = 0;
+        if(check15Timer != nil){
+            [check15Timer invalidate];
+            check15Timer=nil;
         }
-        
-        Byte tempValue[20] = {0};
-        [data getBytes:tempValue length:data.length];
-        
-        int max = tempValue[0]>>4;
-        int current = tempValue[0]&0x0F;
-        /////丢包状态，等待正确包接入
-        if(lostpackge && current!=(lastcountfill+1)){
-            return;
-        }
-        else{
-            
-            ///////正确包接入，取消时钟
-            if(checkfollow!=nil){
-                [checkfollow invalidate];
-                checkfollow = nil;
-            }
-            lostpackge = NO;
-        }
-        
-        /////判断第一个包是否丢失
-        if([_dataRevArray count] == 0 && current!=0){
-            NSLog(@"第一个数据包丢失\n");
-            [self ErrorRecovery:0];
-            //            lostpackge = YES;
-            return;
-        }
-        
-        //////记录第一个数据，
-        if ([_dataRevArray count] == 0 && current==0){
-            maxnow = max;
-            lastcountfill = current;
-            
-        }
-        else{
-            ////////重复包丢弃
-            if(current<=lastcountfill){
-                NSLog(@"重复包丢弃\n");
-                return;
-            }
-            
-            //////判断中间是否有丢包
-            if((current-lastcountfill)>1){
-                NSLog(@"第%d个包丢失\n",lastcountfill+2);
-                [self ErrorRecovery:lastcountfill+1];
-                lostpackge = YES;
-                return;
-            }
-            
-            ////判断最后一个包是否丢失
-            if([_dataRevArray count]!=0 && maxnow!=max){
-                NSLog(@"最后一个包丢失\n");
-                return;
-            }
-            lastcountfill = current;
-        }
-        
-        if(current == maxnow-1){
-            [_dataRevArray addObject:data];
-            for (int i=0; i<[_dataRevArray count]; i++) {
-                if (i == 0) {
-                    _datastring =[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:12];
-                }
-                else{
-                    _datastring = [_datastring stringByAppendingString:[[ConverUtil data2HexString:[_dataRevArray objectAtIndex:i]] substringFromIndex:2]];
-                }
-            }
-            
-            NSLog(@"接收到的有效数据:%@\n",_datastring);
-            [_dataRevArray removeAllObjects];
-            
-            if(_actionsort == 12){
-                NSLog(@"燃气卡片数据请求结束...");
-                
-                //5月25日修改，用于读写燃气卡片结束处理
-                [self gasCardAction];
-            }
-            
-            
-            check15page = NO;
-            if(checkrecive != nil){
-                [checkrecive invalidate];
-                checkrecive=nil;
-            }
-            if(check15Timer != nil){
-                [check15Timer invalidate];
-                check15Timer=nil;
-            }
-            
-            return;
-        }
-        
-        [_dataRevArray addObject:data];
-        ///////开启小包等待超时200ms
-        dispatch_async(dispatch_get_main_queue(), ^{
-            checkrecive = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(CheckpackgeSelector:) userInfo:nil repeats:NO];
-        });
+        return;
     }
+    
+    [_dataRevArray addObject:data];
+    ///////开启小包等待超时200ms
+    dispatch_async(dispatch_get_main_queue(), ^{
+        checkrecive = [NSTimer scheduledTimerWithTimeInterval:0.5 target:self selector:@selector(CheckpackgeSelector:) userInfo:nil repeats:NO];
+    });
 }
 
 -(void)ErrorRecovery:(int)ErrorSerial{
@@ -383,7 +390,7 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
     NSLog(@"纠错包：%@\n",[ConverUtil data2HexString:mydata]);
     
     //发送纠错包
-    [[Bluetooth40Layer sharedInstance] sendData:mydata toDevice:_device];
+    [self sendData:mydata];
 }
 
 
@@ -394,47 +401,51 @@ typedef void (^CardWrittenBlock)(NSData* receiveData,CardOperationState state); 
 
 /////等待接受packge超时///////
 -(void)CheckpackgeSelector:(id)sender{
-    NSLog(@"等待第%d个包超时\n",lastcountfill+2);
-    [self ErrorRecovery:lastcountfill+1];
+    NSLog(@"等待第%d个包超时\n",lastcountfill_+2);
+    [self ErrorRecovery:lastcountfill_+1];
 }
 
 #pragma mark 李中欢-----接收到结果数据
 
-- (NSData *)receiveData{
-    return _receiveData;
+//向蓝牙设备中写入数据
+- (void)sendData:(NSData *)data{
+    [[Bluetooth40Layer sharedInstance] sendData:data toDevice:_device];
 }
 
 
-- (void)gasCardAction{
+//燃气卡结果处理
+- (void)gasCardActionWithString:(NSString *)cardRevData{
+    
+    NSData* receiveData = [NSData data];
     
     if (_device.operationType == GasCardOperation_READ) {
         //接收到卡片回传数据 “9000”为成功
-        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+        if([cardRevData hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
             _currentState = CardOperationState_ReadCorrect;
             //处理返回的数据
-            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:cardRevData];
             [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
-            _datastring = outstring;
-            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+            cardRevData = outstring;
+            receiveData = [cardRevData dataUsingEncoding:NSUTF8StringEncoding];
         }else{
             _currentState = CardOperationState_ReadWrong;
-            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];;
+            receiveData = [cardRevData dataUsingEncoding:NSUTF8StringEncoding];;
         }
     }else if (_device.operationType == GasCardOperation_WRITE){
-        if([_datastring hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
+        if([cardRevData hasSuffix:SINGAL_RECEIVEDATA_SUCCESS]){
             self.currentState = self.currentState | CardOperationState_ReadCorrect;
             //处理返回的数据
-            NSMutableString* outstring = [[NSMutableString alloc] initWithString:_datastring];
+            NSMutableString* outstring = [[NSMutableString alloc] initWithString:cardRevData];
             [outstring replaceCharactersInRange:[outstring rangeOfString:SINGAL_RECEIVEDATA_SUCCESS] withString:@""];
-            _datastring = outstring;
-            _receiveData = [_datastring dataUsingEncoding:NSUTF8StringEncoding];
+            cardRevData = outstring;
+            receiveData = [cardRevData dataUsingEncoding:NSUTF8StringEncoding];
         }else{
             self.currentState = self.currentState & (~CardOperationState_ReadCorrect);
         }
     }
     
     if(self.cardRequestCallBack){
-        self.cardRequestCallBack(_receiveData,self.currentState);
+        self.cardRequestCallBack(receiveData,self.currentState);
 //        self.cardRequestCallBack = nil;
     }
 }

@@ -29,6 +29,7 @@
 		BB06E9961CEABC28000162D6 /* RegExCategories.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9951CEABC28000162D6 /* RegExCategories.m */; };
 		BB06E9991CEAE893000162D6 /* BusInitInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB06E9981CEAE893000162D6 /* BusInitInfo.plist */; };
 		BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */ = {isa = PBXBuildFile; fileRef = BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */; };
+		BB12CC991D12812700563F21 /* CardHandler.m in Sources */ = {isa = PBXBuildFile; fileRef = BB12CC981D12812700563F21 /* CardHandler.m */; };
 		BB19C7AA1CF7E0ED00907E1F /* HHAlertView.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */; };
 		BB19C7AB1CF7E0ED00907E1F /* UIView+Draw.m in Sources */ = {isa = PBXBuildFile; fileRef = BB19C7A91CF7E0ED00907E1F /* UIView+Draw.m */; };
 		BB1D82841CF42C7500FA1DE7 /* BleCardInfo.m in Sources */ = {isa = PBXBuildFile; fileRef = BB1D82831CF42C7500FA1DE7 /* BleCardInfo.m */; };
@@ -100,6 +101,9 @@
 		BB06E9981CEAE893000162D6 /* BusInitInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = BusInitInfo.plist; sourceTree = "<group>"; };
 		BB06E9AB1CEC0DF2000162D6 /* BluetoochManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BluetoochManager.h; sourceTree = "<group>"; };
 		BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BluetoochManager.m; sourceTree = "<group>"; };
+		BB12CC971D12812700563F21 /* CardHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CardHandler.h; sourceTree = "<group>"; };
+		BB12CC981D12812700563F21 /* CardHandler.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CardHandler.m; sourceTree = "<group>"; };
+		BB12CC9B1D12861200563F21 /* PrefixHeader.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PrefixHeader.pch; sourceTree = "<group>"; };
 		BB19C7A51CF7E0ED00907E1F /* HHAlertView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertView.h; sourceTree = "<group>"; };
 		BB19C7A61CF7E0ED00907E1F /* HHAlertView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HHAlertView.m; sourceTree = "<group>"; };
 		BB19C7A71CF7E0ED00907E1F /* HHAlertViewConst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HHAlertViewConst.h; sourceTree = "<group>"; };
@@ -187,8 +191,7 @@
 		BB06E92C1CEAAD7E000162D6 /* BLE_Demo */ = {
 			isa = PBXGroup;
 			children = (
-				BB06E9391CEAAD7F000162D6 /* Main.storyboard */,
-				BB06E93E1CEAAD7F000162D6 /* LaunchScreen.storyboard */,
+				BB06E9721CEAB298000162D6 /* common.h */,
 				BB06E9301CEAAD7E000162D6 /* AppDelegate.h */,
 				BB06E9311CEAAD7E000162D6 /* AppDelegate.m */,
 				BB06E9831CEAB7D0000162D6 /* FoundNewPortViewController.h */,
@@ -196,7 +199,6 @@
 				BB06E9801CEAB7D0000162D6 /* CardactionViewController.h */,
 				BB06E9811CEAB7D0000162D6 /* CardactionViewController.m */,
 				BB06E9821CEAB7D0000162D6 /* CardactionViewController.xib */,
-				BB06E9721CEAB298000162D6 /* common.h */,
 				BB19C7A01CF6E87A00907E1F /* ControlLib */,
 				BB06E9651CEAADA9000162D6 /* Network */,
 				BB06E9631CEAADA9000162D6 /* Bluetooth */,
@@ -210,6 +212,9 @@
 		BB06E92D1CEAAD7E000162D6 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				BB12CC9B1D12861200563F21 /* PrefixHeader.pch */,
+				BB06E9391CEAAD7F000162D6 /* Main.storyboard */,
+				BB06E93E1CEAAD7F000162D6 /* LaunchScreen.storyboard */,
 				BB06E93C1CEAAD7F000162D6 /* Assets.xcassets */,
 				BB06E9411CEAAD7F000162D6 /* Info.plist */,
 				BB06E92E1CEAAD7E000162D6 /* main.m */,
@@ -245,10 +250,9 @@
 				BB06E9AC1CEC0DF2000162D6 /* BluetoochManager.m */,
 				BB06E96B1CEAB1AD000162D6 /* Bluetooth40Layer.h */,
 				BB06E96C1CEAB1AD000162D6 /* Bluetooth40Layer.m */,
-				BB65ED031CEDA612005E4803 /* BleCardHandler.h */,
-				BB65ED041CEDA612005E4803 /* BleCardHandler.m */,
 				BB06E96E1CEAB1D9000162D6 /* PeripheralDevice.h */,
 				BB06E96F1CEAB1D9000162D6 /* PeripheralDevice.m */,
+				BB12CC961D12800D00563F21 /* CardProxy */,
 			);
 			path = Bluetooth;
 			sourceTree = "<group>";
@@ -290,6 +294,17 @@
 				BB06E9741CEAB312000162D6 /* ConverUtil.m */,
 			);
 			path = UserLib;
+			sourceTree = "<group>";
+		};
+		BB12CC961D12800D00563F21 /* CardProxy */ = {
+			isa = PBXGroup;
+			children = (
+				BB12CC971D12812700563F21 /* CardHandler.h */,
+				BB12CC981D12812700563F21 /* CardHandler.m */,
+				BB65ED031CEDA612005E4803 /* BleCardHandler.h */,
+				BB65ED041CEDA612005E4803 /* BleCardHandler.m */,
+			);
+			name = CardProxy;
 			sourceTree = "<group>";
 		};
 		BB19C7A01CF6E87A00907E1F /* ControlLib */ = {
@@ -510,6 +525,7 @@
 				BB06E9781CEAB343000162D6 /* Alg3DES.m in Sources */,
 				BB06E9321CEAAD7E000162D6 /* AppDelegate.m in Sources */,
 				BB2B33B31CF28F0600823C23 /* XFSocketManager.m in Sources */,
+				BB12CC991D12812700563F21 /* CardHandler.m in Sources */,
 				BB1D828A1CF443D900FA1DE7 /* BleCardParser.m in Sources */,
 				BB06E9701CEAB1D9000162D6 /* PeripheralDevice.m in Sources */,
 				BB06E9AD1CEC0DF2000162D6 /* BluetoochManager.m in Sources */,
@@ -672,6 +688,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(PROJECT)/PrefixHeader.pch";
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -689,6 +708,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+				GCC_INCREASE_PRECOMPILED_HEADER_SHARING = NO;
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = "$(PROJECT)/PrefixHeader.pch";
 				INFOPLIST_FILE = BLE_Demo/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 7.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

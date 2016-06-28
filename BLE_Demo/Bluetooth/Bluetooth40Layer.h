@@ -56,10 +56,7 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
  */
 
 @interface Bluetooth40Layer : NSObject 
-{
-    int count;
-    int pagecou;
-}
+
 
 @property (nonatomic,assign)        id<Bluetooth40LayerDelegate>    delegate;
 @property (nonatomic,assign)        BT40LayerStateTypeDef state;    //蓝牙连接的状态
@@ -183,8 +180,3 @@ typedef NS_ENUM(NSInteger, BT40LayerStateTypeDef) {
 
 
 @end
-
-
-
-
-

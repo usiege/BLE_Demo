@@ -408,7 +408,7 @@ static const NSUInteger STANTARD_CARDDATA_LENGTH = 512; //卡片最长可读写�
                             //不成功则状态置为： 已写入,已更新
                             cardHandler.currentState = cardHandler.currentState | CardOperationState_ChangedPass;
                             [self stopConnectPeriphralDevice:device];
-                            [self delegateActionWithData:cardHandler.receiveData device:device state:state operationType:GasCardOperation_WRITE];
+                            [self delegateActionWithData:receiveData device:device state:state operationType:GasCardOperation_WRITE];
                             return;
                         }
                         
@@ -433,7 +433,7 @@ static const NSUInteger STANTARD_CARDDATA_LENGTH = 512; //卡片最长可读写�
     }
 }
 
-//蓝牙向外围设备写入成功！
+//蓝牙向外围设备写入结果
 - (void)bluetoochLayer:(Bluetooth40Layer *)bluetoochLayer didWriteDataPeripheralDevice:(PeripheralDevice *)pDevice error:(NSError *)error{
     
     if (error) {
