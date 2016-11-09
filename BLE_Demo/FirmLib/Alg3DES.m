@@ -1,5 +1,5 @@
 // ALG3DES.cpp : Defines the entry point for the console application.
-
+#if 0
 
 #include "stdio.h"
 #include "string.h"
@@ -237,4 +237,4 @@ void _DES(unsigned char* dataOut, unsigned char* srcData, unsigned char* keyBuff
 
 }
 
-
+#endif

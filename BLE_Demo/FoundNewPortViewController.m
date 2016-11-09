@@ -6,8 +6,8 @@
 //  Copyright (c) 2014 BDE. All rights reserved.
 //
 
-#import "FoundNewPortViewController.h"
 #import <QuartzCore/CALayer.h>
+#import "FoundNewPortViewController.h"
 #import "CardactionViewController.h"
 
 #import "BluetoochManager.h"
@@ -24,9 +24,9 @@ static NSString* RIGHT_BUTTON_STATE_STOP = @"停止";
     
     
     NSString* rButtonState;
-    
-//    BLEManageController *_bleController;
     BluetoochManager*  _bleManager;
+//    BLEManageController *_bleController;
+    
 }
 @property (strong,nonatomic) UITableView *foundDevicesTableView;
 @property (strong,nonatomic) UIActivityIndicatorView* aInView;

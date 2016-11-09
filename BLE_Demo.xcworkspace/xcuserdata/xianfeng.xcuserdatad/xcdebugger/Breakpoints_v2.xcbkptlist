@@ -16,7 +16,7 @@
             startingLineNumber = "231"
             endingLineNumber = "231"
             landmarkName = "-stream:handleEvent:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -48,7 +48,7 @@
             startingLineNumber = "145"
             endingLineNumber = "145"
             landmarkName = "-startConnectWithDevice:completed:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
@@ -64,7 +64,7 @@
             startingLineNumber = "92"
             endingLineNumber = "92"
             landmarkName = "-Bluechaxun:"
-            landmarkType = "5">
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

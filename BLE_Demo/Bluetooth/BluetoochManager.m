@@ -35,9 +35,9 @@ static const NSUInteger STANTARD_CARDDATA_LENGTH = 512; //卡片最长可读写�
 }
 
 @property (nonatomic,strong)    NSMutableData*      readResultData;     //读卡后的结果
-//@property (nonatomic,strong)    NSData*             writeData;          //要写入卡的数据
 
-//@property (nonatomic,copy)      CardWrittenBlock     cardWrttenCallBack;
+//@property (nonatomic,strong)    NSData*               writeData;          //要写入卡的数据
+//@property (nonatomic,copy)      CardWrittenBlock      cardWrttenCallBack;
 
 @end
 

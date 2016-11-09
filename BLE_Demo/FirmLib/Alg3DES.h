@@ -1,4 +1,5 @@
 
+#if 0
 
 #define BYTE unsigned char
 
@@ -33,3 +34,4 @@ void generateMac(unsigned char *resultBuf, unsigned char *MAC, unsigned char* ma
 /////1   2   16  16
 void generateSessionKey(unsigned char *sequenceBuf, unsigned char *sesKey, unsigned char *macKey);
 
+#endif
